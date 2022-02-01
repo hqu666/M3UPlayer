@@ -8,10 +8,6 @@ using System.Text;
 using System.Windows.Controls;
 //using System.Windows.Forms;
 
-//using Livet;
-//using Livet.Commands;
-//using Livet.Messaging;
-
 using M3UPlayer.Views;
 //using ShockwaveFlashObjects;
 
@@ -35,6 +31,8 @@ using ContextMenu = System.Windows.Controls.ContextMenu;
 using MenuItem = System.Windows.Controls.MenuItem;
 using System.Windows.Threading;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using Microsoft.Azure.Cosmos.Core.Collections;
 //using AxShockwaveFlashObjects;
 
 namespace M3UPlayer.ViewModels
@@ -44,7 +42,7 @@ namespace M3UPlayer.ViewModels
 		/// <summary>
 		/// WindowsMediaPlayerのコントローラ
 		/// </summary>
-		public PlayerWFCL.WMPControl axWmp;
+		//public PlayerWFCL.WMPControl axWmp;
 
 		/// <summary>
 		/// プレイリスト本体
@@ -66,6 +64,11 @@ namespace M3UPlayer.ViewModels
 				_DurationStr = value;
 				RaisePropertyChanged();
 			}
+		}
+
+		private void RaisePropertyChanged()
+		{
+			throw new NotImplementedException();
 		}
 
 		private double _SliderMaximum;
@@ -108,11 +111,11 @@ namespace M3UPlayer.ViewModels
 				if (_SliderValue == value)
 					return;
 				_SliderValue = value;
-				if (axWmp != null) {
-					_timer.Stop();
-					axWmp.SetPlayPosition(value);
-					_timer.Start();
-				}
+				//if (axWmp != null) {
+				//	_timer.Stop();
+				//	axWmp.SetPlayPosition(value);
+				//	_timer.Start();
+				//}
 				RaisePropertyChanged();
 			}
 		}
@@ -141,9 +144,9 @@ namespace M3UPlayer.ViewModels
 				if (_SoundValue == value)
 					return;
 				_SoundValue = value;
-				if (axWmp != null) {
-					axWmp.SetVolume(value);
-				}
+				//if (axWmp != null) {
+				//	axWmp.SetVolume(value);
+				//}
 				RaisePropertyChanged();
 			}
 		}
@@ -419,6 +422,11 @@ namespace M3UPlayer.ViewModels
             }
 
         }
+
+		private void RaisePropertyChanged(string v)
+		{
+			throw new NotImplementedException();
+		}
 
 		/// <summary>
 		/// 動画ファイルのURLからプレイリスト1行分を作成
@@ -944,7 +952,7 @@ namespace M3UPlayer.ViewModels
 			string TAG = "PlayListToPlayer";
 			string dbMsg = "";
 			try {
-				axWmp = null;
+				//axWmp = null;
 				dbMsg += "targetItem=" + targetItem.Summary;
 				if (MyView != null) {
 					if (0 < MyView.FrameGrid.Children.Count) {
@@ -967,64 +975,64 @@ namespace M3UPlayer.ViewModels
 					Frame frame = new Frame();
 					dbMsg += "、Web=" + toWeb;
 					if (toWeb) {
-						WebViewModel WVM = new WebViewModel();
-						WVM.TargetURLStr = targetURLStr;
-						WVM.TargeStr = targetURLStr;
-						WebPage WP =new WebPage();                  //Page
-						WP.DataContext = WVM;
-						frame.Navigate(WP);
-						MyView.FrameGrid.Children.Add(frame);
+						//WebViewModel WVM = new WebViewModel();
+						//WVM.TargetURLStr = targetURLStr;
+						//WVM.TargeStr = targetURLStr;
+						//WebPage WP =new WebPage();                  //Page
+						//WP.DataContext = WVM;
+						//frame.Navigate(WP);
+						//MyView.FrameGrid.Children.Add(frame);
 					} else if(-1 < Array.IndexOf(FlashVideo, extention)) {
-						// Create the interop host control.
-						System.Windows.Forms.Integration.WindowsFormsHost host =
-							new System.Windows.Forms.Integration.WindowsFormsHost();
+						//// Create the interop host control.
+						//System.Windows.Forms.Integration.WindowsFormsHost host =
+						//	new System.Windows.Forms.Integration.WindowsFormsHost();
 
-						// Create the ActiveX control.
-						PlayerWFCL.FlushControl axFLP = new PlayerWFCL.FlushControl(targetURLStr);
+						//// Create the ActiveX control.
+						//PlayerWFCL.FlushControl axFLP = new PlayerWFCL.FlushControl(targetURLStr);
 						// Assign the ActiveX control as the host control's child.
-						host.Child = axFLP;
+					//	host.Child = axFLP;
 
-						// Add the interop host control to the Grid
-						// control's collection of child controls.
-						MyView.FrameGrid.Children.Add(host);
+					//	// Add the interop host control to the Grid
+					//	// control's collection of child controls.
+					//	MyView.FrameGrid.Children.Add(host);
 
-					//	//		axFLP.InitAxShockwaveFlash();
-					//	axFLP.AddURl(targetURLStr);
+					////	//		axFLP.InitAxShockwaveFlash();
+					////	axFLP.AddURl(targetURLStr);
 
 
-						if (axFLP.SFPlayer != null) {
-						} else {
-							dbMsg += ">>FlushControl生成できず";
-						}
+					//	//if (axFLP.SFPlayer != null) {
+					//	//} else {
+					//	//	dbMsg += ">>FlushControl生成できず";
+					//	//}
 
 					} else {
-						// Create the interop host control.
-						System.Windows.Forms.Integration.WindowsFormsHost host =
-							new System.Windows.Forms.Integration.WindowsFormsHost();
+						//// Create the interop host control.
+						//System.Windows.Forms.Integration.WindowsFormsHost host =
+						//	new System.Windows.Forms.Integration.WindowsFormsHost();
 
-						// Create the ActiveX control.
-						axWmp = new PlayerWFCL.WMPControl(targetURLStr);
+						//// Create the ActiveX control.
+						//axWmp = new PlayerWFCL.WMPControl(targetURLStr);
 
-						// Assign the ActiveX control as the host control's child.
-						host.Child = axWmp;
+						//// Assign the ActiveX control as the host control's child.
+						//host.Child = axWmp;
 
-						// Add the interop host control to the Grid
-						// control's collection of child controls.
-						MyView.FrameGrid.Children.Add(host);
-						axWmp.ReSizeContlor((int)MyView.FrameGrid.Width , (int)MyView.FrameGrid.Height);
-						// Play a .wav file with the ActiveX control.
-						axWmp.AddURl(targetURLStr);
-						double playPosition = axWmp.GetPlayPosition();
-						DurationStr = "00:00:00";
-						double playDuration = axWmp.GetDuration();
-						if (0 < playDuration) {
-							TimeSpan span = new TimeSpan(0, 0, (int)playDuration);
-							DurationStr = span.ToString("HH:mm:ss");
-						}
-						RaisePropertyChanged("DurationStr");
-						SetupTimer();
-						// player = axWmp.GetPlayer();
-						//player.currentMedia.
+						//// Add the interop host control to the Grid
+						//// control's collection of child controls.
+						//MyView.FrameGrid.Children.Add(host);
+						//axWmp.ReSizeContlor((int)MyView.FrameGrid.Width , (int)MyView.FrameGrid.Height);
+						//// Play a .wav file with the ActiveX control.
+						//axWmp.AddURl(targetURLStr);
+						//double playPosition = axWmp.GetPlayPosition();
+						//DurationStr = "00:00:00";
+						//double playDuration = axWmp.GetDuration();
+						//if (0 < playDuration) {
+						//	TimeSpan span = new TimeSpan(0, 0, (int)playDuration);
+						//	DurationStr = span.ToString("HH:mm:ss");
+						//}
+						//RaisePropertyChanged("DurationStr");
+						//SetupTimer();
+						//// player = axWmp.GetPlayer();
+						////player.currentMedia.
 					}
 				} else {
 					dbMsg += ">>MyView == null";
@@ -1040,36 +1048,36 @@ namespace M3UPlayer.ViewModels
 			string TAG = "MyTimerMethod";
 			string dbMsg = "";
 			try {
-				if (axWmp != null) {
-					this.IsPlaying = axWmp.IsPlaying;
-					dbMsg += ":IsPlaying=" + IsPlaying;
-					double position = axWmp.GetPlayPosition();
-					SliderMaximum = axWmp.GetDuration();
-					dbMsg += "," + position;
-					if (0 < position) {
-						TimeSpan span = new TimeSpan(0, 0, (int)position);
-						this.PositionStr = span.ToString(@"hh\:mm\:ss");
-						if (position < 1) {
-							SliderMaximum = axWmp.GetDuration();
-							dbMsg +=  " / " + SliderMaximum ;
-							span = new TimeSpan(0, 0, (int)SliderMaximum);
-							this.DurationStr = span.ToString(@"hh\:mm\:ss");
-						}
-						SliderValue = position;
-					} else {
-						this.DurationStr ="00:00:00";
-						this.PositionStr = "00:00:00";
-					}
-					dbMsg += ",>>" + PositionStr + " / " + DurationStr;
-					SoundValue = axWmp.GetVolume();
-					dbMsg += "," + SoundValue;
-					if (SoundValue == 0) {
-						IsMute = true;
-					} else {
-						IsMute = false;
-					}
+				//if (axWmp != null) {
+				//	this.IsPlaying = axWmp.IsPlaying;
+				//	dbMsg += ":IsPlaying=" + IsPlaying;
+				//	double position = axWmp.GetPlayPosition();
+				//	SliderMaximum = axWmp.GetDuration();
+				//	dbMsg += "," + position;
+				//	if (0 < position) {
+				//		TimeSpan span = new TimeSpan(0, 0, (int)position);
+				//		this.PositionStr = span.ToString(@"hh\:mm\:ss");
+				//		if (position < 1) {
+				//			SliderMaximum = axWmp.GetDuration();
+				//			dbMsg +=  " / " + SliderMaximum ;
+				//			span = new TimeSpan(0, 0, (int)SliderMaximum);
+				//			this.DurationStr = span.ToString(@"hh\:mm\:ss");
+				//		}
+				//		SliderValue = position;
+				//	} else {
+				//		this.DurationStr ="00:00:00";
+				//		this.PositionStr = "00:00:00";
+				//	}
+				//	dbMsg += ",>>" + PositionStr + " / " + DurationStr;
+				//	SoundValue = axWmp.GetVolume();
+				//	dbMsg += "," + SoundValue;
+				//	if (SoundValue == 0) {
+				//		IsMute = true;
+				//	} else {
+				//		IsMute = false;
+				//	}
 
-				}
+				//}
 				RaisePropertyChanged();
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
@@ -1129,7 +1137,7 @@ namespace M3UPlayer.ViewModels
 			}
 		}
 
-		public AxShockwaveFlashObjects.AxShockwaveFlash SFPlayer;
+		//public AxShockwaveFlashObjects.AxShockwaveFlash SFPlayer;
 		private System.ComponentModel.IContainer components = null;
 		//public WindowsMediaPlayer mediaPlayer;
 		//	public AxWMPLib.AxWindowsMediaPlayer mediaPlayer;           //AxWMPLib
@@ -1147,31 +1155,31 @@ namespace M3UPlayer.ViewModels
 			string TAG = "[MakeFlash]" + fileName;
 			string dbMsg = TAG;
 			try {
-		//		this.MediaPlayerPanel.Controls.RemoveAt(0);
-				this.SFPlayer = InitializeFLComponent();
-				try {
-					System.IO.FileInfo fi = new System.IO.FileInfo(fileName);
-					if (fi.Extension.Equals(".flv") || fi.Extension.Equals(".f4v")) {
-						LoadFLV(fileName, SFPlayer);
-			//			LoadFladance(fileName);
-					} else if (fi.Extension.Equals(".swf")) {
-						this.SFPlayer.LoadMovie(0, fileName); //でthis.SFPlayer.Movieにセットされるが再生はされない
-															  //   Movie   "M:\\sample\\EmbedFlash.swf" 
-					}
-					dbMsg += ",Movie=" + this.SFPlayer.Movie;
-					dbMsg += ",MovieData=" + this.SFPlayer.MovieData;
-					dbMsg += ",FlashVars=" + this.SFPlayer.FlashVars;
+		////		this.MediaPlayerPanel.Controls.RemoveAt(0);
+		//		this.SFPlayer = InitializeFLComponent();
+		//		try {
+		//			System.IO.FileInfo fi = new System.IO.FileInfo(fileName);
+		//			if (fi.Extension.Equals(".flv") || fi.Extension.Equals(".f4v")) {
+		//				LoadFLV(fileName, SFPlayer);
+		//	//			LoadFladance(fileName);
+		//			} else if (fi.Extension.Equals(".swf")) {
+		//				this.SFPlayer.LoadMovie(0, fileName); //でthis.SFPlayer.Movieにセットされるが再生はされない
+		//													  //   Movie   "M:\\sample\\EmbedFlash.swf" 
+		//			}
+		//			dbMsg += ",Movie=" + this.SFPlayer.Movie;
+		//			dbMsg += ",MovieData=" + this.SFPlayer.MovieData;
+		//			dbMsg += ",FlashVars=" + this.SFPlayer.FlashVars;
 
 
-					this.SFPlayer.FlashCall += new AxShockwaveFlashObjects._IShockwaveFlashEvents_FlashCallEventHandler(this.SFPlayer_FlashCall);
-					//          ((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).EndInit();                   //必須
-					this.SFPlayer.Play();
-				} catch {
-					string titolStr = "Flash";
-					string msgStr = "Flashがインストールされていないようです";
-					MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-					dbMsg += ",result=" + result;
-				}
+		//			this.SFPlayer.FlashCall += new AxShockwaveFlashObjects._IShockwaveFlashEvents_FlashCallEventHandler(this.SFPlayer_FlashCall);
+		//			//          ((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).EndInit();                   //必須
+		//			this.SFPlayer.Play();
+		//		} catch {
+		//			string titolStr = "Flash";
+		//			string msgStr = "Flashがインストールされていないようです";
+		//			MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+		//			dbMsg += ",result=" + result;
+		//		}
 
 
 				MyLog(TAG, dbMsg);
@@ -1183,70 +1191,70 @@ namespace M3UPlayer.ViewModels
 		/// <summary>
 		/// ShockWaveObjewctを作成してGridに埋め込む
 		/// </summary>
-		private AxShockwaveFlashObjects.AxShockwaveFlash InitializeFLComponent() {
-			string TAG = "[InitializeFLComponent]";
-			string dbMsg = TAG;
-			//System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));   //?
-			AxShockwaveFlashObjects.AxShockwaveFlash SFPlayer = new AxShockwaveFlashObjects.AxShockwaveFlash();
-			try {
-				((System.ComponentModel.ISupportInitialize)(SFPlayer)).BeginInit();   
-				//必須;http://bbs.wankuma.com/index.cgi?mode=al2&namber=9784&KLOG=22
-			//	this.SuspendLayout();           //必要？
-				SFPlayer.Dock = System.Windows.Forms.DockStyle.Fill;
-				SFPlayer.Enabled = true;
-	//0113		SFPlayer.Location = new System.Drawing.Point(0, 0);
-				SFPlayer.Name = "SFPlayer";
-				System.Windows.Forms.Panel MediaPlayerPanel = new System.Windows.Forms.Panel();
-				Frame frame = new Frame();
-				frame.Navigate(MediaPlayerPanel);
-				MyView.FrameGrid.Children.Add(frame);
-				//0115	VWidth = MyView.FrameGrid.ActualWidth;
-				//VHeight = MyView.FrameGrid.ActualHeight;
-				dbMsg += "[" + VWidth + "×" + VHeight + "]";
-			//	SFPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("this.SFPlayer.OcxState")));
-			// 'C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Windows.Forms\v4.0_4.0.0.0__b77a5c561934e089\System.Windows.Forms.dll' が読み込まれました。PDB ファイルを開けないか、ファイルが見つかりません。
-// 'C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Windows.Forms.resources\v4.0_4.0.0.0_ja_b77a5c561934e089\System.Windows.Forms.resources.dll' が読み込まれました。モジュールがシンボルなしでビルドされました。
-				SFPlayer.Width = (int)VWidth;
-				SFPlayer.Height = (int)VHeight;	
-				dbMsg += ">SFPlayer[" + this.SFPlayer.Width + "×" + this.SFPlayer.Height + "]";
-				SFPlayer.TabIndex = 0;
-				MediaPlayerPanel.Controls.Add(this.SFPlayer);
-				////this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form1_DragDrop);
-				////this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
-				SFPlayer.FSCommand += new AxShockwaveFlashObjects._IShockwaveFlashEvents_FSCommandEventHandler(this.SFPlayer_FSCommand);
-				SFPlayer.RegionChanged += new System.EventHandler(this.SFPlayer_RegionChanged);
-				SFPlayer.Move += new System.EventHandler(this.SFPlayer_Move);
-				((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).EndInit();                   //必須
-	//	0115	MyView.ResumeLayout(false);
+//		private AxShockwaveFlashObjects.AxShockwaveFlash InitializeFLComponent() {
+//			string TAG = "[InitializeFLComponent]";
+//			string dbMsg = TAG;
+//			//System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));   //?
+//			AxShockwaveFlashObjects.AxShockwaveFlash SFPlayer = new AxShockwaveFlashObjects.AxShockwaveFlash();
+//			try {
+//				((System.ComponentModel.ISupportInitialize)(SFPlayer)).BeginInit();   
+//				//必須;http://bbs.wankuma.com/index.cgi?mode=al2&namber=9784&KLOG=22
+//			//	this.SuspendLayout();           //必要？
+//				SFPlayer.Dock = System.Windows.Forms.DockStyle.Fill;
+//				SFPlayer.Enabled = true;
+//	//0113		SFPlayer.Location = new System.Drawing.Point(0, 0);
+//				SFPlayer.Name = "SFPlayer";
+//				System.Windows.Forms.Panel MediaPlayerPanel = new System.Windows.Forms.Panel();
+//				Frame frame = new Frame();
+//				frame.Navigate(MediaPlayerPanel);
+//				MyView.FrameGrid.Children.Add(frame);
+//				//0115	VWidth = MyView.FrameGrid.ActualWidth;
+//				//VHeight = MyView.FrameGrid.ActualHeight;
+//				dbMsg += "[" + VWidth + "×" + VHeight + "]";
+//			//	SFPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("this.SFPlayer.OcxState")));
+//			// 'C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Windows.Forms\v4.0_4.0.0.0__b77a5c561934e089\System.Windows.Forms.dll' が読み込まれました。PDB ファイルを開けないか、ファイルが見つかりません。
+//// 'C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Windows.Forms.resources\v4.0_4.0.0.0_ja_b77a5c561934e089\System.Windows.Forms.resources.dll' が読み込まれました。モジュールがシンボルなしでビルドされました。
+//				SFPlayer.Width = (int)VWidth;
+//				SFPlayer.Height = (int)VHeight;	
+//				dbMsg += ">SFPlayer[" + this.SFPlayer.Width + "×" + this.SFPlayer.Height + "]";
+//				SFPlayer.TabIndex = 0;
+//				MediaPlayerPanel.Controls.Add(this.SFPlayer);
+//				////this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form1_DragDrop);
+//				////this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
+//				SFPlayer.FSCommand += new AxShockwaveFlashObjects._IShockwaveFlashEvents_FSCommandEventHandler(this.SFPlayer_FSCommand);
+//				SFPlayer.RegionChanged += new System.EventHandler(this.SFPlayer_RegionChanged);
+//				SFPlayer.Move += new System.EventHandler(this.SFPlayer_Move);
+//				((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).EndInit();                   //必須
+//	//	0115	MyView.ResumeLayout(false);
 
-				SFPlayer=InitAxShockwaveFlash(SFPlayer);
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				dbMsg += "<<以降でエラー発生>>" + er.Message;
-				MyLog(TAG, dbMsg);
-			}
-			return SFPlayer;
+//				SFPlayer=InitAxShockwaveFlash(SFPlayer);
+//				MyLog(TAG, dbMsg);
+//			} catch (Exception er) {
+//				dbMsg += "<<以降でエラー発生>>" + er.Message;
+//				MyLog(TAG, dbMsg);
+//			}
+//			return SFPlayer;
 
-		}
+//		}
 
-		private void SFPlayer_FSCommand(object sender, AxShockwaveFlashObjects._IShockwaveFlashEvents_FSCommandEvent e) {
-			string TAG = "[SFPlayer_FSCommand]";
-			string dbMsg = TAG;
-			try {
-				dbMsg += e.command + ";";
-				//switch (e.command)
-				//{
-				//    case 0:
-				//        dbMsg += "1";
-				//        //            PlayTitolLabel.Text = ("Undefined;WindowsMediaPlayerの状態が定義されていません");
-				//        break;
-				//}
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				dbMsg += "<<以降でエラー発生>>" + er.Message;
-				MyLog(TAG, dbMsg);
-			}
-		}
+		//private void SFPlayer_FSCommand(object sender, AxShockwaveFlashObjects._IShockwaveFlashEvents_FSCommandEvent e) {
+		//	string TAG = "[SFPlayer_FSCommand]";
+		//	string dbMsg = TAG;
+		//	try {
+		//		dbMsg += e.command + ";";
+		//		//switch (e.command)
+		//		//{
+		//		//    case 0:
+		//		//        dbMsg += "1";
+		//		//        //            PlayTitolLabel.Text = ("Undefined;WindowsMediaPlayerの状態が定義されていません");
+		//		//        break;
+		//		//}
+		//		MyLog(TAG, dbMsg);
+		//	} catch (Exception er) {
+		//		dbMsg += "<<以降でエラー発生>>" + er.Message;
+		//		MyLog(TAG, dbMsg);
+		//	}
+		//}
 
 		private void SFPlayer_Move(object sender, EventArgs e) {
 			string TAG = "[SFPlayer_Move]";
@@ -1289,74 +1297,74 @@ namespace M3UPlayer.ViewModels
 		/// <summary>
 		/// AxShockwaveFlashの設定
 		/// </summary>
-		private AxShockwaveFlashObjects.AxShockwaveFlash InitAxShockwaveFlash(AxShockwaveFlashObjects.AxShockwaveFlash SFPlayer) {
-			string TAG = "[InitAxShockwaveFlash]";
-			string dbMsg = TAG;
-			try {
-				dbMsg += "開始[" + SFPlayer.Width + "×" + SFPlayer.Height + "]";
-				SFPlayer.AllowFullScreen = "false";
-				SFPlayer.BGColor = "000000";
-				SFPlayer.AllowNetworking = "all";
-				dbMsg += ",AllowNetworking";
+	//	private AxShockwaveFlashObjects.AxShockwaveFlash InitAxShockwaveFlash(AxShockwaveFlashObjects.AxShockwaveFlash SFPlayer) {
+	//		string TAG = "[InitAxShockwaveFlash]";
+	//		string dbMsg = TAG;
+	//		try {
+	//			dbMsg += "開始[" + SFPlayer.Width + "×" + SFPlayer.Height + "]";
+	//			SFPlayer.AllowFullScreen = "false";
+	//			SFPlayer.BGColor = "000000";
+	//			SFPlayer.AllowNetworking = "all";
+	//			dbMsg += ",AllowNetworking";
 
-	//0115			SFPlayer.CtlScale = "NoScale";
-				// 保護されているメモリに読み取りまたは書き込み操作を行おうとしました。他のメモリが壊れていることが考えられます。
-				//this.SFPlayer.CtlScale = "NoBorder ";
-				//this.SFPlayer.CtlScale = "ExactFit";
-				//this.SFPlayer.CtlScale = "ShowAll";
+	////0115			SFPlayer.CtlScale = "NoScale";
+	//			// 保護されているメモリに読み取りまたは書き込み操作を行おうとしました。他のメモリが壊れていることが考えられます。
+	//			//this.SFPlayer.CtlScale = "NoBorder ";
+	//			//this.SFPlayer.CtlScale = "ExactFit";
+	//			//this.SFPlayer.CtlScale = "ShowAll";
 
-				SFPlayer.DeviceFont = false;
-				SFPlayer.EmbedMovie = true;
+	//			SFPlayer.DeviceFont = false;
+	//			SFPlayer.EmbedMovie = true;
 
-				SFPlayer.FrameNum = -1;
-				SFPlayer.Loop = true;
-				SFPlayer.Playing = true;
-				SFPlayer.Profile = true;
-				SFPlayer.Quality2 = "High";
-				SFPlayer.SAlign = "LT";
-				SFPlayer.WMode = "Window";
-				SFPlayer.Dock = DockStyle.Fill;
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				dbMsg += "<<以降でエラー発生>>" + er.Message;
-				MyLog(TAG, dbMsg);
-			}
-			return SFPlayer;
-		}
+	//			SFPlayer.FrameNum = -1;
+	//			SFPlayer.Loop = true;
+	//			SFPlayer.Playing = true;
+	//			SFPlayer.Profile = true;
+	//			SFPlayer.Quality2 = "High";
+	//			SFPlayer.SAlign = "LT";
+	//			SFPlayer.WMode = "Window";
+	//			SFPlayer.Dock = DockStyle.Fill;
+	//			MyLog(TAG, dbMsg);
+	//		} catch (Exception er) {
+	//			dbMsg += "<<以降でエラー発生>>" + er.Message;
+	//			MyLog(TAG, dbMsg);
+	//		}
+	//		return SFPlayer;
+	//	}
 
 		/// <summary>
 		/// FLVファイルのロード
 		/// </summary>
 		/// <param name="videoPath"></param>
-		private void LoadFLV(string videoPath , AxShockwaveFlashObjects.AxShockwaveFlash SFPlayer) {
-			SFPlayer.CallFunction("<invoke name=\"loadAndPlayVideo\" returntype=\"xml\"><arguments><string>" + videoPath + "</string></arguments></invoke>");
-		}
+		//private void LoadFLV(string videoPath , AxShockwaveFlashObjects.AxShockwaveFlash SFPlayer) {
+		//	SFPlayer.CallFunction("<invoke name=\"loadAndPlayVideo\" returntype=\"xml\"><arguments><string>" + videoPath + "</string></arguments></invoke>");
+		//}
 		#endregion
 
 
 
 		//2008:C#でFLVファイルをお手軽再生   http://zecl.hatenablog.com/entry/20081119/p1///////////////////////////////
-		private void SFPlayer_FlashCall(object sender, _IShockwaveFlashEvents_FlashCallEvent e) {
-			string TAG = "[SFPlayer_FlashCall]";
-			string dbMsg = TAG;
-			try {
-				var document = new XmlDocument();
-				document.LoadXml(e.request);
+		//private void SFPlayer_FlashCall(object sender, _IShockwaveFlashEvents_FlashCallEvent e) {
+		//	string TAG = "[SFPlayer_FlashCall]";
+		//	string dbMsg = TAG;
+		//	try {
+		//		var document = new XmlDocument();
+		//		document.LoadXml(e.request);
 
-				XmlNodeList list = document.GetElementsByTagName("arguments");
-				//ResizePlayer(Convert.ToInt32(list[0].FirstChild.InnerText), Convert.ToInt32(list[0].ChildNodes[1].InnerText));
+		//		XmlNodeList list = document.GetElementsByTagName("arguments");
+		//		//ResizePlayer(Convert.ToInt32(list[0].FirstChild.InnerText), Convert.ToInt32(list[0].ChildNodes[1].InnerText));
 
-				var width = int.Parse(list[0].ChildNodes[0].InnerText);
-				var height = int.Parse(list[0].ChildNodes[1].InnerText);
+		//		var width = int.Parse(list[0].ChildNodes[0].InnerText);
+		//		var height = int.Parse(list[0].ChildNodes[1].InnerText);
 
-				//this.ClientSize = new System.Drawing.Size(width, height);
-				//this.SFPlayer.ClientSize = this.SFPlayer.Size;
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				dbMsg += "<<以降でエラー発生>>" + er.Message;
-				MyLog(TAG, dbMsg);
-			}
-		}
+		//		//this.ClientSize = new System.Drawing.Size(width, height);
+		//		//this.SFPlayer.ClientSize = this.SFPlayer.Size;
+		//		MyLog(TAG, dbMsg);
+		//	} catch (Exception er) {
+		//		dbMsg += "<<以降でエラー発生>>" + er.Message;
+		//		MyLog(TAG, dbMsg);
+		//	}
+		//}
 
 
 		///Drop/////////////////////////////////////////////////////////////
@@ -1578,7 +1586,7 @@ namespace M3UPlayer.ViewModels
                     PlayListStr = AddFlieName + "," + PlayListStr;
                     CurrentPlayListFileName = AddFlieName;
                     //設定ファイル更新
-                    Properties.Settings.Default.Save();
+                    //Properties.Settings.Default.Save();
                 }
                 PlayLists = PlayListStr.Split(',');
                 //コンボボックスソースの更新
@@ -1610,107 +1618,107 @@ namespace M3UPlayer.ViewModels
         /// https://days-of-programming.blogspot.com/2018/01/livetwpf.html
         /// </summary>
         /// <param name="msg"></param>
-        public void MessageBoxClosed(ConfirmationMessage msg)
-        {
-            string TAG = "MessageBoxClosed";
-            string dbMsg = "";
-            try
-            {
-                dbMsg += ",ConfirmationMessage=" + msg.Response;
-                if (msg.Response == null)
-                {
-                    dbMsg += "null>>Cancel";
-                } else if (msg.Response.Value){     //true
-                    dbMsg += ">>Yes";
-                }else{                              //false
-                    dbMsg += ">>No";
-                }
-                MyLog(TAG, dbMsg);
-            }
-            catch (Exception er)
-            {
-                MyErrorLog(TAG, dbMsg, er);
-            }
-        }
+        //public void MessageBoxClosed(ConfirmationMessage msg)
+        //{
+        //    string TAG = "MessageBoxClosed";
+        //    string dbMsg = "";
+        //    try
+        //    {
+        //        dbMsg += ",ConfirmationMessage=" + msg.Response;
+        //        if (msg.Response == null)
+        //        {
+        //            dbMsg += "null>>Cancel";
+        //        } else if (msg.Response.Value){     //true
+        //            dbMsg += ">>Yes";
+        //        }else{                              //false
+        //            dbMsg += ">>No";
+        //        }
+        //        MyLog(TAG, dbMsg);
+        //    }
+        //    catch (Exception er)
+        //    {
+        //        MyErrorLog(TAG, dbMsg, er);
+        //    }
+        //}
 
         /// <summary>
         /// ボタン内で表示させたConfirmからのコールバック
         /// 》OKボタンで現在日時算出
         /// </summary>
         /// <param name="message"></param>
-        public void ConfirmFromView(ConfirmationMessage message)
-        {
-            string TAG = "ConfirmFromView";
-            string OutputMessage = $"{DateTime.Now}: ConfirmFromView: {message.Response ?? false}";
-            string dbMsg = "OutputMessage=" + OutputMessage;
-            MyLog(TAG, dbMsg);
-        }
+        //public void ConfirmFromView(ConfirmationMessage message)
+        //{
+        //    string TAG = "ConfirmFromView";
+        //    string OutputMessage = $"{DateTime.Now}: ConfirmFromView: {message.Response ?? false}";
+        //    string dbMsg = "OutputMessage=" + OutputMessage;
+        //    MyLog(TAG, dbMsg);
+        //}
 
 
 
-        private ViewModelCommand _ViewModelConfirmFrom;
-        public ViewModelCommand ViewModelConfirmFrom
-        {
-            get {
-                string TAG = "ViewModelConfirmFrom";
-                string dbMsg = "";
-                try
-                {
-                    if (_ViewModelConfirmFrom == null)
-                    {
-                        dbMsg += ">>起動時";
-                        _ViewModelConfirmFrom = new ViewModelCommand(ConfirmFromViewModel);
+        //private ViewModelCommand _ViewModelConfirmFrom;
+        //public ViewModelCommand ViewModelConfirmFrom
+        //{
+        //    get {
+        //        string TAG = "ViewModelConfirmFrom";
+        //        string dbMsg = "";
+        //        try
+        //        {
+        //            if (_ViewModelConfirmFrom == null)
+        //            {
+        //                dbMsg += ">>起動時";
+        //                _ViewModelConfirmFrom = new ViewModelCommand(ConfirmFromViewModel);
 
-                    }
-                    MyLog(TAG, dbMsg);
-                }
-                catch (Exception er)
-                {
-                    MyErrorLog(TAG, dbMsg, er);
-                }
-                return _FileNameInputShow;
-            }
-        }
+        //            }
+        //            MyLog(TAG, dbMsg);
+        //        }
+        //        catch (Exception er)
+        //        {
+        //            MyErrorLog(TAG, dbMsg, er);
+        //        }
+        //        return _FileNameInputShow;
+        //    }
+        //}
 
-        public async void ConfirmFromViewModel()
-        {
-            string TAG = "ConfirmFromView";
-            ConfirmationMessage message = new ConfirmationMessage("これはテスト用メッセージです。", "テスト", "MessageKey_Confirm")
-            {
-                Button = MessageBoxButton.OKCancel,
-            };
-            await Messenger.RaiseAsync(message);
-            string OutputMessage = $"{DateTime.Now}: ConfirmFromViewModel: {message.Response ?? false}";
-            string dbMsg = "OutputMessage=" + OutputMessage;
-            MyLog(TAG, dbMsg);
-        }
+        //public async void ConfirmFromViewModel()
+        //{
+        //    string TAG = "ConfirmFromView";
+        //    ConfirmationMessage message = new ConfirmationMessage("これはテスト用メッセージです。", "テスト", "MessageKey_Confirm")
+        //    {
+        //        Button = MessageBoxButton.OKCancel,
+        //    };
+        //    await Messenger.RaiseAsync(message);
+        //    string OutputMessage = $"{DateTime.Now}: ConfirmFromViewModel: {message.Response ?? false}";
+        //    string dbMsg = "OutputMessage=" + OutputMessage;
+        //    MyLog(TAG, dbMsg);
+        //}
 
 #endregion
 
 
-        private ViewModelCommand _FileNameInputShow;
-        public ViewModelCommand FileNameInputShow
-        {
-            get {
-                string TAG = "FileNameInputShow";
-                string dbMsg = "";
-                try
-                {
-                    if (_FileNameInputShow == null)
-                    {
-                        dbMsg += ">>起動時";
-                        _FileNameInputShow = new ViewModelCommand(MakeNewPlayListFileAsync);
+        //private ViewModelCommand _FileNameInputShow;
+        //public ViewModelCommand FileNameInputShow
+        //{
+        //    get {
+        //        string TAG = "FileNameInputShow";
+        //        string dbMsg = "";
+        //        try
+        //        {
+        //            if (_FileNameInputShow == null)
+        //            {
+        //                dbMsg += ">>起動時";
+        //                _FileNameInputShow = new ViewModelCommand(MakeNewPlayListFileAsync);
 
-                    }
-                    MyLog(TAG, dbMsg);
-                }
-                catch (Exception er)
-                {
-                    MyErrorLog(TAG, dbMsg, er);
-                }
-                return _FileNameInputShow;
-            }
-        }
+        //            }
+        //            MyLog(TAG, dbMsg);
+        //        }
+        //        catch (Exception er)
+        //        {
+        //            MyErrorLog(TAG, dbMsg, er);
+        //        }
+        //        return _FileNameInputShow;
+        //    }
+        //}
 
         public string DResult { get; private set; }
 
@@ -1731,47 +1739,47 @@ namespace M3UPlayer.ViewModels
             try
             {
                 NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
-                FileNameInputViewModel VM =  new FileNameInputViewModel()
-                {
-                    NeedHideOwner = true,
-                    PathStr = NowSelectedPath,
-                    FileNameStr = String.Format("{0:yyyyMM_ss}", DateTime.Now),
-                    ExtStr = ".m3u8"
-                };
-                TransitionMessage message = new TransitionMessage(VM, "FileNameInputShow");
-                await Messenger.RaiseAsync(message);
-                dbMsg += ",Response=" + message.Response;
-                dbMsg += ",Result=" + VM.DialogResult;
-                if (VM.DialogResult != null){
-                    string nSelectedFile = VM.DialogResult;
-                    dbMsg += ">>" + nSelectedFile;
-                    if (File.Exists(nSelectedFile)){
-                        string titolStr = "既に存在するファイルです";
-                        string msgStr = "再度、ファイル作成ができるダイアログを開きますか";
-                        MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
-                        dbMsg += ",result=" + result;
-                        if (result == MessageBoxResult.Yes){
-                            MakeNewPlayListFileAsync();
-                        }else{
-                            return;
-                        }
-                    }else{
-                        dbMsg += "新規作成";
-                        NowSelectedPath = System.IO.Path.GetDirectoryName(nSelectedFile);
-                        string newFileName = System.IO.Path.GetFileName(nSelectedFile);
-                        CurrentPlayListFileName = nSelectedFile;
-                        dbMsg += ">>CurrentPlayListFileName=" + CurrentPlayListFileName;
+                //FileNameInputViewModel VM =  new FileNameInputViewModel()
+                //{
+                //    NeedHideOwner = true,
+                //    PathStr = NowSelectedPath,
+                //    FileNameStr = String.Format("{0:yyyyMM_ss}", DateTime.Now),
+                //    ExtStr = ".m3u8"
+                //};
+                //TransitionMessage message = new TransitionMessage(VM, "FileNameInputShow");
+                //await Messenger.RaiseAsync(message);
+                //dbMsg += ",Response=" + message.Response;
+                //dbMsg += ",Result=" + VM.DialogResult;
+                //if (VM.DialogResult != null){
+                //    string nSelectedFile = VM.DialogResult;
+                //    dbMsg += ">>" + nSelectedFile;
+                //    if (File.Exists(nSelectedFile)){
+                //        string titolStr = "既に存在するファイルです";
+                //        string msgStr = "再度、ファイル作成ができるダイアログを開きますか";
+                //        MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
+                //        dbMsg += ",result=" + result;
+                //        if (result == MessageBoxResult.Yes){
+                //            MakeNewPlayListFileAsync();
+                //        }else{
+                //            return;
+                //        }
+                //    }else{
+                //        dbMsg += "新規作成";
+                //        NowSelectedPath = System.IO.Path.GetDirectoryName(nSelectedFile);
+                //        string newFileName = System.IO.Path.GetFileName(nSelectedFile);
+                //        CurrentPlayListFileName = nSelectedFile;
+                //        dbMsg += ">>CurrentPlayListFileName=" + CurrentPlayListFileName;
 
-                        StreamWriter sw = File.CreateText(CurrentPlayListFileName);
-                        sw.Close();
+                //        StreamWriter sw = File.CreateText(CurrentPlayListFileName);
+                //        sw.Close();
 
-                        //設定ファイル更新
-                        Properties.Settings.Default.Save();
-                        AddPlayListCombo(CurrentPlayListFileName);
-                    }
-                }else{
-                    dbMsg += "キャンセルされました";
-                }
+                //        //設定ファイル更新
+                //        Properties.Settings.Default.Save();
+                //        AddPlayListCombo(CurrentPlayListFileName);
+                //    }
+                //}else{
+                //    dbMsg += "キャンセルされました";
+                //}
 
                 MyLog(TAG, dbMsg);
             }
@@ -1782,16 +1790,16 @@ namespace M3UPlayer.ViewModels
         }
 
 
-		private ViewModelCommand _PlayListSave;
+		//private ViewModelCommand _PlayListSave;
 
-		public ViewModelCommand PlayListSave {
-			get {
-				if (_PlayListSave == null) {
-					_PlayListSave = new ViewModelCommand(SavePlayList);
-				}
-				return _PlayListSave;
-			}
-		}
+		//public ViewModelCommand PlayListSave {
+		//	get {
+		//		if (_PlayListSave == null) {
+		//			_PlayListSave = new ViewModelCommand(SavePlayList);
+		//		}
+		//		return _PlayListSave;
+		//	}
+		//}
 
 		/// <summary>
 		/// 表示されてるプレイリストを保存する
@@ -2072,38 +2080,38 @@ namespace M3UPlayer.ViewModels
 
 				NowSelectedFile = PLListSelectedItem.UrlStr;
 				dbMsg += ",FileName=" + CurrentPlayListFileName;
-				SaveFileDialog dialog = new SaveFileDialog();
-				dialog.InitialDirectory = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
-				//	dialog.DefaultExt = ".m3u*";
-				dialog.Filter = "プレイリスト (*.m3u*)|*.m3u*|すべて (*.*)|*.*";
-				dialog.FilterIndex = 1;
-				dialog.FileName = System.IO.Path.GetFileNameWithoutExtension(CurrentPlayListFileName) + "のコピー";
+				//SaveFileDialog dialog = new SaveFileDialog();
+				//dialog.InitialDirectory = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
+				////	dialog.DefaultExt = ".m3u*";
+				//dialog.Filter = "プレイリスト (*.m3u*)|*.m3u*|すべて (*.*)|*.*";
+				//dialog.FilterIndex = 1;
+				//dialog.FileName = System.IO.Path.GetFileNameWithoutExtension(CurrentPlayListFileName) + "のコピー";
 
 
-				//	Nullable<bool> 
-				DialogResult result = dialog.ShowDialog();
-				if (result.Equals(DialogResult.OK)) {
-					CurrentPlayListFileName = dialog.FileName;
-					dbMsg += ">>" + CurrentPlayListFileName;
-					CurrentPlayListFileName += ".m3u8";
-					dbMsg += ">>" + CurrentPlayListFileName;
-					File.WriteAllText(CurrentPlayListFileName, text, Encoding.UTF8);
+				////	Nullable<bool> 
+				//DialogResult result = dialog.ShowDialog();
+				//if (result.Equals(DialogResult.OK)) {
+				//	CurrentPlayListFileName = dialog.FileName;
+				//	dbMsg += ">>" + CurrentPlayListFileName;
+				//	CurrentPlayListFileName += ".m3u8";
+				//	dbMsg += ">>" + CurrentPlayListFileName;
+				//	File.WriteAllText(CurrentPlayListFileName, text, Encoding.UTF8);
 
-					//using (Stream fileStream = dialog.OpenFile())
-					//using (StreamWriter sr = new StreamWriter(fileStream)) {
-					//	sr.Write(text);
-					//}
+				//	//using (Stream fileStream = dialog.OpenFile())
+				//	//using (StreamWriter sr = new StreamWriter(fileStream)) {
+				//	//	sr.Write(text);
+				//	//}
 
-					AddPlayListCombo(CurrentPlayListFileName);
+				//	AddPlayListCombo(CurrentPlayListFileName);
 
-					NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
-					dbMsg += ">>NowSelectedPath=" + NowSelectedPath;
-					RaisePropertyChanged("CurrentPlayListFileName");
-					RaisePropertyChanged("NowSelectedPath");
-					//設定ファイル更新
-					Properties.Settings.Default.Save();
-					string extention = System.IO.Path.GetExtension(NowSelectedFile);
-				}
+				//	NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
+				//	dbMsg += ">>NowSelectedPath=" + NowSelectedPath;
+				//	RaisePropertyChanged("CurrentPlayListFileName");
+				//	RaisePropertyChanged("NowSelectedPath");
+				//	//設定ファイル更新
+				//	Properties.Settings.Default.Save();
+				//	string extention = System.IO.Path.GetExtension(NowSelectedFile);
+				//}
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
@@ -2120,17 +2128,17 @@ namespace M3UPlayer.ViewModels
 
 
 		#region FileDlogShow	　単一ファイルの選択
-		private ViewModelCommand _FileDlogShow;
-        public ViewModelCommand FileDlogShow
-        {
-            get {
-                if (_FileDlogShow == null)
-                {
-                    _FileDlogShow = new ViewModelCommand(ShowFileDlog);
-                }
-                return _FileDlogShow;
-            }
-        }
+		//private ViewModelCommand _FileDlogShow;
+  //      public ViewModelCommand FileDlogShow
+  //      {
+  //          get {
+  //              if (_FileDlogShow == null)
+  //              {
+  //                  _FileDlogShow = new ViewModelCommand(ShowFileDlog);
+  //              }
+  //              return _FileDlogShow;
+  //          }
+  //      }
         /// <summary>
         /// 単一ファイルの選択ダイアログから選択されたファイルをPLリストもしくは現在のプレイリストに追加する
         /// </summary>
@@ -2140,54 +2148,54 @@ namespace M3UPlayer.ViewModels
             string dbMsg = "";
             try
             {
-       //         string SelectFileName = "";
-                //①
-                System.Windows.Forms.OpenFileDialog ofDialog = new System.Windows.Forms.OpenFileDialog();
-                //② デフォルトのフォルダを指定する
-                if (CurrentPlayListFileName.Equals(""))
-                {
-                    CurrentPlayListFileName = "C;";
-                }
-				if (NowSelectedPath==null || NowSelectedPath.Equals("")) {
-					NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
-				}
-				dbMsg += ",NowSelectedPath=" + NowSelectedPath;
-                ofDialog.InitialDirectory = @NowSelectedPath;
-                //③ダイアログのタイトルを指定する
-                ofDialog.Title = "添付ファイル選択";
-                //ダイアログを表示する
-                if (ofDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    NowSelectedFile = ofDialog.FileName;
-                    dbMsg += ">>" + NowSelectedFile;
-                    NowSelectedPath = System.IO.Path.GetDirectoryName(NowSelectedFile);
-                    dbMsg += ">>NowSelectedPath=" + NowSelectedPath;
-					RaisePropertyChanged("NowSelectedPath");
-					//設定ファイル更新
-					Properties.Settings.Default.Save();
-                    string extention = System.IO.Path.GetExtension(NowSelectedFile);
-                    if (extention.Contains("m3u"))                    {
-                        dbMsg += "PLListに追加";
-                        AddPlayListCombo(NowSelectedFile);
-                    }else{
-                        dbMsg += "現在のプレイリストの先頭に追加";
-						if(AddToPlayList(NowSelectedFile, 0)) {
-			//				SavePlayList();
-						}
-					}
-                }
-                else
-                {
-                    dbMsg += "キャンセルされました";
-                }
-                // オブジェクトを破棄する
-                ofDialog.Dispose();
+   //    //         string SelectFileName = "";
+   //             //①
+   //             System.Windows.Forms.OpenFileDialog ofDialog = new System.Windows.Forms.OpenFileDialog();
+   //             //② デフォルトのフォルダを指定する
+   //             if (CurrentPlayListFileName.Equals(""))
+   //             {
+   //                 CurrentPlayListFileName = "C;";
+   //             }
+			//	if (NowSelectedPath==null || NowSelectedPath.Equals("")) {
+			//		NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
+			//	}
+			//	dbMsg += ",NowSelectedPath=" + NowSelectedPath;
+   //             ofDialog.InitialDirectory = @NowSelectedPath;
+   //             //③ダイアログのタイトルを指定する
+   //             ofDialog.Title = "添付ファイル選択";
+   //             //ダイアログを表示する
+   //             if (ofDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+   //             {
+   //                 NowSelectedFile = ofDialog.FileName;
+   //                 dbMsg += ">>" + NowSelectedFile;
+   //                 NowSelectedPath = System.IO.Path.GetDirectoryName(NowSelectedFile);
+   //                 dbMsg += ">>NowSelectedPath=" + NowSelectedPath;
+			//		RaisePropertyChanged("NowSelectedPath");
+			//		//設定ファイル更新
+			//		Properties.Settings.Default.Save();
+   //                 string extention = System.IO.Path.GetExtension(NowSelectedFile);
+   //                 if (extention.Contains("m3u"))                    {
+   //                     dbMsg += "PLListに追加";
+   //                     AddPlayListCombo(NowSelectedFile);
+   //                 }else{
+   //                     dbMsg += "現在のプレイリストの先頭に追加";
+			//			if(AddToPlayList(NowSelectedFile, 0)) {
+			////				SavePlayList();
+			//			}
+			//		}
+   //             }
+   //             else
+   //             {
+   //                 dbMsg += "キャンセルされました";
+   //             }
+   //             // オブジェクトを破棄する
+   //             ofDialog.Dispose();
 
-                if (!NowSelectedFile.Equals(""))
-                {
-                    string[] files = { NowSelectedFile };
-                    //         FilesFromLocal(files);
-                }
+   //             if (!NowSelectedFile.Equals(""))
+   //             {
+   //                 string[] files = { NowSelectedFile };
+   //                 //         FilesFromLocal(files);
+   //             }
                 MyLog(TAG, dbMsg);
             }
             catch (Exception er)
@@ -2198,18 +2206,18 @@ namespace M3UPlayer.ViewModels
         #endregion
 
         #region FolderDlogShow	　フォルダ選択
-        private ViewModelCommand _FolderDlogShow;
+        //private ViewModelCommand _FolderDlogShow;
 
-        public ViewModelCommand FolderDlogShow
-        {
-            get {
-                if (_FolderDlogShow == null)
-                {
-                    _FolderDlogShow = new ViewModelCommand(ShowFolderDlog);
-                }
-                return _FolderDlogShow;
-            }
-        }
+        //public ViewModelCommand FolderDlogShow
+        //{
+        //    get {
+        //        if (_FolderDlogShow == null)
+        //        {
+        //            _FolderDlogShow = new ViewModelCommand(ShowFolderDlog);
+        //        }
+        //        return _FolderDlogShow;
+        //    }
+        //}
         /// <summary>
         /// フォルダ選択ダイアログから選択されたフォルダのファイルリストをファイルをアイコン化処理に渡す
         /// </summary>
@@ -2219,32 +2227,32 @@ namespace M3UPlayer.ViewModels
             string dbMsg = "";
             try
             {
-                //①
-                System.Windows.Forms.FolderBrowserDialog fbDialog = new System.Windows.Forms.FolderBrowserDialog();
-                // ダイアログの説明文を指定する
-                fbDialog.Description = "添付ファイルをフォルダ単位で指定";
-                // デフォルトのフォルダを指定する
-                dbMsg += ",NowSelectedPath=" + NowSelectedPath;
-                fbDialog.SelectedPath = @NowSelectedPath;
-                // 「新しいフォルダーの作成する」ボタンを表示しない
-                fbDialog.ShowNewFolderButton = false;
-                //フォルダを選択するダイアログを表示する
-                if (fbDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    NowSelectedPath = fbDialog.SelectedPath;
-                    dbMsg += ">>" + NowSelectedPath;
-                    string[] files = System.IO.Directory.GetFiles(@NowSelectedPath, "*", System.IO.SearchOption.AllDirectories);
-                    dbMsg += ">>" + files.Length + "件";
-                    //設定ファイル更新
-                    Properties.Settings.Default.Save();
-					FilesAdd(files,0);
-				}
-                else
-                {
-                    dbMsg += "キャンセルされました";
-                }
+    //            //①
+    //            System.Windows.Forms.FolderBrowserDialog fbDialog = new System.Windows.Forms.FolderBrowserDialog();
+    //            // ダイアログの説明文を指定する
+    //            fbDialog.Description = "添付ファイルをフォルダ単位で指定";
+    //            // デフォルトのフォルダを指定する
+    //            dbMsg += ",NowSelectedPath=" + NowSelectedPath;
+    //            fbDialog.SelectedPath = @NowSelectedPath;
+    //            // 「新しいフォルダーの作成する」ボタンを表示しない
+    //            fbDialog.ShowNewFolderButton = false;
+    //            //フォルダを選択するダイアログを表示する
+    //            if (fbDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+    //            {
+    //                NowSelectedPath = fbDialog.SelectedPath;
+    //                dbMsg += ">>" + NowSelectedPath;
+    //                string[] files = System.IO.Directory.GetFiles(@NowSelectedPath, "*", System.IO.SearchOption.AllDirectories);
+    //                dbMsg += ">>" + files.Length + "件";
+    //                //設定ファイル更新
+    //                Properties.Settings.Default.Save();
+				//	FilesAdd(files,0);
+				//}
+    //            else
+    //            {
+    //                dbMsg += "キャンセルされました";
+    //            }
                 // オブジェクトを破棄する
-                fbDialog.Dispose();
+                //fbDialog.Dispose();
                 MyLog(TAG, dbMsg);
             }
             catch (Exception er)
@@ -2257,18 +2265,18 @@ namespace M3UPlayer.ViewModels
 
 
         #region ExploreShow	　エクスプローラー表示
-        private ViewModelCommand _ExploreShow;
+        //private ViewModelCommand _ExploreShow;
 
-        public ViewModelCommand ExploreShow
-        {
-            get {
-                if (_ExploreShow == null)
-                {
-                    _ExploreShow = new ViewModelCommand(ShowExplore);
-                }
-                return _ExploreShow;
-            }
-        }
+        //public ViewModelCommand ExploreShow
+        //{
+        //    get {
+        //        if (_ExploreShow == null)
+        //        {
+        //            _ExploreShow = new ViewModelCommand(ShowExplore);
+        //        }
+        //        return _ExploreShow;
+        //    }
+        //}
         /// <summary>
         /// エクスプローラで作業対象フォルダを表示する
         /// </summary>
@@ -2354,7 +2362,7 @@ namespace M3UPlayer.ViewModels
  //       Settings appSettings = new Settings();
         public System.ComponentModel.ComponentResourceManager resources;
         //	public SplitContainer MediaPlayerSplitter;
-        public System.Windows.Forms.WebBrowser playerWebBrowser;
+        //public System.Windows.Forms.WebBrowser playerWebBrowser;
 
         string[] systemFiles = new string[] { "RECYCLE", ".bak", ".bdmv", ".blf", ".BIN", ".cab",  ".cfg",  ".cmd",".css",  ".dat",".dll",
                                                 ".inf",  ".inf", ".ini", ".lsi", ".iso",  ".lst", ".jar",  ".log", ".lock",".mis",
@@ -2411,16 +2419,17 @@ namespace M3UPlayer.ViewModels
         int dragSouceIDP = -1;                          //ドラッグ開始時のマウスの位置から取得
         string dragSouceUrl = "";
         string b_dragSouceUrl = "";
-   //     private Point PlaylistMouseDownPoint = Point.Empty;     //マウスの押された位置
-                                                                //アイコン
-                                                                /*	private Cursor noneCursor = new Cursor("none.cur");
-																	private Cursor moveCursor = new Cursor("move.cur");
-																	private Cursor copyCursor = new Cursor("copy.cur");
-																	private Cursor linkCursor = new Cursor("link.cur");*/
+        //     private Point PlaylistMouseDownPoint = Point.Empty;     //マウスの押された位置
+        //アイコン
+        //Properties
+        //private Cursor noneCursor = new Cursor("none.cur");
+		//private Cursor moveCursor = new Cursor("move.cur");
+		//private Cursor copyCursor = new Cursor("copy.cur");
+		//private Cursor linkCursor = new Cursor("link.cur");
 
-        //	int playListWidth = 234;            //プレイリストの幅
-        //	ProgressDialog pDialog;
-        List<String> PlayListFileNames = new List<String>();
+//	int playListWidth = 234;            //プレイリストの幅
+//	ProgressDialog pDialog;
+List<String> PlayListFileNames = new List<String>();
         bool isPlay = true;
 
         //public Form1()
@@ -2764,10 +2773,10 @@ namespace M3UPlayer.ViewModels
                 string driveNames = drive.Name; // ドライブ名
                 if (drive.IsReady)
                 { // ドライブの準備はOK？
-                    tn = new TreeNode(driveNames, 0, 0);
-              //      fileTree.Nodes.Add(tn);//親ノードにドライブを設定
-                //    FolderItemListUp(driveNames, tn);
-                    tn.ImageIndex = 0;          //hd_icon.png
+              //      tn = new TreeNode(driveNames, 0, 0);
+              ////      fileTree.Nodes.Add(tn);//親ノードにドライブを設定
+              //  //    FolderItemListUp(driveNames, tn);
+              //      tn.ImageIndex = 0;          //hd_icon.png
                 }
             }
         }//使用可能なドライブリスト取得
@@ -3172,19 +3181,19 @@ AddType video/MP2T .ts
             string rPlayList = "";
             try
             {
-                OpenFileDialog ofd = new OpenFileDialog();             //OpenFileDialogクラスのインスタンスを作成☆
-                ofd.Title = dlogTitol;              //タイトルを設定する
-                                                    //	ofd.FileName = "default.m3u";                          //はじめのファイル名を指定する
-                                                    //はじめに「ファイル名」で表示される文字列を指定する
-                dbMsg += ",initialDirectory=" + initialDirectory;
-                ofd.InitialDirectory = initialDirectory;              //はじめに表示されるフォルダを指定する
-                ofd.Filter = filterStr;                             //[ファイルの種類]に表示される選択肢を指定する	
-                ofd.FilterIndex = 1;                                //[ファイルの種類]ではじめに選択されるものを指定する
-                ofd.RestoreDirectory = true;                //ダイアログボックスを閉じる前に現在のディレクトリを復元するようにする
-                if (ofd.ShowDialog() == DialogResult.OK)
-                {        //OpenFileDialogでは == DialogResult.OK)
-                    rPlayList = ofd.FileName;
-                }
+                //OpenFileDialog ofd = new OpenFileDialog();             //OpenFileDialogクラスのインスタンスを作成☆
+                //ofd.Title = dlogTitol;              //タイトルを設定する
+                //                                    //	ofd.FileName = "default.m3u";                          //はじめのファイル名を指定する
+                //                                    //はじめに「ファイル名」で表示される文字列を指定する
+                //dbMsg += ",initialDirectory=" + initialDirectory;
+                //ofd.InitialDirectory = initialDirectory;              //はじめに表示されるフォルダを指定する
+                //ofd.Filter = filterStr;                             //[ファイルの種類]に表示される選択肢を指定する	
+                //ofd.FilterIndex = 1;                                //[ファイルの種類]ではじめに選択されるものを指定する
+                //ofd.RestoreDirectory = true;                //ダイアログボックスを閉じる前に現在のディレクトリを復元するようにする
+                //if (ofd.ShowDialog() == DialogResult.OK)
+                //{        //OpenFileDialogでは == DialogResult.OK)
+                //    rPlayList = ofd.FileName;
+                //}
                 dbMsg += ",選択されたファイル名=" + rPlayList;
                 MyLog(TAG, dbMsg);
             }
@@ -3521,30 +3530,30 @@ AddType video/MP2T .ts
 
      //   #region WebBlock
 
-        private void WebBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
-        {
-            string TAG = "[WebBrowser1_DocumentCompleted]";
-            string dbMsg = TAG;
-            try
-            {
-                /*	HtmlDocument wDoc = playerWebBrowser.Document;
-					string wText = playerWebBrowser.DocumentText;
+     //   private void WebBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+     //   {
+     //       string TAG = "[WebBrowser1_DocumentCompleted]";
+     //       string dbMsg = TAG;
+     //       try
+     //       {
+     //           /*	HtmlDocument wDoc = playerWebBrowser.Document;
+					//string wText = playerWebBrowser.DocumentText;
 
-									if (( wText.Contains( "object" ) ) || ( wText.Contains( "embed" ) )) {
-										HtmlElement playerElem = playerWebBrowser.Document.GetElementById( wiPlayerID );
-										playerElem.AttachEventHandler( "PlayStateChangeEvent", new EventHandler( PlayStateChangeEvent ) );     //PlayState.MediaEnded		CurrentState 
-										dbMsg += ",Controls=" + playerWebBrowser.Controls;
-										dbMsg += ",ReadyState=" + playerWebBrowser.ReadyState;
-									}
-					*/
-                MyLog(TAG, dbMsg);
-            }
-            catch (Exception er)
-            {
-                dbMsg += "<<以降でエラー発生>>" + er.Message;
-                MyLog(TAG, dbMsg);
-            }
-        }
+					//				if (( wText.Contains( "object" ) ) || ( wText.Contains( "embed" ) )) {
+					//					HtmlElement playerElem = playerWebBrowser.Document.GetElementById( wiPlayerID );
+					//					playerElem.AttachEventHandler( "PlayStateChangeEvent", new EventHandler( PlayStateChangeEvent ) );     //PlayState.MediaEnded		CurrentState 
+					//					dbMsg += ",Controls=" + playerWebBrowser.Controls;
+					//					dbMsg += ",ReadyState=" + playerWebBrowser.ReadyState;
+					//				}
+					//*/
+     //           MyLog(TAG, dbMsg);
+     //       }
+     //       catch (Exception er)
+     //       {
+     //           dbMsg += "<<以降でエラー発生>>" + er.Message;
+     //           MyLog(TAG, dbMsg);
+     //       }
+     //   }
 
 
         private string MakeVideoSouce(string fileName, int webWidth, int webHeight)
@@ -10107,7 +10116,6 @@ AddType video/MP2T .ts
             }
         }
 
-        //System.Windows.Input; Livet Messengerでも使う///////////////////////
         void RequeryCommands()
         {
             // Seems like there should be a way to bind CanExecute directly to a bool property
@@ -10130,14 +10138,6 @@ AddType video/MP2T .ts
         //デバッグツール///////////////////////////////////////////////////////////その他//
         Boolean debug_now = true;
 
-        //Livet Messenger用///////////////////////
-        new public void Dispose()
-        {
-            // 基本クラスのDispose()でCompositeDisposableに登録されたイベントを解放する。
-            //base.Dispose();
-            //Dispose(true);
-        }
-        ///////////////////////Livet Messenger用//
         public static void MyLog(string TAG, string dbMsg)
         {
             dbMsg = "[MainViewModel]" + dbMsg;

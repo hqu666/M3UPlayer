@@ -2,11 +2,10 @@
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
-using Livet;
 
 namespace M3UPlayer.Models
 {
-    public class PlayListModel : NotificationObject, ICloneable
+    public class PlayListModel : ICloneable
     {
         /// <summary>
         /// Url
@@ -23,10 +22,15 @@ namespace M3UPlayer.Models
             }
         }
 
-        /// <summary>
-        /// 要約・表記
-        /// </summary>
-        private string _Summary;
+		private void RaisePropertyChanged()
+		{
+			throw new NotImplementedException();
+		}
+
+		/// <summary>
+		/// 要約・表記
+		/// </summary>
+		private string _Summary;
         public string Summary
         {
             get => _Summary;
