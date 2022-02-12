@@ -144,7 +144,7 @@
 							AutomationProperties.HelpText="フォルダ選択" 
 							Grid.Column="1" 
 							 VerticalAlignment="Top" Panel.ZIndex="26" MinWidth="26" 
-							 HorizontalAlignment="Center" Margin="0,7,0,0" Height="26" Grid.RowSpan="2"
+							 HorizontalAlignment="Right" Margin="0,7,0,0" Height="26" Grid.RowSpan="2"
 							>
                         <Button.Background>
                             <ImageBrush ImageSource="/views/folder_icon.png" Stretch="UniformToFill"/>
@@ -225,7 +225,7 @@
                             IsReadOnly="True" 
                             MouseDown="PlayList_MouseDown" 
                             MouseMove="PlayList_MouseMove" 
-                            MouseUp="PlayList_MouseUp" DragEnter="PlayList_DragEnter" Drop="PlayList_Drop"
+                            MouseUp="PlayList_MouseUp" DragEnter="PlayList_DragEnter" Drop="PlayList_Drop" 
 						>
                     <!--DragEnter="PlayList_DragEnter" 
                            DragLeave="PlayList_DragLeave" 
@@ -254,17 +254,26 @@
                     </behaviors:Interaction.Triggers>-->
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="URL"
-                                            Binding="{Binding UrlStr }" 
-                                            Width="Auto">
+                                            Binding="{Binding GranDir }" 
+                                            Width="*"
+                                            >
                             <DataGridTextColumn.ElementStyle>
                                 <Style>
                                     <Setter Property="TextBlock.HorizontalAlignment" Value="Right"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Header="名" 
-                                            Binding="{Binding Summary }" 
-                                            Width="*"
+                        <DataGridTextColumn Header="folder" 
+                                            Binding="{Binding ParentDir }" 
+                                            Width="Auto"
+                                             />
+                        <DataGridTextColumn Header="file" 
+                                            Binding="{Binding fileName }" 
+                                            Width="Auto"
+                                             />
+                        <DataGridTextColumn Header="ext" 
+                                            Binding="{Binding extentionStr }" 
+                                            Width="Auto"
                                              />
                     </DataGrid.Columns>
                 </DataGrid>

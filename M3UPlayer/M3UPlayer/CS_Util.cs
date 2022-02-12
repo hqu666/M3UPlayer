@@ -96,11 +96,11 @@ namespace M3UPlayer
 		/// <param name="dbMsg"></param>
 		public void MyLog(String TAG, String dbMsg)
 		{
-#if DEBUG
+//#if DEBUG
             Console.WriteLine(TAG + " : " + dbMsg);
 
             //Constant.debugNow = true;
-#endif
+//#endif
 		}
 
 		public void MyErrorLog(String TAG, String dbMsg, Exception err)

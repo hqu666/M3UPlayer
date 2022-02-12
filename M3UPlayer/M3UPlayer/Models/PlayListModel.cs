@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
+using System.ComponentModel;
 
 namespace M3UPlayer.Models
 {
@@ -10,7 +11,7 @@ namespace M3UPlayer.Models
         /// <summary>
         /// Url
         /// </summary>
-        private string _UrlStr;
+        private string? _UrlStr;
         public string UrlStr
         {
             get => _UrlStr;
@@ -24,13 +25,13 @@ namespace M3UPlayer.Models
 
 		private void RaisePropertyChanged()
 		{
-			throw new NotImplementedException();
+	//		throw new NotImplementedException();
 		}
 
 		/// <summary>
 		/// 要約・表記
 		/// </summary>
-		private string _Summary;
+		private string? _Summary;
         public string Summary
         {
             get => _Summary;
@@ -42,8 +43,64 @@ namespace M3UPlayer.Models
             }
         }
 
+        /// <summary>
+        /// 3階層以上
+        /// </summary>
+        private string _GranDir;
+        public string GranDir {
+            get => _GranDir;
+            set {
+                if (_GranDir == value)
+                    return;
+                _GranDir = value;
+                RaisePropertyChanged();
+            }
+        }
 
-		private bool _ActionFlag;
+        /// <summary>
+        /// 親階層
+        /// </summary>
+        private string _ParentDir;
+        public string ParentDir {
+            get => _ParentDir;
+            set {
+                if (_ParentDir == value)
+                    return;
+                _ParentDir = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// ファイル名
+        /// </summary>
+        private string _fileName;
+        public string fileName {
+            get => _fileName;
+            set {
+                if (_fileName == value)
+                    return;
+                _fileName = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private string _extentionStr;
+        public string extentionStr {
+            get => _extentionStr;
+            set {
+                if (_extentionStr == value)
+                    return;
+                _extentionStr = value;
+                RaisePropertyChanged();
+            }
+        }
+
+
+        private bool _ActionFlag;
+
+		public event PropertyChangedEventHandler? PropertyChanged;
+
 		public bool ActionFlag {
 			get => _ActionFlag;
 			set {
@@ -56,16 +113,19 @@ namespace M3UPlayer.Models
 
 
 		object ICloneable.Clone()
-        {
-            return new PlayListModel()
-            {
+		{
+            return new PlayListModel() {
                 UrlStr = this.UrlStr,
                 Summary = this.Summary,
-				ActionFlag = this.ActionFlag,
-			};
-        }
+                ActionFlag = this.ActionFlag,
+                GranDir = this.GranDir,
+                ParentDir = this.ParentDir,
+                fileName = this.fileName,
+                extentionStr = this.extentionStr,
+            };
+		}
 
-    }
+	}
 
     public class PlayListCollection : ObservableCollection<PlayListModel>
     {

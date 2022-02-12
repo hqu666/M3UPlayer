@@ -33,6 +33,7 @@ using System.Windows.Threading;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Microsoft.Azure.Cosmos.Core.Collections;
+using Microsoft.Win32;
 //using AxShockwaveFlashObjects;
 
 namespace M3UPlayer.ViewModels
@@ -423,17 +424,12 @@ namespace M3UPlayer.ViewModels
 
         }
 
-		private void RaisePropertyChanged(string v)
-		{
-			throw new NotImplementedException();
-		}
-
-		/// <summary>
-		/// 動画ファイルのURLからプレイリスト1行分を作成
-		/// </summary>
-		/// <param name="item"></param>
-		/// <returns></returns>
-		private PlayListModel MakeOneItem(string item) {
+        /// <summary>
+        /// 動画ファイルのURLからプレイリスト1行分を作成
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        private PlayListModel MakeOneItem(string item) {
 			string TAG = "MakeOneItem";
 			string dbMsg = "";
 			PlayListModel playListModel = new PlayListModel();
@@ -445,17 +441,23 @@ namespace M3UPlayer.ViewModels
 				if (1 < items.Length) {
 					url = items[0];
 				}
-				string extention = System.IO.Path.GetExtension(url);
-				if (-1 < Array.IndexOf(videoFiles, extention)) {
+                playListModel.extentionStr = System.IO.Path.GetExtension(url);
+				if (-1 < Array.IndexOf(videoFiles, playListModel.extentionStr)) {
 					//	if (-1 < list.IndexOf(extention)) {
 					playListModel.UrlStr = url;
 					string[] urls = url.Split(Path.DirectorySeparatorChar);
 					if (urls.Length<summaryCol) {
 						urls = url.Split('/');
 					}
-					playListModel.Summary = urls[urls.Length - summaryCol];
-				} else {
-					dbMsg += ",extention=" + extention;
+					playListModel.fileName = urls[urls.Length-1];
+                    playListModel.fileName = playListModel.fileName.Replace(playListModel.extentionStr, "");
+                    playListModel.ParentDir = urls[urls.Length -2];
+                    //string dellStr = Path.DirectorySeparatorChar + playListModel.ParentDir + Path.DirectorySeparatorChar+ playListModel.fileName + playListModel.extentionStr;
+                    string[] remains = url.Split(playListModel.ParentDir);
+
+                    playListModel.GranDir = remains[0];
+                } else {
+					dbMsg += ",extention=" + playListModel.extentionStr;
 				}
 
 				MyLog(TAG, dbMsg);
@@ -2118,88 +2120,81 @@ namespace M3UPlayer.ViewModels
 			}
 		}
 
-		#endregion
+        #endregion
 
 
 
-		#endregion
-		//ファイル選択///////////////////////////////////////////////////////////playList//
-		//        //プレイリスト///////////////////////////////////////////////////////////FileListVewの操作//
+        #endregion
+        //ファイル選択///////////////////////////////////////////////////////////playList//
+        //        //プレイリスト///////////////////////////////////////////////////////////FileListVewの操作//
 
 
-		#region FileDlogShow	　単一ファイルの選択
-		//private ViewModelCommand _FileDlogShow;
-  //      public ViewModelCommand FileDlogShow
-  //      {
-  //          get {
-  //              if (_FileDlogShow == null)
-  //              {
-  //                  _FileDlogShow = new ViewModelCommand(ShowFileDlog);
-  //              }
-  //              return _FileDlogShow;
-  //          }
-  //      }
+        #region FileDlogShow	　単一ファイルの選択
+        //private ViewModelCommand _FileDlogShow;
+        public ICommand FileDlogShow => new DelegateCommand(ShowFileDlog);
         /// <summary>
         /// 単一ファイルの選択ダイアログから選択されたファイルをPLリストもしくは現在のプレイリストに追加する
         /// </summary>
+        /// https://johobase.com/wpf-file-folder-common-dialog/
         public void ShowFileDlog()
         {
             string TAG = "File_bt_Click";
             string dbMsg = "";
             try
             {
-   //    //         string SelectFileName = "";
-   //             //①
-   //             System.Windows.Forms.OpenFileDialog ofDialog = new System.Windows.Forms.OpenFileDialog();
-   //             //② デフォルトのフォルダを指定する
-   //             if (CurrentPlayListFileName.Equals(""))
-   //             {
-   //                 CurrentPlayListFileName = "C;";
-   //             }
-			//	if (NowSelectedPath==null || NowSelectedPath.Equals("")) {
-			//		NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
-			//	}
-			//	dbMsg += ",NowSelectedPath=" + NowSelectedPath;
-   //             ofDialog.InitialDirectory = @NowSelectedPath;
-   //             //③ダイアログのタイトルを指定する
-   //             ofDialog.Title = "添付ファイル選択";
-   //             //ダイアログを表示する
-   //             if (ofDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-   //             {
-   //                 NowSelectedFile = ofDialog.FileName;
-   //                 dbMsg += ">>" + NowSelectedFile;
-   //                 NowSelectedPath = System.IO.Path.GetDirectoryName(NowSelectedFile);
-   //                 dbMsg += ">>NowSelectedPath=" + NowSelectedPath;
-			//		RaisePropertyChanged("NowSelectedPath");
-			//		//設定ファイル更新
-			//		Properties.Settings.Default.Save();
-   //                 string extention = System.IO.Path.GetExtension(NowSelectedFile);
-   //                 if (extention.Contains("m3u"))                    {
-   //                     dbMsg += "PLListに追加";
-   //                     AddPlayListCombo(NowSelectedFile);
-   //                 }else{
-   //                     dbMsg += "現在のプレイリストの先頭に追加";
-			//			if(AddToPlayList(NowSelectedFile, 0)) {
-			////				SavePlayList();
-			//			}
-			//		}
-   //             }
-   //             else
-   //             {
-   //                 dbMsg += "キャンセルされました";
-   //             }
-   //             // オブジェクトを破棄する
-   //             ofDialog.Dispose();
+                //         string SelectFileName = "";
+                //①
+                // ダイアログのインスタンスを生成
+                var ofDialog = new OpenFileDialog();
+                // ファイルの種類を設定
+                ofDialog.Filter = "プレイリスト (*.m3u*)|*.m3u*|ムービー (*.mp4)|*.mp4|全てのファイル (*.*)|*.*";
 
-   //             if (!NowSelectedFile.Equals(""))
-   //             {
-   //                 string[] files = { NowSelectedFile };
-   //                 //         FilesFromLocal(files);
-   //             }
-                MyLog(TAG, dbMsg);
-            }
-            catch (Exception er)
-            {
+
+				//	System.Windows.Forms.OpenFileDialog ofDialog = new System.Windows.Forms.OpenFileDialog();
+				//② デフォルトのフォルダを指定する
+				if (CurrentPlayListFileName.Equals(""))
+				{
+					CurrentPlayListFileName = "C;";
+				}
+				if (NowSelectedPath == null || NowSelectedPath.Equals(""))
+				{
+					NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
+				}
+				dbMsg += ",NowSelectedPath=" + NowSelectedPath;
+				ofDialog.InitialDirectory = @NowSelectedPath;
+				//③ダイアログのタイトルを指定する
+				ofDialog.Title = "ファイル選択";
+				//ダイアログを表示する
+				if (ofDialog.ShowDialog() == true) {
+					NowSelectedFile = ofDialog.FileName;
+					dbMsg += ">>" + NowSelectedFile;
+					NowSelectedPath = System.IO.Path.GetDirectoryName(NowSelectedFile);
+					dbMsg += ">>NowSelectedPath=" + NowSelectedPath;
+					RaisePropertyChanged("NowSelectedPath");
+					//設定ファイル更新
+					Properties.Settings.Default.Save();
+					string extention = System.IO.Path.GetExtension(NowSelectedFile);
+					if (extention.Contains("m3u")){
+						dbMsg += "PLListに追加";
+						AddPlayListCombo(NowSelectedFile);
+					}else{
+						dbMsg += "現在のプレイリストの先頭に追加";
+						if (AddToPlayList(NowSelectedFile, 0)){
+							//				SavePlayList();
+						}
+					}
+				}else{
+					dbMsg += "キャンセルされました";
+				}
+				// オブジェクトを破棄する
+		//		ofDialog.Dispose();
+
+				if (!NowSelectedFile.Equals("")){
+					string[] files = { NowSelectedFile };
+					//         FilesFromLocal(files);
+				}
+				MyLog(TAG, dbMsg);
+            }catch (Exception er){
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
@@ -10108,10 +10103,8 @@ AddType video/MP2T .ts
         /// </summary>
 
         //public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            if (PropertyChanged != null)
-            {
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = ""){
+            if (PropertyChanged != null){
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
@@ -10132,6 +10125,14 @@ AddType video/MP2T .ts
             // worth it, especially given that the WebView API explicitly documents which events
             // signal the property value changes.
             CommandManager.InvalidateRequerySuggested();
+        }
+
+
+        private void RaisePropertyChanged(string propertyName) {
+            //throw new NotImplementedException();
+            if (PropertyChanged != null) {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
 
 
