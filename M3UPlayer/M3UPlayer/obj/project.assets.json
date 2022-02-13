@@ -1637,6 +1637,23 @@
         "runtime": {
           "lib/netstandard1.3/System.Xml.XPath.XmlDocument.dll": {}
         }
+      },
+      "WindowsAPICodePack/1.1.2": {
+        "type": "package",
+        "compile": {
+          "lib/Microsoft.WindowsAPICodePack.ExtendedLinguisticServices.dll": {},
+          "lib/Microsoft.WindowsAPICodePack.Sensors.dll": {},
+          "lib/Microsoft.WindowsAPICodePack.Shell.dll": {},
+          "lib/Microsoft.WindowsAPICodePack.ShellExtensions.dll": {},
+          "lib/Microsoft.WindowsAPICodePack.dll": {}
+        },
+        "runtime": {
+          "lib/Microsoft.WindowsAPICodePack.ExtendedLinguisticServices.dll": {},
+          "lib/Microsoft.WindowsAPICodePack.Sensors.dll": {},
+          "lib/Microsoft.WindowsAPICodePack.Shell.dll": {},
+          "lib/Microsoft.WindowsAPICodePack.ShellExtensions.dll": {},
+          "lib/Microsoft.WindowsAPICodePack.dll": {}
+        }
       }
     }
   },
@@ -5976,12 +5993,31 @@
         "system.xml.xpath.xmldocument.4.3.0.nupkg.sha512",
         "system.xml.xpath.xmldocument.nuspec"
       ]
+    },
+    "WindowsAPICodePack/1.1.2": {
+      "sha512": "1POQrQOlLPB996AmezxnzLp1okN4gnuDsF6b3ka5dPassA139sJwL80fJGkleRMDzUCAU0rjmBc/2ZievbPhxQ==",
+      "type": "package",
+      "path": "windowsapicodepack/1.1.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "content/Windows Logo.png",
+        "content/license.txt",
+        "lib/Microsoft.WindowsAPICodePack.ExtendedLinguisticServices.dll",
+        "lib/Microsoft.WindowsAPICodePack.Sensors.dll",
+        "lib/Microsoft.WindowsAPICodePack.Shell.dll",
+        "lib/Microsoft.WindowsAPICodePack.ShellExtensions.dll",
+        "lib/Microsoft.WindowsAPICodePack.dll",
+        "windowsapicodepack.1.1.2.nupkg.sha512",
+        "windowsapicodepack.nuspec"
+      ]
     }
   },
   "projectFileDependencyGroups": {
     "net6.0-windows7.0": [
       "Microsoft.Azure.Cosmos >= 3.24.0",
-      "Microsoft.VisualStudio.Services.Client >= 16.170.0"
+      "Microsoft.VisualStudio.Services.Client >= 16.170.0",
+      "WindowsAPICodePack >= 1.1.2"
     ]
   },
   "packageFolders": {
@@ -6030,6 +6066,10 @@
           "Microsoft.VisualStudio.Services.Client": {
             "target": "Package",
             "version": "[16.170.0, )"
+          },
+          "WindowsAPICodePack": {
+            "target": "Package",
+            "version": "[1.1.2, )"
           }
         },
         "imports": [
@@ -6053,5 +6093,17 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.102\\RuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "パッケージ 'WindowsAPICodePack 1.1.2' はプロジェクトのターゲット フレームワーク 'net6.0-windows7.0' ではなく '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' を使用して復元されました。このパッケージは、使用しているプロジェクトとの完全な互換性がない可能性があります。",
+      "libraryId": "WindowsAPICodePack",
+      "targetGraphs": [
+        "net6.0-windows7.0"
+      ]
+    }
+  ]
 }

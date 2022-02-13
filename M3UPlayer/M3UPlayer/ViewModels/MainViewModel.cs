@@ -6,7 +6,6 @@ using System.Linq;
 using System.Windows;
 using System.Text;
 using System.Windows.Controls;
-//using System.Windows.Forms;
 
 using M3UPlayer.Views;
 //using ShockwaveFlashObjects;
@@ -34,6 +33,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Microsoft.Azure.Cosmos.Core.Collections;
 using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
 //using AxShockwaveFlashObjects;
 
 namespace M3UPlayer.ViewModels
@@ -388,7 +388,6 @@ namespace M3UPlayer.ViewModels
                 foreach (string item in Strs)
                 {
                     dbMsg += "\r\n"+ item;
-          //          PlayListModel playListModel = new PlayListModel();
                     //拡張部分を破棄してURLを読み出す
                     string[] items = item.Split(',');
                     string url = items[0];
@@ -396,19 +395,6 @@ namespace M3UPlayer.ViewModels
 					if (playListModel.UrlStr != null) {
 						PLList.Add(playListModel);
 					}
-					//string extention = System.IO.Path.GetExtension(url);
-					//if (-1 < list.IndexOf(extention))
-					//{
-					//    playListModel.UrlStr = url;
-					//    string[] urls = url.Split('/');
-					//    playListModel.Summary = urls[urls.Length - summaryCol];
-					//    PLList.Add(playListModel);
-					//}
-					//else
-					//{
-					//    dbMsg += ",extention=" + extention;
-					//}
-
 				}
                 RaisePropertyChanged("PLList");
                 ListItemCount=PLList.Count();
@@ -443,7 +429,6 @@ namespace M3UPlayer.ViewModels
 				}
                 playListModel.extentionStr = System.IO.Path.GetExtension(url);
 				if (-1 < Array.IndexOf(videoFiles, playListModel.extentionStr)) {
-					//	if (-1 < list.IndexOf(extention)) {
 					playListModel.UrlStr = url;
 					string[] urls = url.Split(Path.DirectorySeparatorChar);
 					if (urls.Length<summaryCol) {
@@ -452,9 +437,7 @@ namespace M3UPlayer.ViewModels
 					playListModel.fileName = urls[urls.Length-1];
                     playListModel.fileName = playListModel.fileName.Replace(playListModel.extentionStr, "");
                     playListModel.ParentDir = urls[urls.Length -2];
-                    //string dellStr = Path.DirectorySeparatorChar + playListModel.ParentDir + Path.DirectorySeparatorChar+ playListModel.fileName + playListModel.extentionStr;
                     string[] remains = url.Split(playListModel.ParentDir);
-
                     playListModel.GranDir = remains[0];
                 } else {
 					dbMsg += ",extention=" + playListModel.extentionStr;
@@ -487,10 +470,6 @@ namespace M3UPlayer.ViewModels
 							} else {
 								PLList.Insert(InsertTo, playListModel);
 							}
-							if (!PlayListSaveBTVisble.Equals("Visible")) {
-								PlayListSaveBTVisble = "Visible";
-								RaisePropertyChanged("PlayListSaveBTVisble");
-							}
 						}
 					} else if (Directory.Exists(url)) {
 						//フォルダなら中身の全ファイルで再起する
@@ -502,11 +481,12 @@ namespace M3UPlayer.ViewModels
 				ListItemCount = PLList.Count();
 				RaisePropertyChanged("ListItemCount");
 				dbMsg += "\r\n" + ListItemCount + "件";
-				if (pEXPLORER.HasExited) {
-					pEXPLORER.Close();
-					dbMsg += ",EXPLORERを閉じた";
-				}
-				MyLog(TAG, dbMsg);
+                //変更されたプレイリストを変更させる
+                //if (!PlayListSaveBTVisble.Equals("Visible")) {
+                //	PlayListSaveBTVisble = "Visible";
+                //	RaisePropertyChanged("PlayListSaveBTVisble");
+                //}
+                MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
@@ -2130,7 +2110,6 @@ namespace M3UPlayer.ViewModels
 
 
         #region FileDlogShow	　単一ファイルの選択
-        //private ViewModelCommand _FileDlogShow;
         public ICommand FileDlogShow => new DelegateCommand(ShowFileDlog);
         /// <summary>
         /// 単一ファイルの選択ダイアログから選択されたファイルをPLリストもしくは現在のプレイリストに追加する
@@ -2201,20 +2180,10 @@ namespace M3UPlayer.ViewModels
         #endregion
 
         #region FolderDlogShow	　フォルダ選択
-        //private ViewModelCommand _FolderDlogShow;
-
-        //public ViewModelCommand FolderDlogShow
-        //{
-        //    get {
-        //        if (_FolderDlogShow == null)
-        //        {
-        //            _FolderDlogShow = new ViewModelCommand(ShowFolderDlog);
-        //        }
-        //        return _FolderDlogShow;
-        //    }
-        //}
+        public ICommand FolderDlogShow => new DelegateCommand(ShowFolderDlog);
         /// <summary>
         /// フォルダ選択ダイアログから選択されたフォルダのファイルリストをファイルをアイコン化処理に渡す
+        /// https://johobase.com/file-folder-common-dialog/
         /// </summary>
         private void ShowFolderDlog()
         {
@@ -2222,36 +2191,29 @@ namespace M3UPlayer.ViewModels
             string dbMsg = "";
             try
             {
-    //            //①
-    //            System.Windows.Forms.FolderBrowserDialog fbDialog = new System.Windows.Forms.FolderBrowserDialog();
-    //            // ダイアログの説明文を指定する
-    //            fbDialog.Description = "添付ファイルをフォルダ単位で指定";
-    //            // デフォルトのフォルダを指定する
-    //            dbMsg += ",NowSelectedPath=" + NowSelectedPath;
-    //            fbDialog.SelectedPath = @NowSelectedPath;
-    //            // 「新しいフォルダーの作成する」ボタンを表示しない
-    //            fbDialog.ShowNewFolderButton = false;
-    //            //フォルダを選択するダイアログを表示する
-    //            if (fbDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-    //            {
-    //                NowSelectedPath = fbDialog.SelectedPath;
-    //                dbMsg += ">>" + NowSelectedPath;
-    //                string[] files = System.IO.Directory.GetFiles(@NowSelectedPath, "*", System.IO.SearchOption.AllDirectories);
-    //                dbMsg += ">>" + files.Length + "件";
-    //                //設定ファイル更新
-    //                Properties.Settings.Default.Save();
-				//	FilesAdd(files,0);
-				//}
-    //            else
-    //            {
-    //                dbMsg += "キャンセルされました";
-    //            }
+                // ダイアログのインスタンスを生成
+                var dialog = new CommonOpenFileDialog("フォルダーの選択");
+
+                // 選択形式をフォルダースタイルにする IsFolderPicker プロパティを設定
+                dialog.IsFolderPicker = true;
+
+                // ダイアログを表示
+                if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
+                //    MessageBox.Show(dialog.FileName);
+                    NowSelectedPath = dialog.FileName;              //fbDialog.SelectedPath;
+					dbMsg += ">>" + NowSelectedPath;
+					string[] files = System.IO.Directory.GetFiles(@NowSelectedPath, "*", System.IO.SearchOption.AllDirectories);
+					dbMsg += ">>" + files.Length + "件";
+					//設定ファイル更新
+					Properties.Settings.Default.Save();
+					FilesAdd(files, 0);
+				} else {
+					dbMsg += "キャンセルされました";
+				}
                 // オブジェクトを破棄する
-                //fbDialog.Dispose();
-                MyLog(TAG, dbMsg);
-            }
-            catch (Exception er)
-            {
+        //        dialog.Dispose();
+				MyLog(TAG, dbMsg);
+            }catch (Exception er){
                 MyErrorLog(TAG, dbMsg, er);
             }
         }

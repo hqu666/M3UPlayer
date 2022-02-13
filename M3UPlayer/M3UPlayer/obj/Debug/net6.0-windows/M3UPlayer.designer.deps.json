@@ -1445,6 +1445,30 @@
             "fileVersion": "4.6.24705.1"
           }
         }
+      },
+      "WindowsAPICodePack/1.1.2": {
+        "runtime": {
+          "lib/Microsoft.WindowsAPICodePack.ExtendedLinguisticServices.dll": {
+            "assemblyVersion": "1.1.0.0",
+            "fileVersion": "1.1.0.0"
+          },
+          "lib/Microsoft.WindowsAPICodePack.Sensors.dll": {
+            "assemblyVersion": "1.1.0.0",
+            "fileVersion": "1.1.0.0"
+          },
+          "lib/Microsoft.WindowsAPICodePack.Shell.dll": {
+            "assemblyVersion": "1.1.0.0",
+            "fileVersion": "1.1.0.0"
+          },
+          "lib/Microsoft.WindowsAPICodePack.ShellExtensions.dll": {
+            "assemblyVersion": "1.1.0.0",
+            "fileVersion": "1.1.0.0"
+          },
+          "lib/Microsoft.WindowsAPICodePack.dll": {
+            "assemblyVersion": "1.1.0.0",
+            "fileVersion": "1.1.0.0"
+          }
+        }
       }
     }
   },
@@ -2176,6 +2200,13 @@
       "sha512": "sha512-A/uxsWi/Ifzkmd4ArTLISMbfFs6XpRPsXZonrIqyTY70xi8t+mDtvSM5Os0RqyRDobjMBwIDHDL4NOIbkDwf7A==",
       "path": "system.xml.xpath.xmldocument/4.3.0",
       "hashPath": "system.xml.xpath.xmldocument.4.3.0.nupkg.sha512"
+    },
+    "WindowsAPICodePack/1.1.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-1POQrQOlLPB996AmezxnzLp1okN4gnuDsF6b3ka5dPassA139sJwL80fJGkleRMDzUCAU0rjmBc/2ZievbPhxQ==",
+      "path": "windowsapicodepack/1.1.2",
+      "hashPath": "windowsapicodepack.1.1.2.nupkg.sha512"
     }
   }
 }
