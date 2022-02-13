@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
@@ -96,23 +97,22 @@ namespace M3UPlayer
 		/// <param name="dbMsg"></param>
 		public void MyLog(String TAG, String dbMsg)
 		{
-//#if DEBUG
-            Console.WriteLine(TAG + " : " + dbMsg);
-
-            //Constant.debugNow = true;
-//#endif
+#if DEBUG
+			Debug.Print(TAG + " : " + dbMsg);
+			//Constant.debugNow = true;
+#endif
 		}
 
 		public void MyErrorLog(String TAG, String dbMsg, Exception err)
 		{
-            Console.WriteLine(TAG + " : " + dbMsg + "でエラー発生;" + err);
+			Debug.Print(TAG + " : " + dbMsg + "でエラー発生;" + err);
         }
 
         public MessageBoxResult MessageShowWPF(String msgStr,
-																				String titolStr = null,
-																				MessageBoxButton buttns = MessageBoxButton.OK,
-																				MessageBoxImage icon = MessageBoxImage.None
-																				)
+												String titolStr = null,
+												MessageBoxButton buttns = MessageBoxButton.OK,
+												MessageBoxImage icon = MessageBoxImage.None
+												)
 		{
 			String TAG = "MessageShowWPF";
 			String dbMsg = "開始";
