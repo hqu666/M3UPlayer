@@ -63,13 +63,8 @@ namespace M3UPlayer.ViewModels
 				if (_DurationStr == value)
 					return;
 				_DurationStr = value;
-				RaisePropertyChanged();
+				RaisePropertyChanged("DurationStr");
 			}
-		}
-
-		private void RaisePropertyChanged()
-		{
-			throw new NotImplementedException();
 		}
 
 		private double _SliderMaximum;
@@ -82,7 +77,7 @@ namespace M3UPlayer.ViewModels
 				if (_SliderMaximum == value)
 					return;
 				_SliderMaximum = value;
-				RaisePropertyChanged();
+				RaisePropertyChanged("SliderMaximum");
 			}
 		}
 		
@@ -98,7 +93,7 @@ namespace M3UPlayer.ViewModels
 				if (_PositionStr == value)
 					return;
 				_PositionStr = value;
-				RaisePropertyChanged();
+				RaisePropertyChanged("PositionStr");
 			}
 		}
 
@@ -117,7 +112,7 @@ namespace M3UPlayer.ViewModels
 				//	axWmp.SetPlayPosition(value);
 				//	_timer.Start();
 				//}
-				RaisePropertyChanged();
+				RaisePropertyChanged("SliderValue");
 			}
 		}
 
@@ -131,7 +126,7 @@ namespace M3UPlayer.ViewModels
 				if (_IsPlaying == value)
 					return;
 				_IsPlaying = value;
-				RaisePropertyChanged();
+				RaisePropertyChanged("IsPlaying");
 			}
 		}
 
@@ -148,7 +143,7 @@ namespace M3UPlayer.ViewModels
 				//if (axWmp != null) {
 				//	axWmp.SetVolume(value);
 				//}
-				RaisePropertyChanged();
+				RaisePropertyChanged("SoundValue");
 			}
 		}
 
@@ -162,7 +157,7 @@ namespace M3UPlayer.ViewModels
 				if (_IsMute == value)
 					return;
 				_IsMute = value;
-				RaisePropertyChanged();
+				RaisePropertyChanged("IsMute");
 			}
 		}
 
@@ -283,7 +278,9 @@ namespace M3UPlayer.ViewModels
                 PLComboSource = new Dictionary<string, string>();
                 PLComboSelectedItem = new List<string>();
                 AddPlayListCombo("");
-                RaisePropertyChanged(); //	"dataManager"
+            //    NotifyPropertyChanged();
+
+                //       RaisePropertyChanged(); //	"dataManager"
                 MakePlayListComboMenu();
 				dbMsg += "[" + VWidth + "×" + VHeight + "]";
 				dbMsg += ",CurrentPlayListFileName=" + CurrentPlayListFileName;
@@ -295,12 +292,12 @@ namespace M3UPlayer.ViewModels
 				}
 				dbMsg += ",NowSelectedFile=" + NowSelectedFile;
 				dbMsg += " [" + NowSelectedPosition + "]";
-				MyLog(TAG, dbMsg);
 				//   CallWeb();
 				PlayListSaveBTVisble = "Hidden";
 				PlayListSaveRoot.IsEnabled = false;
-				RaisePropertyChanged();
-			} catch (Exception er)
+				RaisePropertyChanged("PlayListSaveBTVisble");
+				MyLog(TAG, dbMsg);
+            } catch (Exception er)
             {
                 MyErrorLog(TAG, dbMsg, er);
             }
@@ -330,7 +327,6 @@ namespace M3UPlayer.ViewModels
             FrameSource = "WebPage.xaml";
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
 
 
 
@@ -450,11 +446,13 @@ namespace M3UPlayer.ViewModels
 			return playListModel;
 		}
 
-		/// <summary>
-		/// ファイル名配列からプレイリストに一連登録
-		/// </summary>
-		/// <param name="files"></param>
-		public void FilesAdd(string[] files , int InsertTo) {
+        /// <summary>
+        /// ファイル名配列からプレイリストに一連登録
+        /// </summary>
+        /// <param name="files">追加するファイル配列</param>
+        /// <param name="InsertTo">挿入位置</param>
+        /// ShowFolderDlogの時は
+        public void FilesAdd(string[] files , int InsertTo) {
 			string TAG = "FilesAdd";
 			string dbMsg = "";
 			try {
@@ -1060,7 +1058,7 @@ namespace M3UPlayer.ViewModels
 				//	}
 
 				//}
-				RaisePropertyChanged();
+	//			RaisePropertyChanged();
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
@@ -10089,13 +10087,25 @@ AddType video/MP2T .ts
             CommandManager.InvalidateRequerySuggested();
         }
 
-
+        public event PropertyChangedEventHandler PropertyChanged;
         private void RaisePropertyChanged(string propertyName) {
             //throw new NotImplementedException();
             if (PropertyChanged != null) {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        /// <summary>
+        /// プロパティ変更通知を行うBindableBase
+        /// ；ヘルパなしでRaisePropertyChangedの代りにNotifyPropertyChangedを使う
+        /// </summary>
+
+    //    public event PropertyChangedEventHandler PropertyChanged;
+        //private void NotifyPropertyChanged([CallerMemberName] String propertyName = "") {
+        //    if (PropertyChanged != null) {
+        //        PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        //    }
+        //}
 
 
         //デバッグツール///////////////////////////////////////////////////////////その他//
