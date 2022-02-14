@@ -518,8 +518,7 @@ namespace M3UPlayer.Views
 					dbMsg += ",AllowDrop=" + droplist.AllowDrop;
 					dbMsg += "[" + droplist.SelectedIndex + "]";
 					DraggedItem = (PlayListModel)droplist.SelectedItem;
-					dbMsg += ",Summary=" + DraggedItem.Summary;
-					dbMsg += ",UrlStr=" + DraggedItem.UrlStr;
+			//		dbMsg += ",UrlStr=" + DraggedItem.UrlStr;
 					_isDragging = true;
 				} else {
 					dbMsg += "droplist == null";
@@ -567,7 +566,6 @@ namespace M3UPlayer.Views
 					dbMsg += ",AllowDrop=" + droplist.AllowDrop;
 					dbMsg += "[" + droplist.SelectedIndex + "]";
 					PlayListModel targetItem = (PlayListModel)droplist.SelectedItem;
-					dbMsg += ",target=" + targetItem.Summary;
 					//get the target item
 					if (DraggedItem != null) {
 						dbMsg += "<<Dragged=" + DraggedItem.Summary;

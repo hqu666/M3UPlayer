@@ -263,6 +263,10 @@ namespace M3UPlayer.ViewModels
 					Initialize();
 				}
 
+
+        /// <summary>
+        /// 起動メソッド
+        /// </summary>
         public void Initialize(){
             string TAG = "Initialize";
             string dbMsg = "";
@@ -278,9 +282,6 @@ namespace M3UPlayer.ViewModels
                 PLComboSource = new Dictionary<string, string>();
                 PLComboSelectedItem = new List<string>();
                 AddPlayListCombo("");
-            //    NotifyPropertyChanged();
-
-                //       RaisePropertyChanged(); //	"dataManager"
                 MakePlayListComboMenu();
 				dbMsg += "[" + VWidth + "×" + VHeight + "]";
 				dbMsg += ",CurrentPlayListFileName=" + CurrentPlayListFileName;
@@ -303,6 +304,9 @@ namespace M3UPlayer.ViewModels
             }
         }
 
+        /// <summary>
+        /// 終了前イベントのメソッド
+        /// </summary>
 		public void BeforeClose() {
 			string TAG = "BeforeClose";
 			string dbMsg = "";
@@ -1891,14 +1895,21 @@ namespace M3UPlayer.ViewModels
 			}
 		}
 
+        /// <summary>
+        /// プレイリストで選択したアイテムをエクスプローラーで開く
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// https://dobon.net/vb/dotnet/process/openexplore.html
 		private void PlayListItemViewExplore_Click(object sender, RoutedEventArgs e) {
 			string TAG = "PlayListItemViewExplore_Click";
 			string dbMsg = "";
 			try {
 				NowSelectedFile = PLListSelectedItem.UrlStr;
-				dbMsg += "urlStr=" + NowSelectedFile;
-				System.Diagnostics.Process.Start(
-					"EXPLORER.EXE", @"/select," + NowSelectedFile + "");
+				dbMsg += "操作するのは=" + NowSelectedFile;
+                string argmentStr = "\"/select,\"\"" + NowSelectedFile + "\"\"\"";
+                dbMsg += ">>" + argmentStr;
+                System.Diagnostics.Process.Start("EXPLORER.EXE", @argmentStr);
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
