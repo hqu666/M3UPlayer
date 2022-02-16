@@ -1904,26 +1904,33 @@ namespace M3UPlayer.ViewModels
 			try {
 				NowSelectedFile = PLListSelectedItem.UrlStr;
 				dbMsg += "操作するのは=" + NowSelectedFile;
-                string[] Strs = NowSelectedFile.Split(Path.DirectorySeparatorChar);
+                string[] Strs = NowSelectedFile.Split('/');         //Path.DirectorySeparatorCharはバックスラッシュ
                 string fileNameStr =  Strs[Strs.Length-1];
-                string pathStr = NowSelectedFile.Remove(NowSelectedFile.Length - fileNameStr.Length-1);
+                string pathStr =  NowSelectedFile.Remove(NowSelectedFile.Length - fileNameStr.Length-1);
+                pathStr = pathStr.Replace("file://", "");
+                pathStr = pathStr.Replace("///", "/");
+                pathStr = pathStr.Replace("//", "/");
+                ////pathStr = pathStr.Replace("://", ":" + Path.DirectorySeparatorChar);
+                pathStr = pathStr.Replace('/', Path.DirectorySeparatorChar);
+                //P:\dendow\1actress
                 dbMsg += ">>" + pathStr+" の "+ fileNameStr;
+				//		System.Diagnostics.Process.Start("EXPLORER.EXE", pathStr);
 				// ダイアログのインスタンスを生成
 				CommonOpenFileDialog dialog = new CommonOpenFileDialog("ファイルの操作") {
-                    IsFolderPicker = false,             //フォルダ選択
-                    InitialDirectory = @pathStr,
-                    DefaultDirectory = @pathStr,         //初期ディレクトリ
-					DefaultFileName = NowSelectedFile,  //ファイルの完全なパスを含む文字列
-                    EnsurePathExists=true,
-                    // FileNameは読み取り専用
-                };
-                if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
+					IsFolderPicker = false,             //フォルダ選択
+					InitialDirectory =  pathStr,
+					DefaultDirectory =  pathStr,         //初期ディレクトリ
+					DefaultFileName = fileNameStr,  //ファイルの完全なパスを含む文字列
+					EnsurePathExists = true,
+					// FileNameは読み取り専用
+				};
+				if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
 					//    MessageBox.Show(dialog.FileName);
 					NowSelectedPath = dialog.FileName;              //fbDialog.SelectedPath;
 					dbMsg += ">>" + NowSelectedPath;
-					string[] files = System.IO.Directory.GetFiles(@NowSelectedPath, "*", System.IO.SearchOption.AllDirectories);
-					dbMsg += ">>" + files.Length + "件";
-					dbMsg += ">>" + files[0];
+					//string[] files = System.IO.Directory.GetFiles(@NowSelectedPath, "*", System.IO.SearchOption.AllDirectories);
+					//dbMsg += ">>" + files.Length + "件";
+					//dbMsg += ">>" + files[0];
 
 				} else {
 					dbMsg += "キャンセルされました";
