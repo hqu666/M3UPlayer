@@ -312,15 +312,16 @@ namespace M3UPlayer.ViewModels
 			string dbMsg = "";
 			try {
 				if (PlayListSaveBTVisble.Equals("Visible")) {
-					string titolStr = "プレイリストが変更されています";
-					string msgStr = "保存しますか？";
-					MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
-					dbMsg += ",result=" + result;
-					if (result == MessageBoxResult.Yes) {
-						SavePlayList();
-					}
-				}
-			} catch (Exception er) {
+                    IsDoSavePlayList(false);
+                    //string titolStr = "プレイリストが変更されています";
+                    //string msgStr = "保存しますか？";
+                    //MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
+                    //dbMsg += ",result=" + result;
+                    //if (result == MessageBoxResult.Yes) {
+                    //	SavePlayList();
+                    //}
+                }
+            } catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
 		}
@@ -480,12 +481,12 @@ namespace M3UPlayer.ViewModels
 				ListItemCount = PLList.Count();
 				RaisePropertyChanged("ListItemCount");
 				dbMsg += "\r\n" + ListItemCount + "件";
-                //変更されたプレイリストを変更させる
-                //if (!PlayListSaveBTVisble.Equals("Visible")) {
-                //	PlayListSaveBTVisble = "Visible";
-                //	RaisePropertyChanged("PlayListSaveBTVisble");
-                //}
-                MyLog(TAG, dbMsg);
+				//変更されたプレイリストを変更させる
+				if (!PlayListSaveBTVisble.Equals("Visible")) {
+					PlayListSaveBTVisble = "Visible";
+					RaisePropertyChanged("PlayListSaveBTVisble");
+				}
+				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
@@ -525,10 +526,11 @@ namespace M3UPlayer.ViewModels
 					RaisePropertyChanged("ListItemCount");
 					dbMsg += "\r\n" + ListItemCount + "件";
 					retBool = true;
-					PlayListSaveBTVisble = "Visible";
-					RaisePropertyChanged("PlayListSaveBTVisble");
-					PlayListSaveRoot.IsEnabled = true;
-				} else {
+                    IsDoSavePlayList(false);
+                    //PlayListSaveBTVisble = "Visible";
+                    //RaisePropertyChanged("PlayListSaveBTVisble");
+                    //PlayListSaveRoot.IsEnabled = true;
+                } else {
 					dbMsg += ">>映像ではない";
 				}
 
@@ -1770,23 +1772,12 @@ namespace M3UPlayer.ViewModels
             }
         }
 
-
-		//private ViewModelCommand _PlayListSave;
-
-		//public ViewModelCommand PlayListSave {
-		//	get {
-		//		if (_PlayListSave == null) {
-		//			_PlayListSave = new ViewModelCommand(SavePlayList);
-		//		}
-		//		return _PlayListSave;
-		//	}
-		//}
-
-		/// <summary>
-		/// 表示されてるプレイリストを保存する
-		/// </summary>
-		/// <param name="url"></param>
-		private void SavePlayList() {
+        public ICommand PlayListSave => new DelegateCommand(SavePlayList);
+        /// <summary>
+        /// 表示されてるプレイリストを保存する
+        /// </summary>
+        /// <param name="url"></param>
+        private void SavePlayList() {
 			string TAG = "SavePlayList";
 			string dbMsg = "";
 			try {
@@ -1808,8 +1799,43 @@ namespace M3UPlayer.ViewModels
 			}
 		}
 
-		#region プレイリストのコンテキストメニュー
-		public ContextMenu PlayListMenu { get; set; }
+
+        /// <summary>
+        /// プレイリストに変化があった場合、trueを渡せば保存、falseで設問によって保存。
+        /// 保存しなければ保存準備だけする。
+        /// </summary>
+        /// <param name="isSave">trueを渡せば保存、falseで設問によって保存</param>
+        private void IsDoSavePlayList(bool isSave) {
+            string TAG = "IsDoSavePlayList";
+            string dbMsg = "";
+            try {
+                dbMsg += "isSave=" + isSave;
+                PlayListSaveRoot.IsEnabled = true;
+                PlayListSaveBTVisble = "Visible";
+                RaisePropertyChanged("PlayListSaveBTVisble");
+                dbMsg += "＞isSave＞" + isSave;
+                if (isSave) {
+                    SavePlayList();
+                    dbMsg += "＞＞保存済み";
+				} else {
+                    string titolStr = "プレイリストが変更されています";
+                    string msgStr = "保存しますか？";
+                    MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
+                    dbMsg += ",result=" + result;
+                    if (result == MessageBoxResult.Yes) {
+                        SavePlayList();
+                    }
+                }
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+
+
+        #region プレイリストのコンテキストメニュー
+        public ContextMenu PlayListMenu { get; set; }
 		public MenuItem PlayListItemViewExplore;
 		public MenuItem PlayListItemMove;
 		public MenuItem PlayListItemMoveTop;
@@ -1910,9 +1936,7 @@ namespace M3UPlayer.ViewModels
                 pathStr = pathStr.Replace("file://", "");
                 pathStr = pathStr.Replace("///", "/");
                 pathStr = pathStr.Replace("//", "/");
-                ////pathStr = pathStr.Replace("://", ":" + Path.DirectorySeparatorChar);
                 pathStr = pathStr.Replace('/', Path.DirectorySeparatorChar);
-                //P:\dendow\1actress
                 dbMsg += ">>" + pathStr+" の "+ fileNameStr;
 				//		System.Diagnostics.Process.Start("EXPLORER.EXE", pathStr);
 				// ダイアログのインスタンスを生成
@@ -1926,13 +1950,17 @@ namespace M3UPlayer.ViewModels
 				};
 				if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
 					//    MessageBox.Show(dialog.FileName);
-					NowSelectedPath = dialog.FileName;              //fbDialog.SelectedPath;
-					dbMsg += ">>" + NowSelectedPath;
-					//string[] files = System.IO.Directory.GetFiles(@NowSelectedPath, "*", System.IO.SearchOption.AllDirectories);
-					//dbMsg += ">>" + files.Length + "件";
-					//dbMsg += ">>" + files[0];
+					string NewSelectedPath = dialog.FileName;              //fbDialog.SelectedPath;
+					dbMsg += ">>" + NewSelectedPath;
+					if (!NewSelectedPath.Equals(NowSelectedFile)) {
+                        dbMsg += ">>変更有り" ;
 
-				} else {
+                    }
+                    //string[] files = System.IO.Directory.GetFiles(@NowSelectedPath, "*", System.IO.SearchOption.AllDirectories);
+                    //dbMsg += ">>" + files.Length + "件";
+                    //dbMsg += ">>" + files[0];
+
+                } else {
 					dbMsg += "キャンセルされました";
 				}
 				MyLog(TAG, dbMsg);
@@ -1994,8 +2022,8 @@ namespace M3UPlayer.ViewModels
 					RaisePropertyChanged("ListItemCount");
 					dbMsg += ">>" + ListItemCount + "件";
 				}
-
-				MyLog(TAG, dbMsg);
+                IsDoSavePlayList(true);
+                MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
@@ -2241,7 +2269,8 @@ namespace M3UPlayer.ViewModels
 					//設定ファイル更新
 					Properties.Settings.Default.Save();
 					FilesAdd(files, 0);
-				} else {
+                    IsDoSavePlayList(false);
+                } else {
 					dbMsg += "キャンセルされました";
 				}
                 // オブジェクトを破棄する
