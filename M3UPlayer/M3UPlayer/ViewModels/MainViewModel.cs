@@ -34,6 +34,7 @@ using System.Windows.Input;
 using Microsoft.Azure.Cosmos.Core.Collections;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Text.RegularExpressions;
 //using AxShockwaveFlashObjects;
 
 namespace M3UPlayer.ViewModels
@@ -481,12 +482,9 @@ namespace M3UPlayer.ViewModels
 				ListItemCount = PLList.Count();
 				RaisePropertyChanged("ListItemCount");
 				dbMsg += "\r\n" + ListItemCount + "件";
-				//変更されたプレイリストを変更させる
-				if (!PlayListSaveBTVisble.Equals("Visible")) {
-					PlayListSaveBTVisble = "Visible";
-					RaisePropertyChanged("PlayListSaveBTVisble");
-				}
-				MyLog(TAG, dbMsg);
+                //変更されたプレイリストを変更させる
+                IsDoSavePlayList(true);
+                MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
@@ -527,9 +525,6 @@ namespace M3UPlayer.ViewModels
 					dbMsg += "\r\n" + ListItemCount + "件";
 					retBool = true;
                     IsDoSavePlayList(false);
-                    //PlayListSaveBTVisble = "Visible";
-                    //RaisePropertyChanged("PlayListSaveBTVisble");
-                    //PlayListSaveRoot.IsEnabled = true;
                 } else {
 					dbMsg += ">>映像ではない";
 				}
@@ -702,7 +697,7 @@ namespace M3UPlayer.ViewModels
 				dbMsg += CurrentPlayListFileName;
 				Properties.Settings.Default.Save();
 				if (CurrentPlayListFileName.Equals(ComboLastItemKey)) {
-					MakeNewPlayListFileAsync();
+					MakeNewPlayListFile();
 				} else {
 					ListUpFiles(CurrentPlayListFileName);
 				}
@@ -1557,6 +1552,14 @@ namespace M3UPlayer.ViewModels
                 dbMsg += "、AddFlieName=" + AddFlieName;
                 //登録済みのPlayリストと照合
                 dbMsg += "、登録済み=" + PlayListStr;
+                //セパレータの入れ直し
+                Regex reg = new Regex(".m3u");
+                PlayListStr = reg.Replace(PlayListStr, ".m3u,");
+                reg = new Regex(".m3u,8");
+                PlayListStr = reg.Replace(PlayListStr, ".m3u8,");
+                reg = new Regex(",,");
+                PlayListStr = reg.Replace(PlayListStr, ",");
+                PlayListStr = PlayListStr.Remove(PlayListStr.Length - 1);
                 PlayLists = PlayListStr.Split(',');
                 var list = new List<string>();
                 list.AddRange(PlayLists);
@@ -1582,6 +1585,7 @@ namespace M3UPlayer.ViewModels
                         PLComboSource.Add(item, DispName);
                     }
                 }
+                //新規リスト
                 PLComboSource.Add(ComboLastItemKey, ComboLastItemVal);
                 RaisePropertyChanged("PLComboSource");
                 PLComboSelectedIndex = 0;       // PLComboSource.Count() - 1;
@@ -1678,31 +1682,6 @@ namespace M3UPlayer.ViewModels
 
 #endregion
 
-
-        //private ViewModelCommand _FileNameInputShow;
-        //public ViewModelCommand FileNameInputShow
-        //{
-        //    get {
-        //        string TAG = "FileNameInputShow";
-        //        string dbMsg = "";
-        //        try
-        //        {
-        //            if (_FileNameInputShow == null)
-        //            {
-        //                dbMsg += ">>起動時";
-        //                _FileNameInputShow = new ViewModelCommand(MakeNewPlayListFileAsync);
-
-        //            }
-        //            MyLog(TAG, dbMsg);
-        //        }
-        //        catch (Exception er)
-        //        {
-        //            MyErrorLog(TAG, dbMsg, er);
-        //        }
-        //        return _FileNameInputShow;
-        //    }
-        //}
-
         public string DResult { get; private set; }
 
 		#region playList　/////////////////////////////////////////////////////////////
@@ -1711,68 +1690,79 @@ namespace M3UPlayer.ViewModels
 		/// </summary>
 		public string PlayListSaveBTVisble { get; set; }
 
-
+        public ICommand FileNameInputShow => new DelegateCommand(MakeNewPlayListFile);
 		/// <summary>
 		/// 新規プレイリストを作成する
 		/// </summary>
-		public async void MakeNewPlayListFileAsync()
-        {
-            string TAG = "MakeNewPlayListFile";
-            string dbMsg = "";
-            try
-            {
-                NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
-                //FileNameInputViewModel VM =  new FileNameInputViewModel()
-                //{
-                //    NeedHideOwner = true,
-                //    PathStr = NowSelectedPath,
-                //    FileNameStr = String.Format("{0:yyyyMM_ss}", DateTime.Now),
-                //    ExtStr = ".m3u8"
-                //};
-                //TransitionMessage message = new TransitionMessage(VM, "FileNameInputShow");
-                //await Messenger.RaiseAsync(message);
-                //dbMsg += ",Response=" + message.Response;
-                //dbMsg += ",Result=" + VM.DialogResult;
-                //if (VM.DialogResult != null){
-                //    string nSelectedFile = VM.DialogResult;
-                //    dbMsg += ">>" + nSelectedFile;
-                //    if (File.Exists(nSelectedFile)){
-                //        string titolStr = "既に存在するファイルです";
-                //        string msgStr = "再度、ファイル作成ができるダイアログを開きますか";
-                //        MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
-                //        dbMsg += ",result=" + result;
-                //        if (result == MessageBoxResult.Yes){
-                //            MakeNewPlayListFileAsync();
-                //        }else{
-                //            return;
-                //        }
-                //    }else{
-                //        dbMsg += "新規作成";
-                //        NowSelectedPath = System.IO.Path.GetDirectoryName(nSelectedFile);
-                //        string newFileName = System.IO.Path.GetFileName(nSelectedFile);
-                //        CurrentPlayListFileName = nSelectedFile;
-                //        dbMsg += ">>CurrentPlayListFileName=" + CurrentPlayListFileName;
+		/// https://water2litter.net/rye/post/c_io_save_dialog/
+		public void MakeNewPlayListFile() {
+			string TAG = "MakeNewPlayListFile";
+			string dbMsg = "";
+			try {
+				NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
+				SaveFileDialog SFDialog = new SaveFileDialog() {
+					Title = "プレイリストを新規作成",
+					InitialDirectory = NowSelectedPath,
+					FileName = String.Format("{0:yyyyMM_ss}", DateTime.Now),
+					DefaultExt = ".m3u8",
 
-                //        StreamWriter sw = File.CreateText(CurrentPlayListFileName);
-                //        sw.Close();
+                    AddExtension = true,        // ユーザーが拡張子を省略したときに、自動的に拡張子を付けるか。規定値はtrue。
+                    CheckFileExists = false,    // ユーザーが存在しないファイルを指定したときに、警告するか。規定値はfalse。
+                    CheckPathExists = true,     // ユーザーが存在しないパスを指定したときに、警告するか。規定値はtrue。
+                    CreatePrompt = false,       // ユーザーが存在しないファイルを指定したときに、作成の許可を求めるか。規定値はfalse。
+                    CustomPlaces = null,        // ダイアログ左側のショートカットのリスト。
+                    DereferenceLinks = false,   // ショートカットが参照先を返す場合はtrue。リンクファイルを返す場合はfalse。規定値はfalse。
+                    Filter = string.Empty,      // ダイアログで表示するファイルの種類のフィルタを指定する文字列。
+                    FilterIndex = 1,            // 選択されたFilterのインデックス。規定値は1。
+                    OverwritePrompt = true,     // 存在するファイルを指定したときに、警告するか。規定値はtrue。
+                    ValidateNames = true,       // ファイル名がWin32に適合するか検査するかどうか。規定値はfalse。
+            };
+				if (SFDialog.ShowDialog() == true) {
+					//TransitionMessage message = new TransitionMessage(VM, "FileNameInputShow");
+					//await Messenger.RaiseAsync(message);
+					//dbMsg += ",Response=" + message.Response;
+					//dbMsg += ",Result=" + VM.DialogResult;
+					//if (VM.DialogResult != null) {
+					//    string nSelectedFile = VM.DialogResult;
+					string nSelectedFile = SFDialog.FileName;
+					dbMsg += ">>" + nSelectedFile;
+					if (File.Exists(nSelectedFile)) {
+						string titolStr = "既に存在するファイルです";
+						string msgStr = "再度、ファイル作成ができるダイアログを開きますか";
+						MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
+						dbMsg += ",result=" + result;
+						if (result == MessageBoxResult.Yes) {
+							MakeNewPlayListFile();
+						} else {
+							return;
+						}
+					} else {
+						dbMsg += "新規作成";
+						NowSelectedPath = Path.GetDirectoryName(nSelectedFile);
+						string newFileName = System.IO.Path.GetFileName(nSelectedFile);
+						CurrentPlayListFileName = nSelectedFile;
+						dbMsg += ">>CurrentPlayListFileName=" + CurrentPlayListFileName;
 
-                //        //設定ファイル更新
-                //        Properties.Settings.Default.Save();
-                //        AddPlayListCombo(CurrentPlayListFileName);
-                //    }
-                //}else{
-                //    dbMsg += "キャンセルされました";
-                //}
+						StreamWriter sw = File.CreateText(CurrentPlayListFileName);
+						sw.Close();
 
-                MyLog(TAG, dbMsg);
-            }
-            catch (Exception er)
-            {
-                MyErrorLog(TAG, dbMsg, er);
-            }
-        }
+						//設定ファイル更新
+						Properties.Settings.Default.Save();
+						AddPlayListCombo(CurrentPlayListFileName);
+					}
+					//} else {
+					//    dbMsg += "キャンセルされました";
+					//}
 
-        public ICommand PlayListSave => new DelegateCommand(SavePlayList);
+				}
+
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				MyErrorLog(TAG, dbMsg, er);
+			}
+		}
+
+		public ICommand PlayListSave => new DelegateCommand(SavePlayList);
         /// <summary>
         /// 表示されてるプレイリストを保存する
         /// </summary>
@@ -1798,7 +1788,6 @@ namespace M3UPlayer.ViewModels
 				MyErrorLog(TAG, dbMsg, er);
 			}
 		}
-
 
         /// <summary>
         /// プレイリストに変化があった場合、trueを渡せば保存、falseで設問によって保存。
@@ -1831,8 +1820,6 @@ namespace M3UPlayer.ViewModels
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
-
-
 
         #region プレイリストのコンテキストメニュー
         public ContextMenu PlayListMenu { get; set; }
