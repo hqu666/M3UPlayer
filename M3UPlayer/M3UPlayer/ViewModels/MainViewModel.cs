@@ -312,15 +312,10 @@ namespace M3UPlayer.ViewModels
 			string TAG = "BeforeClose";
 			string dbMsg = "";
 			try {
-				if (PlayListSaveBTVisble.Equals("Visible")) {
-                    IsDoSavePlayList(false);
-                    //string titolStr = "プレイリストが変更されています";
-                    //string msgStr = "保存しますか？";
-                    //MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
-                    //dbMsg += ",result=" + result;
-                    //if (result == MessageBoxResult.Yes) {
-                    //	SavePlayList();
-                    //}
+				if (PlayListSaveBTVisble != null) {
+                    if (PlayListSaveBTVisble.Equals("Visible")) {
+                        IsDoSavePlayList(false);
+                    }
                 }
             } catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
