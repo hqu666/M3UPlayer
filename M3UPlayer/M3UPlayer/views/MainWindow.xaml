@@ -198,9 +198,9 @@
                     <StackPanel  Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Center" Grid.RowSpan="2">
                         <ComboBox ItemsSource="{Binding PLComboSource, Mode=TwoWay}"
                                   SelectedValuePath="Key" DisplayMemberPath="Value"
-                                   SelectedIndex="{Binding PLComboSelectedIndex, Mode=TwoWay}"
+                                  SelectedIndex="{Binding PLComboSelectedIndex, Mode=TwoWay}"
                                   ContextMenu="{Binding PlayListComboItemMenu}"
-								 Height="26" Width="Auto"
+								  Height="26" Width="Auto"
 								/>
                     </StackPanel>
                     <Label  Grid.Column="7"
