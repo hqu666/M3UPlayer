@@ -285,12 +285,12 @@ namespace M3UPlayer.ViewModels
 				PLList = new ObservableCollection<PlayListModel>();
                 // ICommandの場合
                 //	EditCommand = CreateCommand(t_events => MyDoubleClickCommand(t_events));
+                dbMsg += ",CurrentPlayListFileName=" + CurrentPlayListFileName;
                 PLComboSource = new Dictionary<string, string>();
                 PLComboSelectedItem = new List<string>();
                 AddPlayListCombo("");
                 MakePlayListComboMenu();
 				dbMsg += "[" + VWidth + "×" + VHeight + "]";
-				dbMsg += ",CurrentPlayListFileName=" + CurrentPlayListFileName;
 				if (CurrentPlayListFileName.Contains(".M3u")) {
 					ListUpFiles(CurrentPlayListFileName);
 					//PlayListsからCurrentPlayListFileNameのインデックスを取得
@@ -1924,8 +1924,14 @@ namespace M3UPlayer.ViewModels
 			try {
 				NowSelectedFile = PLListSelectedItem.UrlStr;
 				dbMsg += "操作するのは=" + NowSelectedFile;
-                string[] Strs = NowSelectedFile.Split('/');         //Path.DirectorySeparatorCharはバックスラッシュ
+                string[] Strs = NowSelectedFile.Split('/');
+                if (NowSelectedFile.Contains('/')) {
+                }else if (NowSelectedFile.Contains(Path.DirectorySeparatorChar)) {
+                    Strs = NowSelectedFile.Split(Path.DirectorySeparatorChar);
+                }
+                dbMsg += "," + Strs.Length + "階層";
                 string fileNameStr =  Strs[Strs.Length-1];
+                dbMsg += ",fileNameStr=" + fileNameStr;
                 string pathStr =  NowSelectedFile.Remove(NowSelectedFile.Length - fileNameStr.Length-1);
                 pathStr = pathStr.Replace("file://", "");
                 pathStr = pathStr.Replace("///", "/");
