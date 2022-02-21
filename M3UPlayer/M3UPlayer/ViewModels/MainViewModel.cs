@@ -211,6 +211,23 @@ namespace M3UPlayer.ViewModels
                     }
             }
         }
+
+        private string _PlayListComboSelected;
+       /// <summary>
+       /// 選択jされたプレイリストファイル
+       /// </summary>
+        public string PlayListComboSelected {
+            get => _PlayListComboSelected;
+            set {
+                if (_PlayListComboSelected == value)
+                    return;
+                    _PlayListComboSelected = value;
+                    RaisePropertyChanged("PlayListComboSelected");
+                }
+            }
+
+
+
         /// <summary>
         /// 最後に選択したフォルダ
         /// </summary>
@@ -287,7 +304,7 @@ namespace M3UPlayer.ViewModels
                 //	EditCommand = CreateCommand(t_events => MyDoubleClickCommand(t_events));
                 dbMsg += ",CurrentPlayListFileName=" + CurrentPlayListFileName;
                 PLComboSource = new Dictionary<string, string>();
-                PLComboSelectedItem = new List<string>();
+         //       PLComboSelectedItem = new List<string>();
                 AddPlayListCombo("");
                 MakePlayListComboMenu();
 				dbMsg += "[" + VWidth + "×" + VHeight + "]";
@@ -691,19 +708,19 @@ namespace M3UPlayer.ViewModels
                 string TAG = "PLComboSelectedItem(set)";
                 string dbMsg = "";
                 dbMsg += "[" + value + "]";
-                if (_pLComboSelectedItem == value)
+                if (_pLComboSelectedItem == value || value== null)
                     return;
                 _pLComboSelectedItem = value;
                 RaisePropertyChanged("PLComboSelectedItem");
-                //CurrentPlayListFileName = value[0];
-                //dbMsg += CurrentPlayListFileName;
-                //Properties.Settings.Default.Save();
-                //if (CurrentPlayListFileName.Equals(ComboLastItemKey)) {
-                //    MakeNewPlayListFile();
-                //} else {
-                //    ListUpFiles(CurrentPlayListFileName);
-                //}
-                MyLog(TAG, dbMsg);
+				CurrentPlayListFileName = value[0];
+				dbMsg += CurrentPlayListFileName;
+				Properties.Settings.Default.Save();
+				if (CurrentPlayListFileName.Equals(ComboLastItemKey)) {
+					MakeNewPlayListFile();
+				} else {
+					ListUpFiles(CurrentPlayListFileName);
+				}
+				MyLog(TAG, dbMsg);
             }
         }
         private int _plcomboselectedindex;
@@ -718,7 +735,7 @@ namespace M3UPlayer.ViewModels
                 string TAG = "PLComboSelectedIndex(set)";
                 string dbMsg = "";
                 dbMsg += "[" + value + "]";
-                if (_plcomboselectedindex == value)
+                if (_plcomboselectedindex == value || value < 0)
 					return;
 				_plcomboselectedindex = value;
 				RaisePropertyChanged("PLComboSelectedIndex");
@@ -783,9 +800,17 @@ namespace M3UPlayer.ViewModels
                 //新規リスト
                 PLComboSource.Add(ComboLastItemKey, ComboLastItemVal);
                 RaisePropertyChanged("PLComboSource");
-                //     PLComboSelectedIndex = 0;       // PLComboSource.Count() - 1;
+                int listIndex = Array.IndexOf(PlayLists, CurrentPlayListFileName);
+				if (listIndex <0) {
+                    dbMsg += "リストに不在" ;
+					PLComboSelectedIndex = 0;       // PLComboSource.Count() - 1;
+				} else {
+                    PLComboSelectedIndex = listIndex;
+                }
                 RaisePropertyChanged("PLComboSelectedIndex");
                 dbMsg += ">>" + PLComboSource.Count() + "件[" + PLComboSelectedIndex + "]" + CurrentPlayListFileName;
+                PlayListComboSelected = CurrentPlayListFileName;
+                RaisePropertyChanged("PlayListComboSelected");
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
@@ -910,13 +935,30 @@ namespace M3UPlayer.ViewModels
         /// <summary>
         /// プレイリストコンボからの削除
         /// </summary>
+        /// https://rksoftware.wordpress.com/2015/06/13/combobox-%E3%81%AE-itemssource-%E3%81%A8-selectedvalue-%E3%81%AE%E4%B8%A1%E6%96%B9%E3%81%AB-binding-%E3%82%92%E3%81%99%E3%82%8B/
+        /// 
         private void PlayListComboItemDelete_Click(object sender, RoutedEventArgs e)
         {
             string TAG = "PlayListComboItemDelete_Click";
             string dbMsg = "";
             try
             {
-                //削除するアイテムを特定する
+                string titolStr = "プレイリスト・コンボ：アイテムの削除";
+                string msgStr = "削除するプレイリストが選択されていないようです。\r\n削除したいプレイリストファイル名をクリックしてください。";
+                dbMsg += ",PlayListComboSelected= " + PlayListComboSelected;
+				if (PlayListComboSelected == null) {
+					MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.OK, MessageBoxImage.Error);
+					dbMsg += ",result=" + result;
+					return;
+				} else {
+                    msgStr = PlayListComboSelected + "をコンボボックスから外しますか？\r\n（ファイルは削除しません。)";
+                    MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.OKCancel, MessageBoxImage.Exclamation);
+                    dbMsg += ",result=" + result;
+					if (result.Equals(MessageBoxResult.Cancel)) {
+                        return;
+                    }
+                }
+                //削除するアイテムを特定する  
                 dbMsg += ",現在のプレイリストは[ " + PLComboSelectedIndex +"]";
                 CurrentPlayListFileName = PlayLists[PLComboSelectedIndex];
                 dbMsg +=  CurrentPlayListFileName;
@@ -937,6 +979,7 @@ namespace M3UPlayer.ViewModels
                             }
                         }
                         PlayListStr = rPlayListStr;
+                        PLComboSelectedIndex = 0;
                         //Properties.Settings.Default.PlayListStr = PlayListStr;
                         //Properties.Settings.Default.CurrentPlayListFileName = CurrentPlayListFileName;
                         Properties.Settings.Default.Save();

@@ -196,12 +196,22 @@
 
 
                     <StackPanel  Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Center" Grid.RowSpan="2">
-                        <ComboBox ItemsSource="{Binding PLComboSource, Mode=TwoWay}"
-                                  SelectedValuePath="Key" DisplayMemberPath="Value"
-                                  SelectedIndex="{Binding PLComboSelectedIndex, Mode=TwoWay}"
-                                  ContextMenu="{Binding PlayListComboItemMenu}"
-								  Height="26" Width="Auto"
-								/>
+                        <ComboBox 
+                            SelectedValuePath="Key" 
+                            DisplayMemberPath="Value"
+                            SelectedIndex="{Binding PLComboSelectedIndex, Mode=TwoWay}"
+                            ItemsSource="{Binding PLComboSource, Mode=TwoWay}"
+                            SelectedValue="{Binding PlayListComboSelected, Mode=TwoWay}"
+                            ContextMenu="{Binding PlayListComboItemMenu}"
+						    Height="26" Width="Auto"
+						/>
+                        <!--
+                                  SelectedValuePath="Key" 
+                        
+                                                          SelectedValuePath="{Binding PlayListComboSelectedu"
+
+                        -->
+
                     </StackPanel>
                     <Label  Grid.Column="7"
                             Content="{Binding ListItemCount, Mode=TwoWay}" Margin="5,5,5,5" Grid.RowSpan="2"
@@ -214,7 +224,7 @@
                 <DataGrid  x:Name="PlayList"
 						    Grid.Row="1" Grid.Column="0"
 						    ItemsSource="{Binding PLList}"
-                            SelectedItem="{Binding PLListSelectedItem}"
+                            SelectedItem="{Binding SelectedPlayListFile}"
                             ContextMenu="{Binding PlayListMenu}"
                             AllowDrop="true"
 						    SelectionMode="Single"
