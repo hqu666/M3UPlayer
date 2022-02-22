@@ -1004,29 +1004,6 @@ namespace M3UPlayer.ViewModels
         }
 
         #endregion
-        ////プレイリストのアイテム移動////////////////////////////////////
-
-        /// <summary>
-        /// プレイリスト上での移動
-        /// </summary>
-        public void PlayListItemMoveTo(PlayListModel fromItem, PlayListModel targetItem) {
-			//int oldIndex,
-			string TAG = "PlayListItemMoveTo";
-			string dbMsg = "";
-			try {
-				dbMsg += "fromItem=" + fromItem.Summary;
-				PLList.Remove(fromItem);
-				int NewIndex = PLList.IndexOf(targetItem);
-				dbMsg += ">>[" + NewIndex + "]";
-				PLList.Insert(NewIndex, fromItem);
-				RaisePropertyChanged("PLList");
-				PLListSelectedItem = fromItem;
-				RaisePropertyChanged("PLListSelectedItem");
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
 
 
 		/// <summary>
@@ -1871,6 +1848,76 @@ namespace M3UPlayer.ViewModels
             }
         }
 
+        /// <summary>
+        /// 選択、左クリックされたアイテムを取得し実行確認ダイアログを表示
+        /// メッセージが渡されなければダイアログは表示しない
+        /// </summary>
+        /// <param name="titolStr">表示するダイアログのタイトル</param>
+        /// <param name="errorStr">操作対象が取得できない場合のメッセージ</param>
+        /// <param name="doStr">実行確認ダイアログのメッセージ</param>
+        /// <returns> 実行可否のBool </returns>
+        public Boolean PlayListOpelate(string titolStr, string? errorStr, string? doStr) {
+            //int oldIndex,
+            string TAG = "PlayListOpelate";
+            string dbMsg = "";
+            Boolean retBool = false;
+            try {
+                PLListSelectedItem = (PlayListModel)MyView.PlayList.SelectedItem;
+                NowSelectedFile = PLListSelectedItem.UrlStr;
+                int oldIndex = PLList.IndexOf(PLListSelectedItem);
+
+                dbMsg += "操作するのは["+ oldIndex +"]"+ NowSelectedFile;
+                if (PLListSelectedItem == null) {
+					if (errorStr != null) {
+                        errorStr = errorStr + "するプレイリストアイテムが選択されていないようです。\r\n" + errorStr + "したいプレイリストアイテムをクリックしてください。";
+                        MessageBoxResult result = MessageShowWPF(titolStr, errorStr, MessageBoxButton.OK, MessageBoxImage.Error);
+                        dbMsg += ",result=" + result;
+                    }
+                } else {
+                    retBool = true;
+                    RaisePropertyChanged("PLListSelectedItem");
+					if (doStr != null) {
+                        doStr = PLListSelectedItem.fileName + doStr;
+                        MessageBoxResult result = MessageShowWPF(titolStr, doStr, MessageBoxButton.OKCancel, MessageBoxImage.Exclamation);
+                        dbMsg += ",result=" + result;
+                        if (result.Equals(MessageBoxResult.Cancel)) {
+                            retBool = false;
+                        }
+                    }
+                }
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+            return retBool;
+        }
+
+
+        ////プレイリストのアイテム移動////////////////////////////////////
+
+        /// <summary>
+        /// プレイリスト上での移動
+        /// </summary>
+        public void PlayListItemMoveTo(PlayListModel fromItem, PlayListModel targetItem) {
+            //int oldIndex,
+            string TAG = "PlayListItemMoveTo";
+            string dbMsg = "";
+            try {
+                dbMsg += "fromItem=" + fromItem.Summary;
+                PLList.Remove(fromItem);
+                int NewIndex = PLList.IndexOf(targetItem);
+                dbMsg += ">>[" + NewIndex + "]";
+                PLList.Insert(NewIndex, fromItem);
+                RaisePropertyChanged("PLList");
+                PLListSelectedItem = fromItem;
+                RaisePropertyChanged("PLListSelectedItem");
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+
         #region プレイリストのコンテキストメニュー
         public ContextMenu PlayListMenu { get; set; }
 		public MenuItem PlayListItemViewExplore;
@@ -1965,7 +2012,14 @@ namespace M3UPlayer.ViewModels
 			string TAG = "PlayListItemViewExplore_Click";
 			string dbMsg = "";
 			try {
-				NowSelectedFile = PLListSelectedItem.UrlStr;
+                string titolStr = "プレイリストアイテムファイルの操作";
+                string errorStr = "操作";
+                string? doStr = null;
+                if (!PlayListOpelate(titolStr, errorStr, doStr)) {
+                    return;
+                }
+
+                NowSelectedFile = PLListSelectedItem.UrlStr;
 				dbMsg += "操作するのは=" + NowSelectedFile;
                 string[] Strs = NowSelectedFile.Split('/');
                 if (NowSelectedFile.Contains('/')) {
@@ -2012,11 +2066,23 @@ namespace M3UPlayer.ViewModels
 			}
 		}
 
+        /// <summary>
+        /// 先頭へ移動
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
 		private void PlayListItemMoveTop_Click(object sender, RoutedEventArgs e) {
 			string TAG = "PlayListItemMoveTop_Click";
 			string dbMsg = "";
 			try {
-				NowSelectedFile = PLListSelectedItem.UrlStr;
+                string titolStr = "プレイリストのアイテム移動";
+                string errorStr = "移動";
+                string doStr = "をリスト先頭に移動しますか？";
+                if (!PlayListOpelate( titolStr, errorStr, doStr)) {
+                    return ;
+                }
+
+                NowSelectedFile = PLListSelectedItem.UrlStr;
 				dbMsg += "urlStr=" + NowSelectedFile;
 				int oldIndex = PLList.IndexOf(PLListSelectedItem);
 				dbMsg += ",oldIndex=" + oldIndex;
@@ -2027,11 +2093,22 @@ namespace M3UPlayer.ViewModels
 			}
 		}
 
+        /// <summary>
+        /// 末尾へ移動
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
 		private void PlayListItemMoveBottom_Click(object sender, RoutedEventArgs e) {
 			string TAG = "PlayListItemMoveBottom_Click";
 			string dbMsg = "";
 			try {
-				NowSelectedFile = PLListSelectedItem.UrlStr;
+                string titolStr = "プレイリストのアイテム移動";
+                string errorStr = "移動";
+                string doStr = "をリスト末尾に移動しますか？";
+                if (!PlayListOpelate(titolStr, errorStr, doStr)) {
+                    return;
+                }
+                NowSelectedFile = PLListSelectedItem.UrlStr;
 				dbMsg += "urlStr=" + NowSelectedFile;
 				int oldIndex = PLList.IndexOf(PLListSelectedItem);
 				dbMsg += ",oldIndex=" + oldIndex;
@@ -2042,6 +2119,11 @@ namespace M3UPlayer.ViewModels
 			}
 		}
 
+        /// <summary>
+        /// 読めないファイルを削除
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
 		private void PlayListDeleteCannotRead_Click(object sender, RoutedEventArgs e) {
 			string TAG = "PlayListDeleteCannotRead_Click";
 			string dbMsg = "";
@@ -2072,6 +2154,11 @@ namespace M3UPlayer.ViewModels
 			}
 		}
 
+        /// <summary>
+        /// 先頭側の重複アイテムを削除
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
 		private void PlayListDeleteFrontDoubling_Click(object sender, RoutedEventArgs e) {
 			string TAG = "DeletePlayListComboItem";
 			string dbMsg = "";
@@ -2107,6 +2194,11 @@ namespace M3UPlayer.ViewModels
 			}
 		}
 
+        /// <summary>
+        /// 末尾側の重複アイテムを削除
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
 		private void PlayListDeleteAfterDoubling_Click(object sender, RoutedEventArgs e) {
 			string TAG = "PlayListDeleteAfterDoubling_Click";
 			string dbMsg = "";
@@ -2143,6 +2235,11 @@ namespace M3UPlayer.ViewModels
 			}
 		}
 
+        /// <summary>
+        /// 上書きでこのプレイリストを保存
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
 		private void PlayListSaveMenu_Click(object sender, RoutedEventArgs e) {
 			string TAG = "PlayListSaveMwnu_Click";
 			string dbMsg = "";
@@ -2154,6 +2251,11 @@ namespace M3UPlayer.ViewModels
 			}
 		}
 
+        /// <summary>
+        /// 名前を付けてこのプレイリストを保存
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
 		private void PlayListSaveAsMenu_Click(object sender, RoutedEventArgs e) {
 			string TAG = "PlayListSaveAsMenu_Click";
 			string dbMsg = "";
