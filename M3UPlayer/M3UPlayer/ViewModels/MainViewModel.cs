@@ -1743,7 +1743,7 @@ namespace M3UPlayer.ViewModels
                     FilterIndex = 1,            // 選択されたFilterのインデックス。規定値は1。
                     OverwritePrompt = true,     // 存在するファイルを指定したときに、警告するか。規定値はtrue。
                     ValidateNames = true,       // ファイル名がWin32に適合するか検査するかどうか。規定値はfalse。
-            };
+                };
 				if (SFDialog.ShowDialog() == true) {
 					//TransitionMessage message = new TransitionMessage(VM, "FileNameInputShow");
 					//await Messenger.RaiseAsync(message);
@@ -2260,47 +2260,58 @@ namespace M3UPlayer.ViewModels
 			string TAG = "PlayListSaveAsMenu_Click";
 			string dbMsg = "";
 			try {
-				dbMsg += "\r\n" + ListItemCount + "件";
-				string text = "";
+                string oldPlayListFileName = CurrentPlayListFileName;
+                dbMsg += "[" + PLComboSelectedIndex + " / " + PLComboSource.Count() + "]" + oldPlayListFileName;
+                dbMsg += "\r\n" + ListItemCount + "件";
+				string text = "";           //プレイリスト内の要素
 				foreach (PlayListModel One in PLList) {
-					text += One.UrlStr + "\r\n";
+					text += One.UrlStr + "\r\n";                    //プレイリストはurlのみ
 				}
 
+                SaveFileDialog dialog = new SaveFileDialog() {
+                    Title = "プレイリストの複製",
+                    InitialDirectory = System.IO.Path.GetDirectoryName(CurrentPlayListFileName),
+                    FileName = System.IO.Path.GetFileNameWithoutExtension(CurrentPlayListFileName) + "のコピー",
+                    DefaultExt = ".m3u8",
 
-				NowSelectedFile = PLListSelectedItem.UrlStr;
-				dbMsg += ",FileName=" + CurrentPlayListFileName;
-				//SaveFileDialog dialog = new SaveFileDialog();
-				//dialog.InitialDirectory = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
-				////	dialog.DefaultExt = ".m3u*";
-				//dialog.Filter = "プレイリスト (*.m3u*)|*.m3u*|すべて (*.*)|*.*";
-				//dialog.FilterIndex = 1;
-				//dialog.FileName = System.IO.Path.GetFileNameWithoutExtension(CurrentPlayListFileName) + "のコピー";
+                    AddExtension = true,        // ユーザーが拡張子を省略したときに、自動的に拡張子を付けるか。規定値はtrue。
+                    CheckFileExists = false,    // ユーザーが存在しないファイルを指定したときに、警告するか。規定値はfalse。
+                    CheckPathExists = true,     // ユーザーが存在しないパスを指定したときに、警告するか。規定値はtrue。
+                    CreatePrompt = false,       // ユーザーが存在しないファイルを指定したときに、作成の許可を求めるか。規定値はfalse。
+                    CustomPlaces = null,        // ダイアログ左側のショートカットのリスト。
+                    DereferenceLinks = false,   // ショートカットが参照先を返す場合はtrue。リンクファイルを返す場合はfalse。規定値はfalse。
+                    Filter = "プレイリスト (*.m3u*)|*.m3u*|すべて (*.*)|*.*",      // ダイアログで表示するファイルの種類のフィルタを指定する文字列。
+                    FilterIndex = 1,            // 選択されたFilterのインデックス。規定値は1。
+                    OverwritePrompt = true,     // 存在するファイルを指定したときに、警告するか。規定値はtrue。
+                    ValidateNames = true,       // ファイル名がWin32に適合するか検査するかどうか。規定値はfalse。
+                };
 
 
-				////	Nullable<bool> 
-				//DialogResult result = dialog.ShowDialog();
-				//if (result.Equals(DialogResult.OK)) {
-				//	CurrentPlayListFileName = dialog.FileName;
-				//	dbMsg += ">>" + CurrentPlayListFileName;
-				//	CurrentPlayListFileName += ".m3u8";
-				//	dbMsg += ">>" + CurrentPlayListFileName;
-				//	File.WriteAllText(CurrentPlayListFileName, text, Encoding.UTF8);
+                if (true == dialog.ShowDialog()) {
+					string newFileFullName = dialog.FileName;
+					dbMsg += ">>" + newFileFullName;
+                    string fName = dialog.SafeFileName;              //System.IO.Path.GetFileName(CurrentPlayListFileName);
+                    dbMsg += "と" + fName;
+					File.WriteAllText(newFileFullName, text, Encoding.UTF8);
 
-				//	//using (Stream fileStream = dialog.OpenFile())
-				//	//using (StreamWriter sr = new StreamWriter(fileStream)) {
-				//	//	sr.Write(text);
-				//	//}
-
-				//	AddPlayListCombo(CurrentPlayListFileName);
-
-				//	NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
-				//	dbMsg += ">>NowSelectedPath=" + NowSelectedPath;
-				//	RaisePropertyChanged("CurrentPlayListFileName");
-				//	RaisePropertyChanged("NowSelectedPath");
-				//	//設定ファイル更新
-				//	Properties.Settings.Default.Save();
-				//	string extention = System.IO.Path.GetExtension(NowSelectedFile);
-				//}
+                    //using (Stream fileStream = dialog.OpenFile())
+                    //using (StreamWriter sr = new StreamWriter(fileStream)) {
+                    //	sr.Write(text);
+                    //}
+                    //　コンボボックスデータの更新
+					PLComboSource.Remove(oldPlayListFileName);
+					PLComboSource.Add(newFileFullName, fName);  //Dictionalyは指定位置にインサートできない
+                    RaisePropertyChanged("PLComboSource");
+                    PlayListComboSelected = fName;
+                    RaisePropertyChanged("PlayListComboSelected");
+                    CurrentPlayListFileName = newFileFullName;
+                    RaisePropertyChanged("CurrentPlayListFileName");
+                    NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
+                    RaisePropertyChanged("NowSelectedPath");
+                    dbMsg += ">>NowSelectedPath=" + NowSelectedPath;
+					//設定ファイル更新
+					Properties.Settings.Default.Save();
+				}
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
