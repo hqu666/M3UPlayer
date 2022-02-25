@@ -278,7 +278,7 @@
                                             Width="Auto"
                                              />
                         <DataGridTextColumn Header="file" 
-                                            Binding="{Binding fileName }" 
+                                            Binding="{Binding Summary }" 
                                             Width="Auto"
                                              />
                         <DataGridTextColumn Header="ext" 

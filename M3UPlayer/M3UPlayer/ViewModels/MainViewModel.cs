@@ -440,28 +440,36 @@ namespace M3UPlayer.ViewModels
 			try {
 				dbMsg += "、FileURL=" + item;
 				string url = item;
-				//拡張部分を破棄してURLを読み出す
-				string[] items = item.Split(',');
+                //拡張部分を破棄してURLを読み出す
+                string[] items = item.Split(',');
 				if (1 < items.Length) {
 					url = items[0];
 				}
-                playListModel.extentionStr = System.IO.Path.GetExtension(url);
-				if (-1 < Array.IndexOf(videoFiles, playListModel.extentionStr)) {
-					playListModel.UrlStr = url;
-					string[] urls = url.Split(Path.DirectorySeparatorChar);
-					if (urls.Length<summaryCol) {
-						urls = url.Split('/');
-					}
-					playListModel.fileName = urls[urls.Length-1];
-                    playListModel.fileName = playListModel.fileName.Replace(playListModel.extentionStr, "");
-                    playListModel.ParentDir = urls[urls.Length -2];
-                    string[] remains = url.Split(playListModel.ParentDir);
-                    playListModel.GranDir = remains[0];
-                } else {
-					dbMsg += ",extention=" + playListModel.extentionStr;
-				}
+                playListModel.UrlStr = item;
+                //            playListModel.extentionStr = System.IO.Path.GetExtension(url);
+                //if (-1 < Array.IndexOf(videoFiles, playListModel.extentionStr)) {
+                //	playListModel.UrlStr = url;
+                //	string[] urls = url.Split(Path.DirectorySeparatorChar);
+                //	if (urls.Length<summaryCol) {
+                //		urls = url.Split('/');
+                //	}
+                //	playListModel.fileName = urls[urls.Length-1];
+                //                playListModel.fileName = playListModel.fileName.Replace(playListModel.extentionStr, "");
+                //                playListModel.ParentDir = urls[urls.Length -2];
+                //                string[] remains = url.Split(playListModel.ParentDir);
+                //                playListModel.GranDir = remains[0];
+                //            } else {
+                //	dbMsg += ",extention=" + playListModel.extentionStr;
+                //}
+                dbMsg += ">UrlStr=" + playListModel.UrlStr;
+                dbMsg += ",fileName=" + playListModel.fileName;
+                dbMsg += ",extention=" + playListModel.extentionStr;
+                dbMsg += ",Summary=" + playListModel.Summary;
+                dbMsg += ",ParentDir=" + playListModel.ParentDir;
+                dbMsg += ",GranDir=" + playListModel.GranDir;
+                dbMsg += ",extention=" + playListModel.extentionStr;
 
-				MyLog(TAG, dbMsg);
+                MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
@@ -697,7 +705,7 @@ namespace M3UPlayer.ViewModels
 		/// <summary>
 		/// プレイリスト選択コンボボックス
 		/// </summary>
-		public Dictionary<string, string> PLComboSource { get; set; }
+		public Dictionary<string, string> PLComboSource { get; set; }           //protectedにするとアウトブレークモードになる
         public IList<string> _pLComboSelectedItem;
         /// <summary>
         /// 選択されているプレイリストのアイテム
