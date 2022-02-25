@@ -825,6 +825,38 @@ namespace M3UPlayer.ViewModels
             }
         }
 
+        /// <summary>
+        /// 指定した位置のコンボボックスアイテムを置き換える
+        /// </summary>
+        /// <param name="tIndex"></param>
+        /// <param name="AddFlieName"></param>
+        public void ReplacePlayListComboItem(int tIndex, string AddFlieName) {
+            string TAG = "ReplacePlayListComboItem";
+            string dbMsg = "";
+            try {
+                dbMsg +="["+ tIndex + "/" + PLComboSource.Count() + "を" + AddFlieName + "に置き換える";
+                //登録済みのPlayリストと照合
+                dbMsg += "、登録済み=" + PlayListStr;
+                PlayLists = PlayListStr.Split(',');
+                PlayListStr = "";
+                for (int i = 0; i < PlayLists.Length; ++i) {
+					if (tIndex == i) {
+                        PlayListStr += AddFlieName;
+					} else {
+                        PlayListStr += PlayLists[i];
+                    }
+                }
+                dbMsg += ">>" + PlayListStr;
+                RaisePropertyChanged("PlayListStr");
+                Properties.Settings.Default.PlayListStr = PlayListStr;
+                Properties.Settings.Default.Save();
+                AddPlayListCombo("");
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
 
         //        /// <summary>
         //        /// プレイリスト選択
@@ -2307,9 +2339,12 @@ namespace M3UPlayer.ViewModels
                     //	sr.Write(text);
                     //}
                     //　コンボボックスデータの更新
-					PLComboSource.Remove(oldPlayListFileName);
-					PLComboSource.Add(newFileFullName, fName);  //Dictionalyは指定位置にインサートできない
-                    RaisePropertyChanged("PLComboSource");
+                    ReplacePlayListComboItem(PLComboSelectedIndex, newFileFullName);
+
+
+     //               PLComboSource.Remove(oldPlayListFileName);
+					//PLComboSource.Add(newFileFullName, fName);  //Dictionalyは指定位置にインサートできない
+     //               RaisePropertyChanged("PLComboSource");
                     PlayListComboSelected = fName;
                     RaisePropertyChanged("PlayListComboSelected");
                     CurrentPlayListFileName = newFileFullName;
@@ -3658,7 +3693,8 @@ AddType video/MP2T .ts
 								dbMsg += ",retItems2=" + retItems2.Count + "件";
 								for (int i = 0; i < retItems2.Count; ++i) {
 									retItems.Add( retItems2[i] );
-								}*/
+								}
+                            */
                         }
                     }           //ListBox1に結果を表示する
                 }
