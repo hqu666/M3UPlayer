@@ -2127,7 +2127,8 @@ namespace M3UPlayer.ViewModels
 				int oldIndex = PLList.IndexOf(PLListSelectedItem);
 				dbMsg += ",oldIndex=" + oldIndex;
 				PLList.Move(oldIndex, 0);
-				MyLog(TAG, dbMsg);
+                IsDoSavePlayList( false);
+                MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
@@ -2153,7 +2154,8 @@ namespace M3UPlayer.ViewModels
 				int oldIndex = PLList.IndexOf(PLListSelectedItem);
 				dbMsg += ",oldIndex=" + oldIndex;
 				PLList.Move(oldIndex, PLList.Count - 1);
-				MyLog(TAG, dbMsg);
+                IsDoSavePlayList(false);
+                MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
@@ -2228,7 +2230,8 @@ namespace M3UPlayer.ViewModels
 					RaisePropertyChanged("ListItemCount");
 					dbMsg += ">>" + ListItemCount + "件";
 				}
-				MyLog(TAG, dbMsg);
+                IsDoSavePlayList(false);
+                MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
@@ -2269,7 +2272,8 @@ namespace M3UPlayer.ViewModels
 					RaisePropertyChanged("ListItemCount");
 					dbMsg += ">>" + ListItemCount + "件";
 				}
-				MyLog(TAG, dbMsg);
+                IsDoSavePlayList(false);
+                MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
@@ -2340,11 +2344,6 @@ namespace M3UPlayer.ViewModels
                     //}
                     //　コンボボックスデータの更新
                     ReplacePlayListComboItem(PLComboSelectedIndex, newFileFullName);
-
-
-     //               PLComboSource.Remove(oldPlayListFileName);
-					//PLComboSource.Add(newFileFullName, fName);  //Dictionalyは指定位置にインサートできない
-     //               RaisePropertyChanged("PLComboSource");
                     PlayListComboSelected = fName;
                     RaisePropertyChanged("PlayListComboSelected");
                     CurrentPlayListFileName = newFileFullName;
