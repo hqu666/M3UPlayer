@@ -225,6 +225,7 @@
 						    Grid.Row="1" Grid.Column="0"
 						    ItemsSource="{Binding PLList}"
                             SelectedItem="{Binding SelectedPlayListFile}"
+                            SelectedIndex="{Binding SelectedPlayListIndex}"
                             ContextMenu="{Binding PlayListMenu}"
                             AllowDrop="true"
 						    SelectionMode="Single"

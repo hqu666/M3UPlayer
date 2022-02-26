@@ -244,6 +244,25 @@ namespace M3UPlayer.ViewModels
             get { return Properties.Settings.Default.NowSelectedFile; }
             set { Properties.Settings.Default.NowSelectedFile = value; }
         }
+
+        /// <summary>
+        /// プレイリスト上で選択されているアイテムのインデックス
+        /// </summary>
+        private int _SelectedPlayListIndex;
+        /// <summary>
+        /// 音量
+        /// </summary>
+        public int SelectedPlayListIndex {
+            get => _SelectedPlayListIndex;
+            set {
+                if (_SelectedPlayListIndex == value)
+                    return;
+                _SelectedPlayListIndex = value;
+                RaisePropertyChanged("_SelectedPlayListIndex");
+            }
+        }
+
+
         /// <summary>
         /// 最後に再生したメディアファイルの再生ポジション
         /// </summary>
@@ -1905,9 +1924,10 @@ namespace M3UPlayer.ViewModels
                 PLListSelectedItem = (PlayListModel)MyView.PlayList.SelectedItem;
                 NowSelectedFile = PLListSelectedItem.UrlStr;
                 int oldIndex = PLList.IndexOf(PLListSelectedItem);
+                dbMsg += "[" + SelectedPlayListIndex + "]" + NowSelectedFile;
 
                 dbMsg += "操作するのは["+ oldIndex +"]"+ NowSelectedFile;
-                if (PLListSelectedItem == null) {
+                if (PLListSelectedItem == null || SelectedPlayListIndex < 0) {
 					if (errorStr != null) {
                         errorStr = errorStr + "するプレイリストアイテムが選択されていないようです。\r\n" + errorStr + "したいプレイリストアイテムをクリックしてください。";
                         MessageBoxResult result = MessageShowWPF(titolStr, errorStr, MessageBoxButton.OK, MessageBoxImage.Error);
@@ -2060,7 +2080,7 @@ namespace M3UPlayer.ViewModels
                 }
 
                 NowSelectedFile = PLListSelectedItem.UrlStr;
-				dbMsg += "操作するのは=" + NowSelectedFile;
+				dbMsg += "[" + SelectedPlayListIndex + "]" + NowSelectedFile;
                 string[] Strs = NowSelectedFile.Split('/');
                 if (NowSelectedFile.Contains('/')) {
                 }else if (NowSelectedFile.Contains(Path.DirectorySeparatorChar)) {
@@ -2091,16 +2111,34 @@ namespace M3UPlayer.ViewModels
 					dbMsg += ">>" + NewSelectedPath;
 					if (!NewSelectedPath.Equals(NowSelectedFile)) {
                         dbMsg += ">>変更有り" ;
-
+                        PlayListModel changeItem = new PlayListModel();
+                        changeItem.UrlStr = NewSelectedPath;
+                        if (File.Exists(NowSelectedFile)) {
+                            dbMsg += "元ファイルを残してコピー追加:次行へ";
+                            PLList.Insert(SelectedPlayListIndex + 1, changeItem);
+                        } else {
+                            int orgIndex = SelectedPlayListIndex;
+                            PLList.RemoveAt(SelectedPlayListIndex);
+                            if (File.Exists(NewSelectedPath)) {
+                                dbMsg += "元ファイル変更：同行を置き換え";
+                                PLList.Insert(orgIndex, changeItem);
+                                SelectedPlayListIndex = orgIndex;
+                            } else {
+                                dbMsg += "元ファイルを削除";
+                            }
+                        }
+                        SavePlayList();
                     }
-                    //string[] files = System.IO.Directory.GetFiles(@NowSelectedPath, "*", System.IO.SearchOption.AllDirectories);
-                    //dbMsg += ">>" + files.Length + "件";
-                    //dbMsg += ">>" + files[0];
-
                 } else {
 					dbMsg += "キャンセルされました";
-				}
-				MyLog(TAG, dbMsg);
+                }
+                if (File.Exists(NowSelectedFile)) {
+                } else {
+                    dbMsg += "(もしくは無いファイルを選択した)元ファイルを削除";
+                    PLList.RemoveAt(SelectedPlayListIndex);
+                    SavePlayList();
+                }
+                MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
