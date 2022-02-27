@@ -51,4 +51,3 @@ H:\develop\2022\M3U\M3UPlayer\M3UPlayer\obj\Debug\net6.0-windows\M3UPlayer.dll
 H:\develop\2022\M3U\M3UPlayer\M3UPlayer\obj\Debug\net6.0-windows\ref\M3UPlayer.dll
 H:\develop\2022\M3U\M3UPlayer\M3UPlayer\obj\Debug\net6.0-windows\M3UPlayer.pdb
 H:\develop\2022\M3U\M3UPlayer\M3UPlayer\obj\Debug\net6.0-windows\M3UPlayer.genruntimeconfig.cache
-H:\develop\2022\M3U\M3UPlayer\M3UPlayer\obj\Debug\net6.0-windows\M3UPlayer.csproj.AssemblyReference.cache

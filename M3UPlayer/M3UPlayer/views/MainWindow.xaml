@@ -10,8 +10,8 @@
 		xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
 	   xmlns:local="clr-namespace:M3UPlayer"
 		xmlns:v="clr-namespace:M3UPlayer.Views"
-		xmlns:vm="clr-namespace:M3UPlayer.ViewModels"
-		mc:Ignorable="d"
+		xmlns:vm="clr-namespace:M3UPlayer.ViewModels" d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
+        mc:Ignorable="d"
         Title="MainWindow" Height="1080" Width="1920"
         Top="10" Left="10" 
         Closing="Window_Closing"
@@ -209,6 +209,9 @@
                                   SelectedValuePath="Key" 
                         
                                                           SelectedValuePath="{Binding PlayListComboSelectedu"
+                        重大度レベル	コード	説明	プロジェクト	ファイル	行	抑制状態
+エラー	MC3065	'SelectedItems' プロパティは読み取り専用で、マークアップから設定することはできません。 行 228 位置 29.	M3UPlayer	H:\develop\2022\M3U\M3UPlayer\M3UPlayer\views\MainWindow.xaml	228	
+
 
                         -->
 
@@ -223,12 +226,11 @@
 
                 <DataGrid  x:Name="PlayList"
 						    Grid.Row="1" Grid.Column="0"
-						    ItemsSource="{Binding PLList}"
-                            SelectedItem="{Binding SelectedPlayListFile}"
-                            SelectedIndex="{Binding SelectedPlayListIndex}"
+						    ItemsSource="{Binding PLList, Mode=TwoWay}"
+						    SelectionMode="Extended"
+                            SelectedIndex="{Binding SelectedPlayListIndex, Mode=TwoWay}"
                             ContextMenu="{Binding PlayListMenu}"
                             AllowDrop="true"
-						    SelectionMode="Single"
 						    CanUserAddRows="False" 
 						    CanUserDeleteRows="False"
 						    RowDetailsVisibilityMode="Visible" 
@@ -238,6 +240,14 @@
                             MouseMove="PlayList_MouseMove" 
                             MouseUp="PlayList_MouseUp" DragEnter="PlayList_DragEnter" Drop="PlayList_Drop" 
 						>
+                    <!--
+                    
+                            SelectedItem="{Binding SelectedPlayListFiles}"
+                            SelectedItems="{Binding SelectedPlayListFiles, Mode=TwoWay}"
+                    
+                    -->
+
+
                     <!--DragEnter="PlayList_DragEnter" 
                            DragLeave="PlayList_DragLeave" 
                            DragOver="PlayList_DragOver" 

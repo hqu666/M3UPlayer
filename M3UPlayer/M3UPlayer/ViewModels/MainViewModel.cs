@@ -35,24 +35,128 @@ using Microsoft.Azure.Cosmos.Core.Collections;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Text.RegularExpressions;
+using System.Collections;
 //using AxShockwaveFlashObjects;
 
 namespace M3UPlayer.ViewModels
 {
 	public class MainViewModel : INotifyPropertyChanged {
 		public Views.MainWindow MyView { get; set; }
-		/// <summary>
-		/// WindowsMediaPlayerのコントローラ
-		/// </summary>
-		//public PlayerWFCL.WMPControl axWmp;
+        /// <summary>
+        /// WindowsMediaPlayerのコントローラ
+        /// </summary>
+        //public PlayerWFCL.WMPControl axWmp;
+
+        private ObservableCollection<PlayListModel> _PLList;
+        /// <summary>
+        /// プレイリストのソース
+        /// </summary>
+        public ObservableCollection<PlayListModel> PLList {
+            get => _PLList;
+            set {
+                string TAG = "PLList(set)";
+                string dbMsg = "";
+                try {
+                    if (_PLList == value)
+                        return;
+                    _PLList = value;
+                    dbMsg += PLList.Count +"件 " ;
+					if (0< PLList.Count) {
+                        dbMsg += PLList[0];
+                        dbMsg += "～" + PLList[PLList.Count - 1];
+                    }
+                    MyLog(TAG, dbMsg);
+                    RaisePropertyChanged("PLList");
+                } catch (Exception er) {
+                    MyErrorLog(TAG, dbMsg, er);
+                }
+            }
+        }
+        public PlayListModel PLListSelectedItem { get; set; }
 
 		/// <summary>
-		/// プレイリスト本体
+		/// 選択されているプレイリストアイテムの配列
 		/// </summary>
-		public ObservableCollection<PlayListModel> PLList { get; set; }
-		public PlayListModel PLListSelectedItem { get; set; }
+		public List<PlayListModel> SelectedPlayListFiles { get; set; }
 
-		private string _DurationStr;
+        //private IList<PlayListModel> _SelectedPlayListFiles;
+        //public IList<PlayListModel>? SelectedPlayListFiles {
+        //	get => (List<PlayListModel>)_SelectedPlayListFiles;
+        //	set {
+        //		string TAG = "SelectedPlayListFiles(set)";
+        //		string dbMsg = "";
+        //		try {
+        //			if (_SelectedPlayListFiles == value)
+        //				return;
+        //			_SelectedPlayListFiles = value;
+        //                  RaisePropertyChanged("SelectedPlayListFiles");
+        //                  dbMsg += ",SelectedPlayListFiles=" + SelectedPlayListFiles;
+        //                  if (SelectedPlayListFiles != null) {
+        //                      dbMsg += SelectedPlayListFiles.Count() + "件";
+        //                      if (0< SelectedPlayListFiles.Count()) {
+        //                          dbMsg += SelectedPlayListFiles[0].Summary;
+        //                          dbMsg += "～" + SelectedPlayListFiles[SelectedPlayListFiles.Count()-1].Summary;
+        //                      }
+        //                  }
+        //			MyLog(TAG, dbMsg);
+        //		} catch (Exception er) {
+        //			MyErrorLog(TAG, dbMsg, er);
+        //		}
+        //	}
+        //}
+
+        private int _SelectedPlayListIndex;
+        /// <summary>
+        /// プレイリスト上で選択されているアイテムのインデックス
+        /// </summary>
+        public int SelectedPlayListIndex {
+            get => _SelectedPlayListIndex;
+            set {
+                string TAG = "SelectedPlayListIndex(set)";
+                string dbMsg = "";
+                try {
+                    if (_SelectedPlayListIndex == value)
+                        return;
+                    _SelectedPlayListIndex = value;
+                    RaisePropertyChanged("SelectedPlayListIndex");
+                    dbMsg += SelectedPlayListIndex;
+                    if (MyView.PlayList.SelectedItems != null) {
+                        SelectedPlayListFiles = new List<PlayListModel>();
+                        IList _selectedItems = MyView.PlayList.SelectedItems;
+                        foreach(object pli in _selectedItems) {
+                            PlayListModel PLItem =new PlayListModel();
+                            PLItem = (PlayListModel)pli;
+                            SelectedPlayListFiles.Add(PLItem);
+                        }
+                        dbMsg += SelectedPlayListFiles.Count + "件";
+						if (0 < SelectedPlayListFiles.Count) {
+							dbMsg += SelectedPlayListFiles[0].Summary;
+							dbMsg += "～" + SelectedPlayListFiles[SelectedPlayListFiles.Count() - 1].Summary;
+						}
+					}
+                    MyLog(TAG, dbMsg);
+                } catch (Exception er) {
+                    MyErrorLog(TAG, dbMsg, er);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 最後に選択したフォルダ
+        /// </summary>
+        public string NowSelectedPath {
+            get { return Properties.Settings.Default.NowSelectedPath; }
+            set { Properties.Settings.Default.NowSelectedPath = value; }
+        }
+        /// <summary>
+        /// 最後に選択したファイル
+        /// </summary>
+        public string NowSelectedFile {
+            get { return Properties.Settings.Default.NowSelectedFile; }
+            set { Properties.Settings.Default.NowSelectedFile = value; }
+        }
+
+        private string _DurationStr;
 		/// <summary>
 		/// 全長
 		/// </summary>
@@ -169,6 +273,10 @@ namespace M3UPlayer.ViewModels
 		public string ComboLastItemKey = "AddNew";
         public string ComboLastItemVal = "新規リスト";
 		private int _ListItemCount;
+        /// <summary>
+        /// プレイリストの登録件数。
+        /// 0で無ければコンテキストメニューも各アイテムを有効にする。
+        /// </summary>
 		public int ListItemCount {
 			get { return _ListItemCount; }
 			set { if (_ListItemCount == value)
@@ -229,41 +337,6 @@ namespace M3UPlayer.ViewModels
 
 
         /// <summary>
-        /// 最後に選択したフォルダ
-        /// </summary>
-        public string NowSelectedPath
-        {
-            get { return Properties.Settings.Default.NowSelectedPath; }
-            set { Properties.Settings.Default.NowSelectedPath = value; }
-        }
-        /// <summary>
-        /// 最後に選択したファイル
-        /// </summary>
-        public string NowSelectedFile
-        {
-            get { return Properties.Settings.Default.NowSelectedFile; }
-            set { Properties.Settings.Default.NowSelectedFile = value; }
-        }
-
-        /// <summary>
-        /// プレイリスト上で選択されているアイテムのインデックス
-        /// </summary>
-        private int _SelectedPlayListIndex;
-        /// <summary>
-        /// 音量
-        /// </summary>
-        public int SelectedPlayListIndex {
-            get => _SelectedPlayListIndex;
-            set {
-                if (_SelectedPlayListIndex == value)
-                    return;
-                _SelectedPlayListIndex = value;
-                RaisePropertyChanged("_SelectedPlayListIndex");
-            }
-        }
-
-
-        /// <summary>
         /// 最後に再生したメディアファイルの再生ポジション
         /// </summary>
         public TimeSpan NowSelectedPosition
@@ -319,6 +392,7 @@ namespace M3UPlayer.ViewModels
 				PlayListDeleteCannotRead.IsEnabled = false;
 				PlayListDeleteDoubling.IsEnabled = false;
 				PLList = new ObservableCollection<PlayListModel>();
+
                 // ICommandの場合
                 //	EditCommand = CreateCommand(t_events => MyDoubleClickCommand(t_events));
                 dbMsg += ",CurrentPlayListFileName=" + CurrentPlayListFileName;
@@ -465,21 +539,6 @@ namespace M3UPlayer.ViewModels
 					url = items[0];
 				}
                 playListModel.UrlStr = item;
-                //            playListModel.extentionStr = System.IO.Path.GetExtension(url);
-                //if (-1 < Array.IndexOf(videoFiles, playListModel.extentionStr)) {
-                //	playListModel.UrlStr = url;
-                //	string[] urls = url.Split(Path.DirectorySeparatorChar);
-                //	if (urls.Length<summaryCol) {
-                //		urls = url.Split('/');
-                //	}
-                //	playListModel.fileName = urls[urls.Length-1];
-                //                playListModel.fileName = playListModel.fileName.Replace(playListModel.extentionStr, "");
-                //                playListModel.ParentDir = urls[urls.Length -2];
-                //                string[] remains = url.Split(playListModel.ParentDir);
-                //                playListModel.GranDir = remains[0];
-                //            } else {
-                //	dbMsg += ",extention=" + playListModel.extentionStr;
-                //}
                 dbMsg += ">UrlStr=" + playListModel.UrlStr;
                 dbMsg += ",fileName=" + playListModel.fileName;
                 dbMsg += ",extention=" + playListModel.extentionStr;
@@ -535,7 +594,6 @@ namespace M3UPlayer.ViewModels
 				MyErrorLog(TAG, dbMsg, er);
 			}
 		}
-
 
 		/// <summary>
 		/// プレイリストに1ファイルづつ追加する。
