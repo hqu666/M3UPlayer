@@ -107,7 +107,8 @@ namespace M3UPlayer.ViewModels
 
         private int _SelectedPlayListIndex;
         /// <summary>
-        /// プレイリスト上で選択されているアイテムのインデックス
+        /// プレイリスト上で選択されているアイテムのインデックス。
+        /// 選択しているアイテム配列も作る
         /// </summary>
         public int SelectedPlayListIndex {
             get => _SelectedPlayListIndex;
@@ -119,19 +120,20 @@ namespace M3UPlayer.ViewModels
                         return;
                     _SelectedPlayListIndex = value;
                     RaisePropertyChanged("SelectedPlayListIndex");
-                    dbMsg += SelectedPlayListIndex;
+                    dbMsg += "["+ SelectedPlayListIndex + "]";
                     if (MyView.PlayList.SelectedItems != null) {
                         SelectedPlayListFiles = new List<PlayListModel>();
                         IList _selectedItems = MyView.PlayList.SelectedItems;
                         foreach(object pli in _selectedItems) {
-                            PlayListModel PLItem =new PlayListModel();
+                            PlayListModel PLItem =new PlayListModel();      //直接代入でクラッシュしたのでローカル変数に取得
                             PLItem = (PlayListModel)pli;
                             SelectedPlayListFiles.Add(PLItem);
                         }
-                        dbMsg += SelectedPlayListFiles.Count + "件";
+                        dbMsg += "、複数選択" + SelectedPlayListFiles.Count + "件";
 						if (0 < SelectedPlayListFiles.Count) {
-							dbMsg += SelectedPlayListFiles[0].Summary;
-							dbMsg += "～" + SelectedPlayListFiles[SelectedPlayListFiles.Count() - 1].Summary;
+							dbMsg += "[" + Array.IndexOf(PlayLists, SelectedPlayListFiles[0]) + "]"+ SelectedPlayListFiles[0].Summary;
+                            int lastIndex = SelectedPlayListFiles.Count() - 1;
+                            dbMsg += "～[" + Array.IndexOf(PlayLists, lastIndex) + "]" +  SelectedPlayListFiles[lastIndex].Summary;
 						}
 					}
                     MyLog(TAG, dbMsg);
@@ -287,14 +289,16 @@ namespace M3UPlayer.ViewModels
 					PlayListItemMove.IsEnabled = true;
 					PlayListDeleteCannotRead.IsEnabled = true;
 					PlayListDeleteDoubling.IsEnabled = true;
-					PlayListSaveRoot.IsEnabled = true;
+                    PlayListItemRemove.IsEnabled = true;
+                    PlayListSaveRoot.IsEnabled = true;
 				} else {
 					PlayListItemViewExplore.IsEnabled = false;
 					PlayListItemMove.IsEnabled = false;
 					PlayListDeleteCannotRead.IsEnabled = false;
 					PlayListDeleteDoubling.IsEnabled = false;
-				}
-			}
+                    PlayListItemRemove.IsEnabled = false;
+                }
+            }
 		}
         #region 設定ファイルの項目
         public string[] PlayLists;
@@ -438,7 +442,6 @@ namespace M3UPlayer.ViewModels
 				MyErrorLog(TAG, dbMsg, er);
 			}
 		}
-
 
 		public void CallWeb()
         {
@@ -1979,14 +1982,29 @@ namespace M3UPlayer.ViewModels
             string dbMsg = "";
             Boolean retBool = false;
             try {
+                Boolean isNotselect = false;
+
                 PLListSelectedItem = (PlayListModel)MyView.PlayList.SelectedItem;
                 NowSelectedFile = PLListSelectedItem.UrlStr;
                 int oldIndex = PLList.IndexOf(PLListSelectedItem);
-                dbMsg += "[" + SelectedPlayListIndex + "]" + NowSelectedFile;
+         //       dbMsg += "[" + SelectedPlayListIndex + "]" + NowSelectedFile;
+                dbMsg += "操作するのは[" + oldIndex + "]" + NowSelectedFile;
 
-                dbMsg += "操作するのは["+ oldIndex +"]"+ NowSelectedFile;
-                if (PLListSelectedItem == null || SelectedPlayListIndex < 0) {
-					if (errorStr != null) {
+                if (SelectedPlayListFiles != null) {
+                    if (0 < SelectedPlayListFiles.Count) {
+                        for (int i = 0; i < SelectedPlayListFiles.Count; ++i) {
+							PlayListModel oneItem = SelectedPlayListFiles[i];
+                            dbMsg += "\r\n[" + i + "]" + oneItem.UrlStr;
+                        }
+					} else {
+                        isNotselect = false;
+                    }
+                } else {
+                    isNotselect = false;
+                }
+
+                if (isNotselect ) {  //PLListSelectedItem == null || SelectedPlayListIndex < 0
+                    if (errorStr != null) {
                         errorStr = errorStr + "するプレイリストアイテムが選択されていないようです。\r\n" + errorStr + "したいプレイリストアイテムをクリックしてください。";
                         MessageBoxResult result = MessageShowWPF(titolStr, errorStr, MessageBoxButton.OK, MessageBoxImage.Error);
                         dbMsg += ",result=" + result;
@@ -2021,11 +2039,11 @@ namespace M3UPlayer.ViewModels
             string TAG = "PlayListItemMoveTo";
             string dbMsg = "";
             try {
-                dbMsg += "fromItem=" + fromItem.Summary;
-                PLList.Remove(fromItem);
+                dbMsg += "移動元=" + fromItem.Summary;
                 int NewIndex = PLList.IndexOf(targetItem);
                 dbMsg += ">>[" + NewIndex + "]";
                 PLList.Insert(NewIndex, fromItem);
+                PLList.Remove(fromItem);
                 RaisePropertyChanged("PLList");
                 PLListSelectedItem = fromItem;
                 RaisePropertyChanged("PLListSelectedItem");
@@ -2034,6 +2052,37 @@ namespace M3UPlayer.ViewModels
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
+
+        /// <summary>
+        /// 選択されているプレイリストアイテムの削除
+        /// </summary>
+        private void PlayListItemDelete() {
+            string TAG = "PlayListItemDelete";
+            string dbMsg = "";
+            try {
+                string titolStr = "プレイリストアイテムファイルの操作";
+                string errorStr = "削除";
+                string? doStr = null;
+                if (!PlayListOpelate(titolStr, errorStr, doStr)) {
+                    return;
+                }
+
+                dbMsg += "開始時=" + SelectedPlayListFiles.Count+" / " +PLList.Count + "件";
+                for (int i = 0; i < SelectedPlayListFiles.Count; ++i) {
+                    PlayListModel oneItem = SelectedPlayListFiles[i];
+                    dbMsg += "\r\n[" + i + "]" + oneItem.UrlStr;
+                    PLList.Remove(oneItem);
+                }
+                RaisePropertyChanged("PLList");
+                IsDoSavePlayList(true);
+                dbMsg += ">> " + PLList.Count + "件";
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+
 
 
         #region プレイリストのコンテキストメニュー
@@ -2046,7 +2095,8 @@ namespace M3UPlayer.ViewModels
 		public MenuItem PlayListDeleteDoubling;
 		public MenuItem PlayListDeleteFrontDoubling;
 		public MenuItem PlayListDeleteAfterDoubling;
-		public MenuItem PlayListSaveRoot;
+        public MenuItem PlayListItemRemove;
+        public MenuItem PlayListSaveRoot;
 		public MenuItem PlayListSaveMenu;
 		public MenuItem PlayListSaveAsMenu;
 		/// <summary>
@@ -2080,7 +2130,7 @@ namespace M3UPlayer.ViewModels
 				PlayListMenu.Items.Add(PlayListItemMove);
 
 				PlayListDeleteCannotRead = new MenuItem();
-				PlayListDeleteCannotRead.Header = "読めないファイルを削除";
+				PlayListDeleteCannotRead.Header = "読めないアイテムを削除";
 				PlayListDeleteCannotRead.Click += PlayListDeleteCannotRead_Click;
 				PlayListMenu.Items.Add(PlayListDeleteCannotRead);
 
@@ -2098,7 +2148,12 @@ namespace M3UPlayer.ViewModels
 				PlayListDeleteDoubling.Items.Add(PlayListDeleteAfterDoubling);
 				PlayListMenu.Items.Add(PlayListDeleteDoubling);
 
-				PlayListSaveRoot = new MenuItem();
+                PlayListItemRemove = new MenuItem();
+                PlayListItemRemove.Header = "選択しているアイテムを削除";
+                PlayListItemRemove.Click += PlayListItemRemove_Click;
+                PlayListMenu.Items.Add(PlayListItemRemove);
+
+                PlayListSaveRoot = new MenuItem();
 				PlayListSaveRoot.Header = "このプレイリストを保存...";
 
 				PlayListSaveMenu = new MenuItem();
@@ -2374,6 +2429,24 @@ namespace M3UPlayer.ViewModels
 				MyErrorLog(TAG, dbMsg, er);
 			}
 		}
+
+        /// <summary>
+        /// 選択しているアイテムを削除
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PlayListItemRemove_Click(object sender, RoutedEventArgs e) {
+            string TAG = "PlayListItemRemove_Click";
+            string dbMsg = "";
+            try {
+                PlayListItemDelete();
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+
 
         /// <summary>
         /// 上書きでこのプレイリストを保存
