@@ -48,6 +48,7 @@ namespace M3UPlayer.Views
 		//	targetItem.UrlStr = "https://www.google.co.jp/maps/";
 			targetItem.Summary = "StartUp";
 			VM.PlayListToPlayer(targetItem);
+
 		}
 
 		private void Window_Closed(object sender, EventArgs e) {
@@ -63,7 +64,7 @@ namespace M3UPlayer.Views
 		}
 
 		//Drag: https://hilapon.hatenadiary.org/entry/20110209/1297247754 ///////////////////////////////////////////////////////////////////////
-		private bool _isDragging;
+		public bool _isDragging;
 		private bool _isEditing;
 		private ObservableCollection<PlayListModel> _shareTable;
 		/// <summary>
@@ -221,9 +222,9 @@ namespace M3UPlayer.Views
 		//}
 
 		/// <summary>
-		/// Closes the popup and resets the
-		/// grid to read-enabled mode.
+		/// Closes the popup and resets the grid to read-enabled mode.
 		/// </summary>
+		///  PlayList_MouseUpから呼ばれる
 		private void ResetDragDrop() {
 			string TAG = "[ResetDragDrop]";
 			string dbMsg = "";
@@ -236,6 +237,45 @@ namespace M3UPlayer.Views
 				MyErrorLog(TAG, dbMsg, er);
 			}
 		}
+
+
+
+		/// <summary>
+		/// ドラッグが開始された時のイベント処理（マウスカーソルをドラッグ中のアイコンに変更）
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void PlayList_PreviewDragOver(object sender, DragEventArgs e) {
+			string TAG = "PlayList_PreviewDragOver";
+			string dbMsg = "";
+			try {
+				//ファイルがドラッグされたとき、カーソルをドラッグ中のアイコンに変更し、そうでない場合は何もしない。
+				e.Effects = (e.Data.GetDataPresent(DataFormats.FileDrop)) ? DragDropEffects.Copy : e.Effects = DragDropEffects.None;
+				e.Handled = true;
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				MyErrorLog(TAG, dbMsg, er);
+			}
+		}
+
+
+		private void PlayList_PreviewDrop(object sender, DragEventArgs e) {
+			string TAG = "PlayList_PreviewDrop";
+			string dbMsg = "";
+			try {
+				if (e.Data.GetDataPresent(DataFormats.FileDrop)) // ドロップされたものがファイルかどうか確認する。
+				{
+					string[] paths = ((string[])e.Data.GetData(DataFormats.FileDrop));
+					//--------------------------------------------------------------------
+					// ここに、ドラッグ＆ドロップ受付時の処理を記述する
+					//--------------------------------------------------------------------
+				}
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				MyErrorLog(TAG, dbMsg, er);
+			}
+		}
+
 		///////////////////////////////////////////////////////Drag: https://hilapon.hatenadiary.org/entry/20110209/1297247754 //////////////////
 
 		/// <summary>
@@ -247,6 +287,7 @@ namespace M3UPlayer.Views
 			string TAG = "[PlayListBox_DragEnter]";
 			string dbMsg = "";
 			try {
+			//	e.Effect = DragDropEffects.Copy;
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
@@ -483,25 +524,6 @@ namespace M3UPlayer.Views
 			}
 		}
 
-		private void PlayList_PreviewDragOver(object sender, DragEventArgs e) {
-			string TAG = "[PlayList_PreviewDragOver]";
-			string dbMsg = "";
-			try {
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
-
-		private void PlayList_PreviewDrop(object sender, DragEventArgs e) {
-			string TAG = "[PlayList_PreviewDrop]";
-			string dbMsg = "";
-			try {
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
 
 		/// <summary>
 		/// 始めのマウスクリック
@@ -530,22 +552,40 @@ namespace M3UPlayer.Views
 		}
 
 		private void PlayList_MouseMove(object sender, MouseEventArgs e) {
-			string TAG = "[PlayList_MouseMove]";
+			string TAG = "PlayList_MouseMove";
 			string dbMsg = "";
 			try {
-				if (!_isDragging || e.LeftButton != MouseButtonState.Pressed) return;
+				dbMsg += "左クリック";
+				if (e.LeftButton != MouseButtonState.Pressed) {
+					dbMsg += "してない";
+					return;
+				} else {// if(!_isDragging) 
+					dbMsg += "している";
+					_isDragging = VM.PlayList_DragEnter();
+					//display the popup if it hasn't been opened yet
+					if (!popup1.IsOpen) {
+						popup1.IsOpen = true;
+						dbMsg += "DataGrid内のpopアップを表示させる";
+					}
 
-				//display the popup if it hasn't been opened yet
-				if (!popup1.IsOpen) {
-					popup1.IsOpen = true;
+					Size popupSize = new Size(popup1.ActualWidth, popup1.ActualHeight);
+					popup1.PlacementRectangle = new Rect(e.GetPosition(this), popupSize);
+
+					//make sure the row under the grid is being selected
+					Point position = e.GetPosition(PlayList);
+
+					Ellipse ellipse = sender as Ellipse;        //楕円？
+					if (ellipse != null && e.LeftButton == MouseButtonState.Pressed) {
+						DragDrop.DoDragDrop(ellipse,
+											 ellipse.Fill.ToString(),
+											 DragDropEffects.Copy);
+					}
 				}
 
-				Size popupSize = new Size(popup1.ActualWidth, popup1.ActualHeight);
-				popup1.PlacementRectangle = new Rect(e.GetPosition(this), popupSize);
+				//		if (!_isDragging || e.LeftButton != MouseButtonState.Pressed) return;
 
-				//make sure the row under the grid is being selected
-				Point position = e.GetPosition(PlayList);
-				//		MyLog(TAG, dbMsg);
+
+				//			MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
@@ -561,6 +601,11 @@ namespace M3UPlayer.Views
 			string TAG = "[PlayList_MouseUp]";
 			string dbMsg = "";
 			try {
+				if (_isDragging) {
+					dbMsg += "Drag中";
+					VM.PlayList_Drop(sender, e);
+				}
+
 				DataGrid droplist = (DataGrid)sender;
 				if (droplist != null) {
 					dbMsg += ",AllowDrop=" + droplist.AllowDrop;
@@ -594,33 +639,39 @@ namespace M3UPlayer.Views
 			}
 		}
 
-		//        /*
-		//				private void PlayListBox_GiveFeedback(object sender, GiveFeedbackEventArgs e) {
-		//					string TAG = "[PlayListBox_GiveFeedback]";
-		//					string dbMsg = TAG;
-		//					try {
-		//						/*		https://dobon.net/vb/dotnet/control/draganddrop.html
 
-		//		dbMsg += "Effect=" + e.Effect.ToString();
-		//		e.UseDefaultCursors = false;                //既定のカーソルを使用しない
-		//		//ドロップ効果にあわせてカーソルを指定する
-		//		if ((e.Effect & DragDropEffects.Move) == DragDropEffects.Move) {
-		//		//			Cursor.Current = moveCursor;
-		//		} else if ((e.Effect & DragDropEffects.Copy) == DragDropEffects.Copy) {
-		//		//			Cursor.Current = copyCursor;
-		//		} else if ((e.Effect & DragDropEffects.Link) == DragDropEffects.Link) {
-		//		//			Cursor.Current = linkCursor;
-		//		} else {
-		//		//			Cursor.Current = noneCursor;
-		//		}
+		////アイコン
+		//private Cursor noneCursor = new Cursor("none.cur");
+		//private Cursor moveCursor = new Cursor("move.cur");
+		//private Cursor copyCursor = new Cursor("copy.cur");
+		//private Cursor linkCursor = new Cursor("link.cur");
 
-		//						MyLog(TAG, dbMsg);
-		//					} catch (Exception er) {
-		//						dbMsg += "<<以降でエラー発生>>" + er.Message;
-		//						MyLog(TAG, dbMsg);
-		//					}
-		//				}
-		//		*/
+		private void PlayListBox_GiveFeedback(object sender, GiveFeedbackEventArgs e) {
+			string TAG = "PlayListBox_GiveFeedback";
+			string dbMsg = TAG;
+			try {
+				//	https://dobon.net/vb/dotnet/control/draganddrop.html
+
+				dbMsg += "Effect=" + e.Effects.ToString();
+				e.UseDefaultCursors = false;                //既定のカーソルを使用しない
+															//ドロップ効果にあわせてカーソルを指定する
+				if ((e.Effects & DragDropEffects.Move) == DragDropEffects.Move) {
+					//Cursor = moveCursor;
+				} else if ((e.Effects & DragDropEffects.Copy) == DragDropEffects.Copy) {
+					//Cursor = copyCursor;
+				} else if ((e.Effects & DragDropEffects.Link) == DragDropEffects.Link) {
+					//Cursor = linkCursor;
+				} else {
+					//Cursor = noneCursor;
+				}
+
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(TAG, dbMsg);
+			}
+		}
+
 
 
 

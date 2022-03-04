@@ -10,7 +10,7 @@
 		xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
 	   xmlns:local="clr-namespace:M3UPlayer"
 		xmlns:v="clr-namespace:M3UPlayer.Views"
-		xmlns:vm="clr-namespace:M3UPlayer.ViewModels" d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
+		xmlns:vm="clr-namespace:M3UPlayer.ViewModels" 
         mc:Ignorable="d"
         Title="MainWindow" Height="1080" Width="1920"
         Top="10" Left="10" 
@@ -19,6 +19,7 @@
     <!--xmlns:Controls="clr-namespace:Microsoft.Toolkit.Wpf.UI.Controls;assembly=Microsoft.Toolkit.Wpf.UI.Controls.WebView"
     		Topmost="true"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"  
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
 
 -->
 
@@ -225,25 +226,29 @@
                 </Grid>
 
                 <DataGrid  x:Name="PlayList"
-						    Grid.Row="1" Grid.Column="0"
-						    ItemsSource="{Binding PLList, Mode=TwoWay}"
-						    SelectionMode="Extended"
-                            SelectedIndex="{Binding SelectedPlayListIndex, Mode=TwoWay}"
-                            ContextMenu="{Binding PlayListMenu}"
-                            AllowDrop="true"
-						    CanUserAddRows="False" 
-						    CanUserDeleteRows="False"
-						    RowDetailsVisibilityMode="Visible" 
-						    AutoGenerateColumns="False" 
-                            IsReadOnly="True" 
-                            MouseDown="PlayList_MouseDown" 
-                            MouseMove="PlayList_MouseMove" 
-                            MouseUp="PlayList_MouseUp" DragEnter="PlayList_DragEnter" Drop="PlayList_Drop" 
+						   Grid.Row="1" Grid.Column="0"
+						   ItemsSource="{Binding PLList, Mode=TwoWay}"
+						   SelectionMode="{Binding PlayListSelectionMode, Mode=TwoWay}"
+                           SelectedIndex="{Binding SelectedPlayListIndex, Mode=TwoWay}"
+                           ContextMenu="{Binding PlayListMenu}"
+                           MouseMove="PlayList_MouseMove"
+                           GiveFeedback="PlayListBox_GiveFeedback"
+                           AllowDrop="true"
+						   CanUserAddRows="False" 
+						   CanUserDeleteRows="False"
+						   RowDetailsVisibilityMode="Visible" 
+						   AutoGenerateColumns="False" 
+                           IsReadOnly="True" 
+                           PreviewDragEnter="PlayList_PreviewDragOver"
+                           PreviewDrop="PlayList_PreviewDrop"
+                           DragEnter="PlayList_DragEnter" 
+                           Drop="PlayList_Drop" 
+                           MouseDown="PlayList_MouseDown" 
+                           MouseUp="PlayList_MouseUp" 
 						>
                     <!--
-                    
-                            SelectedItem="{Binding SelectedPlayListFiles}"
-                            SelectedItems="{Binding SelectedPlayListFiles, Mode=TwoWay}"
+    						   SelectionMode="Extended"
+               PlayListSelectionMode="Extended"
                     
                     -->
 
@@ -300,14 +305,16 @@
                 </DataGrid>
                 <!-- Drag and Drop Popup -->
                 <Popup x:Name="popup1" IsHitTestVisible="False" Placement="RelativePoint"
-                   PlacementTarget="{Binding ElementName=me}" AllowsTransparency="True">
+                       PlacementTarget="{Binding ElementName=me}"
+                       IsOpen="{Binding Drag_now, Mode=TwoWay}"
+                       AllowsTransparency="True">
                     <Border
                     BorderBrush="LightSteelBlue"
                     BorderThickness="2" Background="White" Opacity="0.75">
                         <StackPanel Orientation="Horizontal" Margin="4,3,8,3">
-                            <Image Source="/views/rewbtn.png"
-                               Width="16" Height="16" OpacityMask="Black" />
-                            <TextBlock Text="{Binding ElementName=me, Path=DraggedItem.Name}" 
+                            <!--<Image Source="/views/rewbtn.png"
+                               Width="16" Height="16" OpacityMask="Black" />-->
+                            <TextBlock Text="{Binding ElementName=me, Path=DraggedItem_name}" 
                                         FontSize="14" FontWeight="Bold"
                                         VerticalAlignment="Center" Margin="8,0,0,0" 
                                         />
