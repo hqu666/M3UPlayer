@@ -524,6 +524,31 @@ namespace M3UPlayer.Views
 			}
 		}
 
+		/// <summary>
+		/// 引数の位置のDataGridのオブジェクトを取得
+		/// https://www.paveway.info/entry/2020/05/27/wpf_datgridpos
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="dataGrid"> dataGrid データグリッド</param>
+		/// <param name="point">point 位置</param>
+		/// <returns>DataGridのオブジェクト</returns>
+		private T GetDataGridObject<T>(DataGrid dataGrid, Point point) {
+			T result = default(T);
+			var hitResultTest = VisualTreeHelper.HitTest(dataGrid, point);
+			if (hitResultTest != null) {
+				var visualHit = hitResultTest.VisualHit;
+				while (visualHit != null) {
+					if (visualHit is T) {
+						result = (T)(object)visualHit;
+						break;
+					}
+					visualHit = VisualTreeHelper.GetParent(visualHit);
+				}
+			}
+			return result;
+		}
+
+
 
 		/// <summary>
 		/// 始めのマウスクリック
@@ -558,6 +583,21 @@ namespace M3UPlayer.Views
 				dbMsg += "左クリック";
 				if (e.LeftButton != MouseButtonState.Pressed) {
 					dbMsg += "してない";
+					if (_isDragging) {
+						dbMsg += "離した";
+						var dataGrid = sender as DataGrid;
+						var point = e.GetPosition(dataGrid);
+						var row = GetDataGridObject<DataGridRow>(dataGrid, point);
+						if (row == null) {
+							return;
+						}
+						// 行オブジェクトから行インデックス(0起算)を取得します。
+						int dropRow = row.GetIndex();
+						dbMsg += ",dropRow=" + dropRow;
+						VM.PlayList_Drop(dropRow);
+						_isDragging = false;
+					}
+
 					return;
 				} else {// if(!_isDragging) 
 					dbMsg += "している";
@@ -603,36 +643,46 @@ namespace M3UPlayer.Views
 			try {
 				if (_isDragging) {
 					dbMsg += "Drag中";
-					VM.PlayList_Drop(sender, e);
+					var dataGrid = sender as DataGrid;
+					var point = e.GetPosition(dataGrid);
+					var row = GetDataGridObject<DataGridRow>(dataGrid, point);
+					if (row == null) {
+						return;
+					}
+					// 行オブジェクトから行インデックス(0起算)を取得します。
+					int dropRow = row.GetIndex();
+					dbMsg += ",dropRow=" + dropRow;
+					VM.PlayList_Drop(dropRow);
+					_isDragging = false;
 				}
 
-				DataGrid droplist = (DataGrid)sender;
-				if (droplist != null) {
-					dbMsg += ",AllowDrop=" + droplist.AllowDrop;
-					dbMsg += "[" + droplist.SelectedIndex + "]";
-					PlayListModel targetItem = (PlayListModel)droplist.SelectedItem;
-					//get the target item
-					if (DraggedItem != null) {
-						dbMsg += "<<Dragged=" + DraggedItem.Summary;
-						if (DraggedItem == targetItem) {
-							VM.PlayListToPlayer(targetItem);
-						} else {
-							VM.PlayListItemMoveTo(DraggedItem, targetItem);
-						}
-					} else {
+				//DataGrid droplist = (DataGrid)sender;
+				//if (droplist != null) {
+				//	dbMsg += ",AllowDrop=" + droplist.AllowDrop;
+				//	dbMsg += "[" + droplist.SelectedIndex + "]";
+				//	PlayListModel targetItem = (PlayListModel)droplist.SelectedItem;
+				//	//get the target item
+				//	if (DraggedItem != null) {
+				//		dbMsg += "<<Dragged=" + DraggedItem.Summary;
+				//		if (DraggedItem == targetItem) {
+				//			VM.PlayListToPlayer(targetItem);
+				//		} else {
+				//			VM.PlayListItemMoveTo(DraggedItem, targetItem);
+				//		}
+				//	} else {
 
-					}
+				//	}
 
-					//　参考
-					if (targetItem == null || ReferenceEquals(DraggedItem, targetItem)) {
-						dbMsg += ">参考>ReferenceEquals";
-					}
+				//	//　参考
+				//	if (targetItem == null || ReferenceEquals(DraggedItem, targetItem)) {
+				//		dbMsg += ">参考>ReferenceEquals";
+				//	}
 
 					//reset
 					ResetDragDrop();
-				} else {
-					dbMsg += "droplist == null";
-				}
+				//} else {
+				//	dbMsg += "droplist == null";
+				//}
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
