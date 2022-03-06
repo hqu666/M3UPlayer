@@ -1599,7 +1599,7 @@ namespace M3UPlayer.ViewModels
         }
 
         /// <summary>
-        /// ファイルのドロップ
+        /// アイテムのドロップ
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -2200,14 +2200,26 @@ namespace M3UPlayer.ViewModels
             string TAG = "PlayListItemMoveTo";
             string dbMsg = "";
             try {
-				dbMsg += "[" + dropRow + "/" + PLList.Count + "]へ" + dropPlayListFiles.Count + "件移動";
+                if (ofDialog != null) {
+                    dbMsg += "OpenFileDialog";
+                    //   ofDialog.Dispose();
+
+                }
+                if (cofDialog != null) {
+                    dbMsg += "CommonOpenFileDialog";
+                  //  cofDialog.Dispose();ではない
+                }
+                dbMsg += "[" + dropRow + "/" + PLList.Count + "]へ" + dropPlayListFiles.Count + "件移動";
                 int insertRow = dropRow+1;
 
                 foreach (PlayListModel one in dropPlayListFiles) {
-                    dbMsg += "\r\n[" + PLList.IndexOf(one) + "/" + PLList.Count + "]" + one.Summary;
-                    PLList.Remove(one);
-					PLList.Insert(insertRow, one);
-                    dbMsg += ">>[" + PLList.IndexOf(one) + "/" + PLList.Count + "]" ;
+                    int removeIndex = PLList.IndexOf(one);
+					if (-1 < removeIndex) {
+                        dbMsg += "\r\n[" + removeIndex + "/" + PLList.Count + "]";
+                        PLList.Remove(one);
+                    }
+                    PLList.Insert(insertRow, one);
+                    dbMsg += ">>[" + PLList.IndexOf(one) + "/" + PLList.Count + "]" + one.Summary;
 					if (insertRow == dropRow) {
                         PLListSelectedItem = one;
                     }
@@ -2215,7 +2227,8 @@ namespace M3UPlayer.ViewModels
                 }
                 RaisePropertyChanged("PLList");
 				RaisePropertyChanged("PLListSelectedItem");
-				MyLog(TAG, dbMsg);
+                IsDoSavePlayList(false);
+                MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
@@ -2374,9 +2387,9 @@ namespace M3UPlayer.ViewModels
                 pathStr = pathStr.Replace("//", "/");
                 pathStr = pathStr.Replace('/', Path.DirectorySeparatorChar);
                 dbMsg += ">>" + pathStr+" の "+ fileNameStr;
-				//		System.Diagnostics.Process.Start("EXPLORER.EXE", pathStr);
-				// ダイアログのインスタンスを生成
-				CommonOpenFileDialog dialog = new CommonOpenFileDialog("ファイルの操作") {
+                //		System.Diagnostics.Process.Start("EXPLORER.EXE", pathStr);
+                // ダイアログのインスタンスを生成
+                cofDialog = new CommonOpenFileDialog("ファイルの操作") {
 					IsFolderPicker = false,             //フォルダ選択
 					InitialDirectory =  pathStr,
 					DefaultDirectory =  pathStr,         //初期ディレクトリ
@@ -2384,9 +2397,9 @@ namespace M3UPlayer.ViewModels
 					EnsurePathExists = true,
 					// FileNameは読み取り専用
 				};
-				if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
+				if (cofDialog.ShowDialog() == CommonFileDialogResult.Ok) {
 					//    MessageBox.Show(dialog.FileName);
-					string NewSelectedPath = dialog.FileName;              //fbDialog.SelectedPath;
+					string NewSelectedPath = cofDialog.FileName;              //fbDialog.SelectedPath;
 					dbMsg += ">>" + NewSelectedPath;
 					if (!NewSelectedPath.Equals(NowSelectedFile)) {
                         dbMsg += ">>変更有り" ;
@@ -2702,7 +2715,8 @@ namespace M3UPlayer.ViewModels
         #endregion
         //ファイル選択///////////////////////////////////////////////////////////playList//
         //        //プレイリスト///////////////////////////////////////////////////////////FileListVewの操作//
-
+        public OpenFileDialog? ofDialog;
+        public CommonOpenFileDialog? cofDialog;
 
         #region FileDlogShow	　単一ファイルの選択
         public ICommand FileDlogShow => new DelegateCommand(ShowFileDlog);
@@ -2716,12 +2730,13 @@ namespace M3UPlayer.ViewModels
             string dbMsg = "";
             try
             {
+
                 //         string SelectFileName = "";
                 //①
                 // ダイアログのインスタンスを生成
-                var ofDialog = new OpenFileDialog();
-                // ファイルの種類を設定
-                ofDialog.Filter = "プレイリスト (*.m3u*)|*.m3u*|ムービー (*.mp4)|*.mp4|全てのファイル (*.*)|*.*";
+                ofDialog = new OpenFileDialog();
+				// ファイルの種類を設定
+				ofDialog.Filter = "プレイリスト (*.m3u*)|*.m3u*|ムービー (*.mp4)|*.mp4|全てのファイル (*.*)|*.*";
 
 
 				//	System.Windows.Forms.OpenFileDialog ofDialog = new System.Windows.Forms.OpenFileDialog();
@@ -2767,7 +2782,8 @@ namespace M3UPlayer.ViewModels
 					string[] files = { NowSelectedFile };
 					//         FilesFromLocal(files);
 				}
-				MyLog(TAG, dbMsg);
+                ofDialog = null;
+                MyLog(TAG, dbMsg);
             }catch (Exception er){
                 MyErrorLog(TAG, dbMsg, er);
             }
@@ -2787,15 +2803,15 @@ namespace M3UPlayer.ViewModels
             try
             {
                 // ダイアログのインスタンスを生成
-                var dialog = new CommonOpenFileDialog("フォルダーの選択");
+                cofDialog = new CommonOpenFileDialog("フォルダーの選択");
 
                 // 選択形式をフォルダースタイルにする IsFolderPicker プロパティを設定
-                dialog.IsFolderPicker = true;
+                cofDialog.IsFolderPicker = true;
 
                 // ダイアログを表示
-                if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
+                if (cofDialog.ShowDialog() == CommonFileDialogResult.Ok) {
                 //    MessageBox.Show(dialog.FileName);
-                    NowSelectedPath = dialog.FileName;              //fbDialog.SelectedPath;
+                    NowSelectedPath = cofDialog.FileName;              //fbDialog.SelectedPath;
 					dbMsg += ">>" + NowSelectedPath;
 					string[] files = System.IO.Directory.GetFiles(@NowSelectedPath, "*", System.IO.SearchOption.AllDirectories);
 					dbMsg += ">>" + files.Length + "件";
@@ -2807,8 +2823,9 @@ namespace M3UPlayer.ViewModels
 					dbMsg += "キャンセルされました";
 				}
                 // オブジェクトを破棄する
-        //        dialog.Dispose();
-				MyLog(TAG, dbMsg);
+                //        dialog.Dispose();
+                cofDialog = null;
+                MyLog(TAG, dbMsg);
             }catch (Exception er){
                 MyErrorLog(TAG, dbMsg, er);
             }
@@ -2836,12 +2853,12 @@ namespace M3UPlayer.ViewModels
         private void ShowExplore()
         {
             string TAG = "ShowExplore";
-			//最近表示した場所	をシェルなら
-			//	explorer.exe shell:::{ 22877A6D - 37A1 - 461A - 91B0 - DBDA5AAEBC99}
-			pEXPLORER = System.Diagnostics.Process.Start("EXPLORER.EXE", @"{ 22877A6D - 37A1 - 461A - 91B0 - DBDA5AAEBC99}");
             string dbMsg = "";
             try
             {
+                //最近表示した場所	をシェルなら
+                //	explorer.exe shell:::{ 22877A6D - 37A1 - 461A - 91B0 - DBDA5AAEBC99}
+                pEXPLORER = System.Diagnostics.Process.Start("EXPLORER.EXE", @"{ 22877A6D - 37A1 - 461A - 91B0 - DBDA5AAEBC99}");
                 MyLog(TAG, dbMsg);
             }
             catch (Exception er)
