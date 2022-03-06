@@ -1610,7 +1610,7 @@ namespace M3UPlayer.ViewModels
                 dbMsg += "Drag_now=" + Drag_now;
                 if (Drag_now) {
                     dbMsg += ">>dropRow=" + dropRow;
-                    PlayListItemMoveTo(dropRow);
+                    PlayListItemMoveTo(dropRow , SelectedPlayListFiles);
                     Drag_now = false;
                     RaisePropertyChanged("Drag_now");
                     PlayListSelectionMode = "Extended";
@@ -2195,15 +2195,15 @@ namespace M3UPlayer.ViewModels
         /// <summary>
         /// プレイリスト上での移動
         /// </summary>
-        public void PlayListItemMoveTo(int dropRow) {
+        public void PlayListItemMoveTo(int dropRow , List<PlayListModel> dropPlayListFiles) {
             //int oldIndex,
             string TAG = "PlayListItemMoveTo";
             string dbMsg = "";
             try {
-				dbMsg += "[" + dropRow + "/" + PLList.Count + "]へ" + SelectedPlayListFiles.Count + "件移動";
+				dbMsg += "[" + dropRow + "/" + PLList.Count + "]へ" + dropPlayListFiles.Count + "件移動";
                 int insertRow = dropRow+1;
 
-                foreach (PlayListModel one in SelectedPlayListFiles) {
+                foreach (PlayListModel one in dropPlayListFiles) {
                     dbMsg += "\r\n[" + PLList.IndexOf(one) + "/" + PLList.Count + "]" + one.Summary;
                     PLList.Remove(one);
 					PLList.Insert(insertRow, one);
