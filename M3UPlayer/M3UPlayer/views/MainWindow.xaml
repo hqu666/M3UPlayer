@@ -234,6 +234,7 @@
                            MouseMove="PlayList_MouseMove"
                            GiveFeedback="PlayListBox_GiveFeedback"
                            AllowDrop="true"
+                           SelectionUnit="FullRow"
 						   CanUserAddRows="False" 
 						   CanUserDeleteRows="False"
 						   RowDetailsVisibilityMode="Visible" 
@@ -249,11 +250,9 @@
                     <!--
     						   SelectionMode="Extended"
                PlayListSelectionMode="Extended"
-                    
-                    -->
-
-
-                    <!--DragEnter="PlayList_DragEnter" 
+                                          SelectedItems="{Binding PLListSelectedItem}"
+     
+               DragEnter="PlayList_DragEnter" 
                            DragLeave="PlayList_DragLeave" 
                            DragOver="PlayList_DragOver" 
                            Drop="PlayList_Drop" 
