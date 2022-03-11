@@ -314,6 +314,7 @@
                             <!--<Image Source="/views/rewbtn.png"
                                Width="16" Height="16" OpacityMask="Black" />-->
                             <TextBlock Text="{Binding ElementName=me, Path=DraggedItem_name}" 
+                                       Name="popup_text"
                                         FontSize="14" FontWeight="Bold"
                                         VerticalAlignment="Center" Margin="8,0,0,0" 
                                         />

@@ -128,8 +128,8 @@ namespace M3UPlayer.ViewModels
                     _SelectedPlayListIndex = value;
                     RaisePropertyChanged("SelectedPlayListIndex");
                     dbMsg += "["+ SelectedPlayListIndex + "]"+ MyView.PlayList.CurrentItem + "Drag_now=" + Drag_now;
-                    // 選択されているものがあって、Dragで無ければ  && ! Drag_now
-                    if (MyView.PlayList.SelectedItems != null) {
+                    // 選択されているものがあって、Dragで無ければ 
+                    if (MyView.PlayList.SelectedItems != null && !Drag_now) {
                         SelectedPlayListFiles = new List<PlayListModel>();
                         IList selectedItems = MyView.PlayList.SelectedItems;
                         dbMsg += "、selectedItems=" + selectedItems.Count + "件";
@@ -1572,9 +1572,13 @@ namespace M3UPlayer.ViewModels
         //}
 
 
-        //Drag & Drop///////////////////////////////////////////////////////////////////////////
+        ///Drag & Drop///////////////////////////////////////////////////////////////////////////
+
+        /// <summary>
+        /// PopupのTextBlockのtext
+        /// </summary>
         public string DraggedItem_name { get; set; }
-        public bool Drag_now { get; set; }
+        public bool Drag_now = false;           // { get; set; }
 
 
         /// <summary>
@@ -1593,10 +1597,12 @@ namespace M3UPlayer.ViewModels
                     string errorStr = "ドラッグ";
                     string? doStr = null;
                     if (PlayListOpelate(titolStr, errorStr, doStr)) {
-                        DraggedItem_name = "" + SelectedPlayListFiles[0].Summary;
+                        DraggedItem_name = "" + SelectedPlayListFiles[0].UrlStr;
                         RaisePropertyChanged("DraggedItem_name");
+                        dbMsg += "Drag開始＝" + DraggedItem_name;
+                        MyView.popup_text.Text = DraggedItem_name;
                         Drag_now = true;
-
+                        
                         PlayListSelectionMode = "Single";
                         RaisePropertyChanged("PlayListSelectionMode");
 
@@ -1626,9 +1632,12 @@ namespace M3UPlayer.ViewModels
                     dbMsg += ">>dropRow=" + dropRow;
                     PlayListItemMoveTo(dropRow , SelectedPlayListFiles);
                     Drag_now = false;
-                    RaisePropertyChanged("Drag_now");
+              //      RaisePropertyChanged("Drag_now");
                     PlayListSelectionMode = "Extended";
                     RaisePropertyChanged("PlayListSelectionMode");
+                    MyView.popup_text.Text = "";
+                    MyView.popup1.IsOpen = false;
+
                 }
                 ////DataGrid DG = (DataGrid)sender;
                 ////// ドロップ先(dataGridView2)のクライアント位置からDataGridViewの位置情報を取得します。
@@ -2234,9 +2243,13 @@ namespace M3UPlayer.ViewModels
                         dbMsg += "\r\n[" + removeIndex + "/" + PLList.Count + "]";
                         PLList.Remove(one);
                     }
-                    PLList.Insert(insertRow, one);
-                    dbMsg += ">>[" + PLList.IndexOf(one) + "/" + PLList.Count + "]" + one.Summary;
-					if (insertRow == dropRow) {
+                    dbMsg += ">>[" + insertRow + "/" + PLList.Count + "]" + one.UrlStr;
+					if (insertRow< PLList.Count) {
+                        PLList.Insert(insertRow, one);
+					} else {
+                        PLList.Add(one);
+                    }
+                    if (insertRow == dropRow) {
                         PLListSelectedItem = one;
                     }
                     insertRow++;
@@ -2640,8 +2653,6 @@ namespace M3UPlayer.ViewModels
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
-
-
 
         /// <summary>
         /// 上書きでこのプレイリストを保存
