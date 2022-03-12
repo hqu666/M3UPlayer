@@ -727,6 +727,10 @@ namespace M3UPlayer.Views
 					dbMsg += ",dropRow=" + dropRow;
 					VM.PlayList_Drop(dropRow);
 					_isDragging = false;
+				} else {
+					VM.PLMouseUp();
+
+					
 				}
 
 				//DataGrid droplist = (DataGrid)sender;

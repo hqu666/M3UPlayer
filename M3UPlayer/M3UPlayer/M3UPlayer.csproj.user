@@ -10,5 +10,8 @@
     <Page Update="views\MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="views\WebWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 </Project>

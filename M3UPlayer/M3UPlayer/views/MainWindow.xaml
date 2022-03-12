@@ -368,7 +368,10 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <!--ここで動画再生-->
-                <Grid Name="FrameGrid" />
+                <Grid Name="FrameGrid">
+                    <Frame Name="frame" Background="#222" />
+                    <!--Navigating="Frame_Navigating"    NavigationUIVisibility="Hidden"  -->
+                </Grid>
 
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>

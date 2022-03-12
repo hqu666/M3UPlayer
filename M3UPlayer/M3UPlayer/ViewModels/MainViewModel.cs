@@ -357,6 +357,7 @@ namespace M3UPlayer.ViewModels
                 }
             }
 
+        public WsbViewModel WVM;
 
 
         /// <summary>
@@ -434,13 +435,14 @@ namespace M3UPlayer.ViewModels
                 }
                 dbMsg += ",NowSelectedFile=" + NowSelectedFile;
 				dbMsg += " [" + NowSelectedPosition + "]";
-				//   CallWeb();
+				//CallWeb();
 				PlayListSaveBTVisble = "Hidden";
 				PlayListSaveRoot.IsEnabled = false;
 				RaisePropertyChanged("PlayListSaveBTVisble");
                 PlayListSelectionMode = "Extended";
                 RaisePropertyChanged("PlayListSelectionMode");
                 Drag_now = false;
+                WVM = new WsbViewModel();
                 MyLog(TAG, dbMsg);
             } catch (Exception er)
             {
@@ -1164,30 +1166,31 @@ namespace M3UPlayer.ViewModels
 						dbMsg += ">delete既存=" + MyView.FrameGrid.Children.Count + "件";
 						MyView.FrameGrid.Children.RemoveAt(0);
 					}
-					//if ( MyView.MainFrame.Source != null) {
-					//	MyView.MainFrame.Source = null;
-					//	//dbMsg += "既存=" + MyView.MainFrame.Children.Count + "件";
-					//	//MyView.MainFrame.Children.RemoveAt(0);
+					//if (myview.mainframe.source != null) {
+					//	myview.mainframe.source = null;
+					//	//dbmsg += "既存=" + myview.mainframe.children.count + "件";
+					//	//myview.mainframe.children.removeat(0);
 					//}
 					string targetURLStr = targetItem.UrlStr;
 					string extention = System.IO.Path.GetExtension(targetURLStr);
 					dbMsg += "、拡張子=" + extention;
-					bool toWeb = false;
-					if (-1 < Array.IndexOf(WebVideo, extention) ||
-						targetURLStr.StartsWith("https")) {
-						toWeb = true;
-					}
-					Frame frame = new Frame();
+                    bool toWeb = true;  // false;
+					//if (-1 < Array.IndexOf(WebVideo, extention) ||
+					//	targetURLStr.StartsWith("https")) {
+					//	toWeb = true;
+					//}
+					//Frame frame = new Frame();
 					dbMsg += "、Web=" + toWeb;
 					if (toWeb) {
-						//WebViewModel WVM = new WebViewModel();
-						//WVM.TargetURLStr = targetURLStr;
-						//WVM.TargeStr = targetURLStr;
-						//WebPage WP =new WebPage();                  //Page
-						//WP.DataContext = WVM;
-						//frame.Navigate(WP);
-						//MyView.FrameGrid.Children.Add(frame);
-					} else if(-1 < Array.IndexOf(FlashVideo, extention)) {
+                        MyView.frame.Navigate(WVM);
+                        //		WVM.TargetURLStr = targetURLStr;
+                        WVM.SetMyUrl(targetURLStr);
+                        //WVM.TargeStr = targetURLStr;
+                        //WebPage WP = new WebPage();                  //Page
+                        //WP.DataContext = WVM;
+                        //frame.Navigate(WP);
+                        //MyView.FrameGrid.Children.Add(frame);
+                    } else if(-1 < Array.IndexOf(FlashVideo, extention)) {
 						//// Create the interop host control.
 						//System.Windows.Forms.Integration.WindowsFormsHost host =
 						//	new System.Windows.Forms.Integration.WindowsFormsHost();
@@ -1744,61 +1747,62 @@ namespace M3UPlayer.ViewModels
         //		return _PlayListLeftClick;
         //	}
         //}
+
         ///// <summary>
         ///// 始めのマウスクリック
         //// https://dobon.net/vb/dotnet/control/draganddrop.html
         ///// </summary>
         ///// <param name="sender"></param>
         ///// <param name="e"></param>
-        //private void PLMouseDown() {
-        //	string TAG = "[PlayList_MouseDown]";// + fileName;
-        //	string dbMsg = "";
-        //	try {
-        //		if (PLListSelectedItem != null) {
-        //			DraggedItem = PLListSelectedItem;
-        //			dbMsg += ",UrlStr=" + PLListSelectedItem.UrlStr;
-        //			int oldIndex = PLList.IndexOf(PLListSelectedItem);
-        //			dbMsg += "[" + oldIndex + "]";
-        //			_isDragging = true;
-        //			//				var row = UIHelpers.TryFindFromPoint<DataGridRow>((UIElement)sender, e.GetPosition(shareGrid));
-        //			//	if (row == null || row.IsEditing) return;
+        private void PLMouseDown() {
+			string TAG = "[PlayList_MouseDown]";// + fileName;
+			string dbMsg = "";
+			try {
+				if (PLListSelectedItem != null) {
+					//DraggedItem = PLListSelectedItem;
+					//dbMsg += ",UrlStr=" + PLListSelectedItem.UrlStr;
+					//int oldIndex = PLList.IndexOf(PLListSelectedItem);
+					//dbMsg += "[" + oldIndex + "]";
+					//_isDragging = true;
+					//				var row = UIHelpers.TryFindFromPoint<DataGridRow>((UIElement)sender, e.GetPosition(shareGrid));
+					//	if (row == null || row.IsEditing) return;
 
-        //			//set flag that indicates we're capturing mouse movements
-        //			//draglist = (ListBox)sender;
-        //			//PlayListMouseDownNo = draglist.SelectedIndex;
-        //			//dbMsg += "(Down;" + PlayListMouseDownNo + ")";
-        //			//if (e.Button == System.Windows.Forms.MouseButtons.Left) {                   //マウス左ボタン
-        //			//	dbMsg += ",選択モード切替；ModifierKeys=" + Control.ModifierKeys;
-        //			//	if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift) {                //シフト
-        //			//		playListBox.SelectionMode = SelectionMode.MultiExtended;               //3:		インデックスが配列の境界外です。?
-        //			//	} else if ((Control.ModifierKeys & Keys.Control) == Keys.Control) {     //コントロール
-        //			//		playListBox.SelectionMode = SelectionMode.MultiSimple;
-        //			//		2:	MultiSimple / MultiExtended   http://www.atmarkit.co.jp/fdotnet/chushin/introwinform_03/introwinform_03_02.html
+					//set flag that indicates we're capturing mouse movements
+					//draglist = (ListBox)sender;
+					//PlayListMouseDownNo = draglist.SelectedIndex;
+					//dbMsg += "(Down;" + PlayListMouseDownNo + ")";
+					//if (e.Button == System.Windows.Forms.MouseButtons.Left) {                   //マウス左ボタン
+					//	dbMsg += ",選択モード切替；ModifierKeys=" + Control.ModifierKeys;
+					//	if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift) {                //シフト
+					//		playListBox.SelectionMode = SelectionMode.MultiExtended;               //3:		インデックスが配列の境界外です。?
+					//	} else if ((Control.ModifierKeys & Keys.Control) == Keys.Control) {     //コントロール
+					//		playListBox.SelectionMode = SelectionMode.MultiSimple;
+					//		2:	MultiSimple / MultiExtended   http://www.atmarkit.co.jp/fdotnet/chushin/introwinform_03/introwinform_03_02.html
 
-        //			//				} else {                                                                //無しなら
-        //			//		playListBox.SelectionMode = SelectionMode.One;                         //1:単一選択
-        //			//	}
-        //			//	dbMsg += " ,SelectionMode=" + draglist.SelectionMode;
-        //			//}
-        //			//if (-1 < PlayListMouseDownNo) {
-        //			//	PlayListMouseDownValue = draglist.SelectedValue.ToString();
-        //			//	dbMsg += PlayListMouseDownValue;
-        //			//	dragFrom = draglist.Name;
-        //			//	dragSouceIDl = draglist.SelectedIndex;
-        //			//	mouceDownPoint = Control.MousePosition;
-        //			//	mouceDownPoint = draglist.PointToClient(mouceDownPoint);//ドラッグ開始時のマウスの位置をクライアント座標に変換
-        //			//	dbMsg += "(mouceDownPoint;" + mouceDownPoint.X + "," + mouceDownPoint.Y + ")";
-        //			//	dragSouceIDP = draglist.IndexFromPoint(mouceDownPoint);//マウス下のListBoxのインデックスを得る
-        //			//	dbMsg += "(Pointから;" + dragSouceIDP + ")";
-        //			//}
-        //		} else {
-        //			dbMsg += "選択値無し";
-        //		}
-        //		MyLog(TAG, dbMsg);
-        //	} catch (Exception er) {
-        //		MyErrorLog(TAG, dbMsg, er);
-        //	}
-        //}
+					//				} else {                                                                //無しなら
+					//		playListBox.SelectionMode = SelectionMode.One;                         //1:単一選択
+					//	}
+					//	dbMsg += " ,SelectionMode=" + draglist.SelectionMode;
+					//}
+					//if (-1 < PlayListMouseDownNo) {
+					//	PlayListMouseDownValue = draglist.SelectedValue.ToString();
+					//	dbMsg += PlayListMouseDownValue;
+					//	dragFrom = draglist.Name;
+					//	dragSouceIDl = draglist.SelectedIndex;
+					//	mouceDownPoint = Control.MousePosition;
+					//	mouceDownPoint = draglist.PointToClient(mouceDownPoint);//ドラッグ開始時のマウスの位置をクライアント座標に変換
+					//	dbMsg += "(mouceDownPoint;" + mouceDownPoint.X + "," + mouceDownPoint.Y + ")";
+					//	dragSouceIDP = draglist.IndexFromPoint(mouceDownPoint);//マウス下のListBoxのインデックスを得る
+					//	dbMsg += "(Pointから;" + dragSouceIDP + ")";
+					//}
+				} else {
+					dbMsg += "選択値無し";
+				}
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				MyErrorLog(TAG, dbMsg, er);
+			}
+		}
         //#endregion
 
         //#region PlayListアイテムでマウスムーブ
@@ -1864,154 +1868,162 @@ namespace M3UPlayer.ViewModels
         //#endregion
 
         //#region PlayListアイテムでマウスアップ
-        //private ViewModelCommand _PlayListMouseUp;
-        //public ViewModelCommand PlayListMouseUp {
-        //	get {
-        //		if (_PlayListMouseUp == null) {
-        //			_PlayListMouseUp = new ViewModelCommand(PLMouseUp);
-        //		}
-        //		return _PlayListMouseUp;
-        //	}
-        //}
+  //     public ICommand PlayList_MouseUp => new DelegateCommand(PLMouseUp);
+		//private ViewModelCommand _PlayListMouseUp;
+		//public ViewModelCommand PlayListMouseUp {
+		//	get {
+		//		if (_PlayListMouseUp == null) {
+		//			_PlayListMouseUp = new ViewModelCommand(PLMouseUp);
+		//		}
+		//		return _PlayListMouseUp;
+		//	}
+		//}
 
-        ///// <summary>
-        ///// Completes a drag/drop operation.
-        ///// </summary>
-        //private void PLMouseUp() {
-        //	string TAG = "[PLMouseUp]";
-        //	string dbMsg = "";
-        //	try {
-        //		if (DraggedItem != null) {
-        //			//				DraggedItem = PLListSelectedItem;
-        //			dbMsg += ",UrlStr=" + PLListSelectedItem.UrlStr;
-        //			int oldIndex = PLList.IndexOf(PLListSelectedItem);
-        //			dbMsg += "[" + oldIndex + "]";
-        //			if (!_isDragging) {            //|| _isEditing
-        //				return;
-        //			}
+		/// <summary>
+		/// プレイリストでのマウスアップ                    Completes a drag/drop operation.
+		/// </summary>
+		public void PLMouseUp() {
+			string TAG = "[PLMouseUp]";
+			string dbMsg = "";
+			try {
+                PlayListModel targetItem = new PlayListModel();
+                targetItem.UrlStr = "https://www.yahoo.co.jp/";
+                PlayListToPlayer(targetItem);
+                string titolStr = "プレイリストアイテムファイルの操作";
+                string errorStr = "マウスアップ";
+                string? doStr = null;
+                if (PlayListOpelate(titolStr, errorStr, doStr)) {
+					//if (DraggedItem != null) {
+					//	//				DraggedItem = PLListSelectedItem;
+					//	dbMsg += ",UrlStr=" + PLListSelectedItem.UrlStr;
+					//	int oldIndex = PLList.IndexOf(PLListSelectedItem);
+					//	dbMsg += "[" + oldIndex + "]";
+					//	if (!_isDragging) {            //|| _isEditing
+					//		return;
+					//	}
 
-        //			//get the target item
-        //			PlayListModel targetItem = PLListSelectedItem;
+					//	//get the target item
+					//	PlayListModel targetItem = PLListSelectedItem;
 
-        //			if (targetItem == null) {           // || !ReferenceEquals(DraggedItem, targetItem)
+					//	if (targetItem == null) {           // || !ReferenceEquals(DraggedItem, targetItem)
 
-        //				//// create tempporary row
-        //				//var temp = DraggedItem.Row.Table.NewRow();
-        //				//temp.ItemArray = DraggedItem.Row.ItemArray;
-        //				//int tempIndex = _shareTable.Rows.IndexOf(DraggedItem.Row);
+					//		//// create tempporary row
+					//		//var temp = DraggedItem.Row.Table.NewRow();
+					//		//temp.ItemArray = DraggedItem.Row.ItemArray;
+					//		//int tempIndex = _shareTable.Rows.IndexOf(DraggedItem.Row);
 
-        //				////remove the source from the list
-        //				//_shareTable.Rows.Remove(DraggedItem.Row);
+					//		////remove the source from the list
+					//		//_shareTable.Rows.Remove(DraggedItem.Row);
 
-        //				////get target index
-        //				//var targetIndex = _shareTable.Rows.IndexOf(targetItem.Row);
+					//		////get target index
+					//		//var targetIndex = _shareTable.Rows.IndexOf(targetItem.Row);
 
-        //				////insert temporary at the target's location
-        //				//_shareTable.Rows.InsertAt(temp, targetIndex);
+					//		////insert temporary at the target's location
+					//		//_shareTable.Rows.InsertAt(temp, targetIndex);
 
-        //				////select the dropped item
-        //				//shareGrid.SelectedItem = shareGrid.Items[targetIndex];
-        //			}
+					//		////select the dropped item
+					//		//shareGrid.SelectedItem = shareGrid.Items[targetIndex];
+					//	}
 
-        //			//reset
-        //			ResetDragDrop();
-        //		} else {
-        //			dbMsg += "選択値無し";
-        //		}
-        //		MyLog(TAG, dbMsg);
-        //	} catch (Exception er) {
-        //		MyErrorLog(TAG, dbMsg, er);
-        //	}
-        //}
-        //#endregion
+					//reset
+					//ResetDragDrop();
+				} else {
+					dbMsg += "選択値無し";
+				}
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				MyErrorLog(TAG, dbMsg, er);
+			}
+		}
+		//#endregion
 
-        /////////////////////////////////////////////////////////////Drop///
-
-
-        #region inputダイアログのサンプル
-        /// <summary>
-        /// 三択ダイアログのコールバック
-        /// https://days-of-programming.blogspot.com/2018/01/livetwpf.html
-        /// </summary>
-        /// <param name="msg"></param>
-        //public void MessageBoxClosed(ConfirmationMessage msg)
-        //{
-        //    string TAG = "MessageBoxClosed";
-        //    string dbMsg = "";
-        //    try
-        //    {
-        //        dbMsg += ",ConfirmationMessage=" + msg.Response;
-        //        if (msg.Response == null)
-        //        {
-        //            dbMsg += "null>>Cancel";
-        //        } else if (msg.Response.Value){     //true
-        //            dbMsg += ">>Yes";
-        //        }else{                              //false
-        //            dbMsg += ">>No";
-        //        }
-        //        MyLog(TAG, dbMsg);
-        //    }
-        //    catch (Exception er)
-        //    {
-        //        MyErrorLog(TAG, dbMsg, er);
-        //    }
-        //}
-
-        /// <summary>
-        /// ボタン内で表示させたConfirmからのコールバック
-        /// 》OKボタンで現在日時算出
-        /// </summary>
-        /// <param name="message"></param>
-        //public void ConfirmFromView(ConfirmationMessage message)
-        //{
-        //    string TAG = "ConfirmFromView";
-        //    string OutputMessage = $"{DateTime.Now}: ConfirmFromView: {message.Response ?? false}";
-        //    string dbMsg = "OutputMessage=" + OutputMessage;
-        //    MyLog(TAG, dbMsg);
-        //}
+		/////////////////////////////////////////////////////////////Drop///
 
 
+		#region inputダイアログのサンプル
+		/// <summary>
+		/// 三択ダイアログのコールバック
+		/// https://days-of-programming.blogspot.com/2018/01/livetwpf.html
+		/// </summary>
+		/// <param name="msg"></param>
+		//public void MessageBoxClosed(ConfirmationMessage msg)
+		//{
+		//    string TAG = "MessageBoxClosed";
+		//    string dbMsg = "";
+		//    try
+		//    {
+		//        dbMsg += ",ConfirmationMessage=" + msg.Response;
+		//        if (msg.Response == null)
+		//        {
+		//            dbMsg += "null>>Cancel";
+		//        } else if (msg.Response.Value){     //true
+		//            dbMsg += ">>Yes";
+		//        }else{                              //false
+		//            dbMsg += ">>No";
+		//        }
+		//        MyLog(TAG, dbMsg);
+		//    }
+		//    catch (Exception er)
+		//    {
+		//        MyErrorLog(TAG, dbMsg, er);
+		//    }
+		//}
 
-        //private ViewModelCommand _ViewModelConfirmFrom;
-        //public ViewModelCommand ViewModelConfirmFrom
-        //{
-        //    get {
-        //        string TAG = "ViewModelConfirmFrom";
-        //        string dbMsg = "";
-        //        try
-        //        {
-        //            if (_ViewModelConfirmFrom == null)
-        //            {
-        //                dbMsg += ">>起動時";
-        //                _ViewModelConfirmFrom = new ViewModelCommand(ConfirmFromViewModel);
+		/// <summary>
+		/// ボタン内で表示させたConfirmからのコールバック
+		/// 》OKボタンで現在日時算出
+		/// </summary>
+		/// <param name="message"></param>
+		//public void ConfirmFromView(ConfirmationMessage message)
+		//{
+		//    string TAG = "ConfirmFromView";
+		//    string OutputMessage = $"{DateTime.Now}: ConfirmFromView: {message.Response ?? false}";
+		//    string dbMsg = "OutputMessage=" + OutputMessage;
+		//    MyLog(TAG, dbMsg);
+		//}
 
-        //            }
-        //            MyLog(TAG, dbMsg);
-        //        }
-        //        catch (Exception er)
-        //        {
-        //            MyErrorLog(TAG, dbMsg, er);
-        //        }
-        //        return _FileNameInputShow;
-        //    }
-        //}
 
-        //public async void ConfirmFromViewModel()
-        //{
-        //    string TAG = "ConfirmFromView";
-        //    ConfirmationMessage message = new ConfirmationMessage("これはテスト用メッセージです。", "テスト", "MessageKey_Confirm")
-        //    {
-        //        Button = MessageBoxButton.OKCancel,
-        //    };
-        //    await Messenger.RaiseAsync(message);
-        //    string OutputMessage = $"{DateTime.Now}: ConfirmFromViewModel: {message.Response ?? false}";
-        //    string dbMsg = "OutputMessage=" + OutputMessage;
-        //    MyLog(TAG, dbMsg);
-        //}
 
-        #endregion
+		//private ViewModelCommand _ViewModelConfirmFrom;
+		//public ViewModelCommand ViewModelConfirmFrom
+		//{
+		//    get {
+		//        string TAG = "ViewModelConfirmFrom";
+		//        string dbMsg = "";
+		//        try
+		//        {
+		//            if (_ViewModelConfirmFrom == null)
+		//            {
+		//                dbMsg += ">>起動時";
+		//                _ViewModelConfirmFrom = new ViewModelCommand(ConfirmFromViewModel);
 
-        public string DResult { get; private set; }
+		//            }
+		//            MyLog(TAG, dbMsg);
+		//        }
+		//        catch (Exception er)
+		//        {
+		//            MyErrorLog(TAG, dbMsg, er);
+		//        }
+		//        return _FileNameInputShow;
+		//    }
+		//}
+
+		//public async void ConfirmFromViewModel()
+		//{
+		//    string TAG = "ConfirmFromView";
+		//    ConfirmationMessage message = new ConfirmationMessage("これはテスト用メッセージです。", "テスト", "MessageKey_Confirm")
+		//    {
+		//        Button = MessageBoxButton.OKCancel,
+		//    };
+		//    await Messenger.RaiseAsync(message);
+		//    string OutputMessage = $"{DateTime.Now}: ConfirmFromViewModel: {message.Response ?? false}";
+		//    string dbMsg = "OutputMessage=" + OutputMessage;
+		//    MyLog(TAG, dbMsg);
+		//}
+
+		#endregion
+
+		public string DResult { get; private set; }
 
 		#region playList　/////////////////////////////////////////////////////////////
 		/// <summary>
