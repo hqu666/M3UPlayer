@@ -46,7 +46,7 @@ namespace M3UPlayer.ViewModels {
 
         private Uri _TargetURI;
 		/// <summary>
-		/// 遷移先URL
+		/// webViewのSource
 		/// </summary>
 		public Uri? TargetURI {
 			get {
@@ -60,6 +60,7 @@ namespace M3UPlayer.ViewModels {
 					if (value == _TargetURI)
 						return;
 					_TargetURI = value;
+					NotifyPropertyChanged("TargetURI");
 					MyLog(TAG, dbMsg);
 				} catch (Exception er) {
 					MyErrorLog(TAG, dbMsg, er);
@@ -68,7 +69,7 @@ namespace M3UPlayer.ViewModels {
 		}
 		private string _TargetURLStr;
 		/// <summary>
-		/// 遷移先URL文字列
+		/// addressBarのtext
 		/// </summary>
 		public string TargetURLStr {
 			get {

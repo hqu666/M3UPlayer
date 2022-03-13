@@ -1,4 +1,4 @@
-﻿<Window x:Class="M3UPlayer.Views.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -11,6 +11,7 @@
 	   xmlns:local="clr-namespace:M3UPlayer"
 		xmlns:v="clr-namespace:M3UPlayer.Views"
 		xmlns:vm="clr-namespace:M3UPlayer.ViewModels" 
+        xmlns:Wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf" x:Class="M3UPlayer.Views.MainWindow" 
         mc:Ignorable="d"
         Title="MainWindow" Height="1080" Width="1920"
         Top="10" Left="10" 
@@ -33,18 +34,18 @@
             <Setter Property="Margin" Value="0,5,0,5"/>
         </Style>-->
 
-        <Style TargetType="Label">
+        <Style TargetType="{x:Type Label}">
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Margin" Value="5"/>
         </Style>
 
-        <Style TargetType="TextBox">
+        <Style TargetType="{x:Type TextBox}">
             <Setter Property="Margin" Value="0,5,0,5"/>
             <Setter Property="VerticalContentAlignment"  Value="Center"/>
         </Style>
 
-        <ControlTemplate x:Key="buttonTemplate"  TargetType="Button">
-            <Border Name="border"
+        <ControlTemplate x:Key="buttonTemplate"  TargetType="{x:Type Button}">
+            <Border x:Name="border"
                 BorderThickness="2"
                 BorderBrush="DarkGray"
 				 Padding="5"
@@ -55,7 +56,7 @@
             </Border>
         </ControlTemplate>
 
-        <Style TargetType="Button">
+        <Style TargetType="{x:Type Button}">
             <Setter Property="MinWidth" Value="95"/>
 
             <Setter Property="Margin" Value="5,5,5,5"/>
@@ -63,13 +64,13 @@
         </Style>
 
         <!--添付ファイル-->
-        <Style x:Key="bt-attachment" TargetType="Button">
+        <Style x:Key="bt-attachment" TargetType="{x:Type Button}">
             <Setter Property="HorizontalContentAlignment" Value="Left" />
             <Setter Property="Margin" Value="3,3,3,3" />
             <Setter Property="Padding" Value="8,5,10,5" />
             <Setter Property="Panel.ZIndex" Value="90" />
         </Style>
-        <Style x:Key="bt-dell" TargetType="Button">
+        <Style x:Key="bt-dell" TargetType="{x:Type Button}">
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Margin" Value="0,0,10,0" />
@@ -279,25 +280,25 @@
                     </behaviors:Interaction.Triggers>-->
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="URL"
-                                            Binding="{Binding GranDir }" 
+                                            Binding="{Binding GranDir}" 
                                             Width="*"
                                             >
                             <DataGridTextColumn.ElementStyle>
                                 <Style>
-                                    <Setter Property="TextBlock.HorizontalAlignment" Value="Right"/>
+                                    <Setter Property="FrameworkElement.HorizontalAlignment" Value="Right"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <DataGridTextColumn Header="folder" 
-                                            Binding="{Binding ParentDir }" 
+                                            Binding="{Binding ParentDir}" 
                                             Width="Auto"
                                              />
                         <DataGridTextColumn Header="file" 
-                                            Binding="{Binding Summary }" 
+                                            Binding="{Binding Summary}" 
                                             Width="Auto"
                                              />
                         <DataGridTextColumn Header="ext" 
-                                            Binding="{Binding extentionStr }" 
+                                            Binding="{Binding extentionStr}" 
                                             Width="Auto"
                                              />
                     </DataGrid.Columns>
@@ -313,8 +314,8 @@
                         <StackPanel Orientation="Horizontal" Margin="4,3,8,3">
                             <!--<Image Source="/views/rewbtn.png"
                                Width="16" Height="16" OpacityMask="Black" />-->
-                            <TextBlock Text="{Binding ElementName=me, Path=DraggedItem_name}" 
-                                       Name="popup_text"
+                            <TextBlock Text="{Binding DraggedItem_name, ElementName=me}" 
+                                       x:Name="popup_text"
                                         FontSize="14" FontWeight="Bold"
                                         VerticalAlignment="Center" Margin="8,0,0,0" 
                                         />
@@ -340,7 +341,7 @@
                     </Button>
                     <Slider HorizontalAlignment="Stretch" Width="200" Height="20"
                                     Maximum="100"
-                                    Value="{Binding SoundValue,Mode=TwoWay}" Margin="0,0,20,0"
+                                    Value="{Binding SoundValue, Mode=TwoWay}" Margin="0,0,20,0"
                             />
 
                     <Button 
@@ -368,9 +369,25 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <!--ここで動画再生-->
-                <Grid Name="FrameGrid">
-                    <Frame Name="frame" Background="#222" />
-                    <!--Navigating="Frame_Navigating"    NavigationUIVisibility="Hidden"  -->
+                <Grid x:Name="FrameGrid">
+                    <!--<Frame x:Name="frame" Background="#555" />-->
+                    <Wpf:WebView2  Name="webView"
+  					    Source="{Binding TargetURI, Mode=TwoWay}" 
+                        HorizontalAlignment="Stretch" 
+                        VerticalAlignment="Stretch"
+                     />
+                    <!--Navigating="Frame_Navigating"    NavigationUIVisibility="Hidden" 
+                        
+					    NavigationStarting="WebView_NavigationStarting" 
+					    SourceUpdated="WebView_SourceUpdated" 
+					    ContentLoading="WebView_ContentLoading" 
+					    WebMessageReceived="WebView_WebMessageReceived" 
+					    RequestBringIntoView="WebView_RequestBringIntoView" 
+					    TargetUpdated="WebView_TargetUpdated" 
+					    MouseUp="WebView_MouseUp" 
+					    GotMouseCapture="WebView_GotMouseCapture" 
+					    MouseLeftButtonDown="WebView_MouseLeftButtonDown" 
+                    -->
                 </Grid>
 
                 <Grid Grid.Row="1">
@@ -397,14 +414,14 @@
                             <TextBlock Grid.Column="0"
                                         Margin="0,0,0,0" 
                                        Background="Transparent" 
-                                       Text="{Binding PositionStr }" 
+                                       Text="{Binding PositionStr}" 
                                        FontSize="36" 
                                        Foreground="White" />
                             <StackPanel  Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                                 <TextBlock 
                                         Margin="0,0,6,0" 
                                        Background="Transparent" 
-                                       Text="{Binding DurationStr }" 
+                                       Text="{Binding DurationStr}" 
                                        FontSize="24" 
                                        Foreground="White"/>
                             </StackPanel>
@@ -428,8 +445,8 @@
                                     VerticalContentAlignment="Stretch"
                                     HorizontalContentAlignment="Stretch" 
                                     Margin="0,6,0,0"
-                                    Maximum="{Binding SliderMaximum,Mode=OneWay}"
-                                    Value="{Binding SliderValue,Mode=TwoWay}"
+                                    Maximum="{Binding SliderMaximum, Mode=OneWay}"
+                                    Value="{Binding SliderValue, Mode=TwoWay}"
                                     Style="{DynamicResource MySliderStyle}">
                                 <!--センターライン；TrackBackground　/　ハンドル；Thumb-->
                                 <Slider.Resources>
@@ -622,8 +639,7 @@
                                     </ControlTemplate>
                                     <ControlTemplate x:Key="SliderThumbVerticalDefault" TargetType="{x:Type Thumb}">
                                         <Grid HorizontalAlignment="Center" UseLayoutRounding="True" VerticalAlignment="Center">
-                                            <Path x:Name="grip" Data="M0.5,0.5 L18.5,0.5 18.5,11.5 0.5,11.5z" Fill="{StaticResource 
-                                                SliderThumb.Static.Background}" Stretch="Fill" Stroke="{StaticResource SliderThumb.Static.Border}"/>
+                                            <Path x:Name="grip" Data="M0.5,0.5 L18.5,0.5 18.5,11.5 0.5,11.5z" Fill="{StaticResource SliderThumb.Static.Background}" Stretch="Fill" Stroke="{StaticResource SliderThumb.Static.Border}"/>
                                         </Grid>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsMouseOver" Value="true">

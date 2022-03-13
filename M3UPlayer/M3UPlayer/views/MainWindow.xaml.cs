@@ -42,6 +42,7 @@ namespace M3UPlayer.Views
 		private void this_loaded(object sender, RoutedEventArgs e) {
 			//ViewModelのViewプロパティに自分のインスタンス（つまりViewのインスタンス）を渡しています。
 			VM.MyView = this;
+			InitializeAsync();
 			//初期表示
 			PlayListModel targetItem = new PlayListModel();
 			targetItem.UrlStr = "https://www.yahoo.co.jp/";
@@ -49,6 +50,10 @@ namespace M3UPlayer.Views
 			targetItem.Summary = "StartUp";
 			VM.PlayListToPlayer(targetItem);
 
+		}
+
+		async void InitializeAsync() {
+			await webView.EnsureCoreWebView2Async(null);
 		}
 
 		private void Window_Closed(object sender, EventArgs e) {

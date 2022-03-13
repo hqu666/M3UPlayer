@@ -36,6 +36,7 @@ using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Text.RegularExpressions;
 using System.Collections;
+using Microsoft.Web.WebView2.Core;
 //using AxShockwaveFlashObjects;
 
 namespace M3UPlayer.ViewModels
@@ -357,7 +358,30 @@ namespace M3UPlayer.ViewModels
                 }
             }
 
-        public WsbViewModel WVM;
+   //     public WsbViewModel WVM;
+        private Uri _TargetURI;
+        /// <summary>
+        /// webViewのSource
+        /// </summary>
+        public Uri? TargetURI {
+            get {
+                return _TargetURI;
+            }
+            set {
+                string TAG = "TargetURI.set";
+                string dbMsg = "";
+                try {
+                    dbMsg += ">>遷移先URL=  " + value;
+                    if (value == _TargetURI)
+                        return;
+                    _TargetURI = value;
+                    NotifyPropertyChanged("TargetURI");
+                    MyLog(TAG, dbMsg);
+                } catch (Exception er) {
+                    MyErrorLog(TAG, dbMsg, er);
+                }
+            }
+        }
 
 
         /// <summary>
@@ -442,7 +466,7 @@ namespace M3UPlayer.ViewModels
                 PlayListSelectionMode = "Extended";
                 RaisePropertyChanged("PlayListSelectionMode");
                 Drag_now = false;
-                WVM = new WsbViewModel();
+          //      WVM = new WsbViewModel();
                 MyLog(TAG, dbMsg);
             } catch (Exception er)
             {
@@ -1150,29 +1174,28 @@ namespace M3UPlayer.ViewModels
         #endregion
 
 
-		/// <summary>
-	/// プレイヤーへ
-	/// </summary>
-	/// <param name="targetItem"></param>
-		public void PlayListToPlayer( PlayListModel targetItem) {
+        /// <summary>
+        /// プレイヤーへ
+        /// </summary>
+        /// <param name="targetItem">PlayListModelでurlを渡す</param>
+        public void PlayListToPlayer( PlayListModel targetItem) {
 			//int oldIndex,
 			string TAG = "PlayListToPlayer";
 			string dbMsg = "";
 			try {
-				//axWmp = null;
-				dbMsg += "targetItem=" + targetItem.Summary;
-				if (MyView != null) {
-					if (0 < MyView.FrameGrid.Children.Count) {
-						dbMsg += ">delete既存=" + MyView.FrameGrid.Children.Count + "件";
-						MyView.FrameGrid.Children.RemoveAt(0);
-					}
-					//if (myview.mainframe.source != null) {
-					//	myview.mainframe.source = null;
-					//	//dbmsg += "既存=" + myview.mainframe.children.count + "件";
-					//	//myview.mainframe.children.removeat(0);
-					//}
-					string targetURLStr = targetItem.UrlStr;
-					string extention = System.IO.Path.GetExtension(targetURLStr);
+                //axWmp = null;
+                    //if (0 < MyView.FrameGrid.Children.Count) {
+                    //	dbMsg += ">delete既存=" + MyView.FrameGrid.Children.Count + "件";
+                    //	MyView.FrameGrid.Children.RemoveAt(0);
+                    //}
+                    //if (myview.mainframe.source != null) {
+                    //	myview.mainframe.source = null;
+                    //	//dbmsg += "既存=" + myview.mainframe.children.count + "件";
+                    //	//myview.mainframe.children.removeat(0);
+                    //}
+                string targetURLStr = targetItem.UrlStr;
+                    dbMsg += "、targetURLStr=" + targetURLStr;
+                    string extention = System.IO.Path.GetExtension(targetURLStr);
 					dbMsg += "、拡張子=" + extention;
                     bool toWeb = true;  // false;
 					//if (-1 < Array.IndexOf(WebVideo, extention) ||
@@ -1182,15 +1205,19 @@ namespace M3UPlayer.ViewModels
 					//Frame frame = new Frame();
 					dbMsg += "、Web=" + toWeb;
 					if (toWeb) {
-                        MyView.frame.Navigate(WVM);
-                        //		WVM.TargetURLStr = targetURLStr;
-                        WVM.SetMyUrl(targetURLStr);
-                        //WVM.TargeStr = targetURLStr;
-                        //WebPage WP = new WebPage();                  //Page
-                        //WP.DataContext = WVM;
-                        //frame.Navigate(WP);
-                        //MyView.FrameGrid.Children.Add(frame);
-                    } else if(-1 < Array.IndexOf(FlashVideo, extention)) {
+                        //TargetURI = new Uri(targetURLStr);
+                        //NotifyPropertyChanged("TargetURI");
+                        MyView.webView.CoreWebView2.Navigate(targetURLStr); //開きたいURL
+
+                    //MyView.frame.Navigate(WVM);
+                    ////		WVM.TargetURLStr = targetURLStr;
+                    //WVM.SetMyUrl(targetURLStr);
+                    ////WVM.TargeStr = targetURLStr;
+                    ////WebPage WP = new WebPage();                  //Page
+                    ////WP.DataContext = WVM;
+                    ////frame.Navigate(WP);
+                    ////MyView.FrameGrid.Children.Add(frame);
+                } else if(-1 < Array.IndexOf(FlashVideo, extention)) {
 						//// Create the interop host control.
 						//System.Windows.Forms.Integration.WindowsFormsHost host =
 						//	new System.Windows.Forms.Integration.WindowsFormsHost();
@@ -1242,9 +1269,9 @@ namespace M3UPlayer.ViewModels
 						//// player = axWmp.GetPlayer();
 						////player.currentMedia.
 					}
-				} else {
-					dbMsg += ">>MyView == null";
-				}
+				//} else {
+				//	dbMsg += ">>MyView == null";
+				//}
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
@@ -1336,7 +1363,7 @@ namespace M3UPlayer.ViewModels
 
 		public void BackFromPlayer(PlayListModel targetItem) {
 			//int oldIndex,
-			string TAG = "PlayListToPlayer";
+			string TAG = "BackFromPlayer";
 			string dbMsg = "";
 			try {
 				MyLog(TAG, dbMsg);
@@ -1888,8 +1915,7 @@ namespace M3UPlayer.ViewModels
 			try {
                 PlayListModel targetItem = new PlayListModel();
                 targetItem.UrlStr = "https://www.yahoo.co.jp/";
-                PlayListToPlayer(targetItem);
-                string titolStr = "プレイリストアイテムファイルの操作";
+				string titolStr = "プレイリストアイテムファイルの操作";
                 string errorStr = "マウスアップ";
                 string? doStr = null;
                 if (PlayListOpelate(titolStr, errorStr, doStr)) {
@@ -1930,7 +1956,9 @@ namespace M3UPlayer.ViewModels
 				} else {
 					dbMsg += "選択値無し";
 				}
-				MyLog(TAG, dbMsg);
+                dbMsg += ",UrlStr=" + targetItem.UrlStr;
+                PlayListToPlayer(targetItem);
+                MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
