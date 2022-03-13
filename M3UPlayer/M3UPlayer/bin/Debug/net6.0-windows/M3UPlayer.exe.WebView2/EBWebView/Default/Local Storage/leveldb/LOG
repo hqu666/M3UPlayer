@@ -1,5 +1,3 @@
-2022/03/13-22:56:05.697 2768 Creating DB H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\M3UPlayer.exe.WebView2\EBWebView\Default\Local Storage\leveldb since it was missing.
-2022/03/13-22:56:05.716 2768 Reusing MANIFEST H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\M3UPlayer.exe.WebView2\EBWebView\Default\Local Storage\leveldb/MANIFEST-000001
-2022/03/13-22:57:23.188 69c8 Level-0 table #5: started
-2022/03/13-22:57:23.194 69c8 Level-0 table #5: 28142 bytes OK
-2022/03/13-22:57:23.196 69c8 Delete type=0 #3
+2022/03/14-00:10:10.694 4a80 Reusing MANIFEST H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\M3UPlayer.exe.WebView2\EBWebView\Default\Local Storage\leveldb/MANIFEST-000001
+2022/03/14-00:10:10.695 4a80 Recovering log #4
+2022/03/14-00:10:10.696 4a80 Reusing old log H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\M3UPlayer.exe.WebView2\EBWebView\Default\Local Storage\leveldb/000004.log 

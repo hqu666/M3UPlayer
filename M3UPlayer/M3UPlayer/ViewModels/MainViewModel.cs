@@ -37,6 +37,8 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Text.RegularExpressions;
 using System.Collections;
 using Microsoft.Web.WebView2.Core;
+using System.Threading.Tasks;
+using System.Threading;
 //using AxShockwaveFlashObjects;
 
 namespace M3UPlayer.ViewModels
@@ -1174,11 +1176,12 @@ namespace M3UPlayer.ViewModels
         #endregion
 
 
+        readonly CountdownEvent condition = new CountdownEvent(1);
         /// <summary>
         /// プレイヤーへ
         /// </summary>
         /// <param name="targetItem">PlayListModelでurlを渡す</param>
-        public void PlayListToPlayer( PlayListModel targetItem) {
+        public async void PlayListToPlayer( PlayListModel targetItem) {
 			//int oldIndex,
 			string TAG = "PlayListToPlayer";
 			string dbMsg = "";
@@ -1205,10 +1208,23 @@ namespace M3UPlayer.ViewModels
 					//Frame frame = new Frame();
 					dbMsg += "、Web=" + toWeb;
 					if (toWeb) {
-                        //TargetURI = new Uri(targetURLStr);
-                        //NotifyPropertyChanged("TargetURI");
+                    //TargetURI = new Uri(targetURLStr);
+                    //NotifyPropertyChanged("TargetURI");
+                    if (MyView == null) {
+					} else { 
                         MyView.webView.CoreWebView2.Navigate(targetURLStr); //開きたいURL
 
+                    }
+                    //非同期実行
+                    await Task.Run(() =>
+                    {
+                        //読み込み完了まで待機
+                        if (condition.Wait(5000)) {
+                            dbMsg += "、ok";
+                        } else {
+                            dbMsg += "、timeout";
+                        }
+                    });
                     //MyView.frame.Navigate(WVM);
                     ////		WVM.TargetURLStr = targetURLStr;
                     //WVM.SetMyUrl(targetURLStr);
@@ -1929,7 +1945,8 @@ namespace M3UPlayer.ViewModels
 					//	}
 
 					//	//get the target item
-					//	PlayListModel targetItem = PLListSelectedItem;
+					//	PlayListModel
+                    targetItem = SelectedPlayListFiles[0];
 
 					//	if (targetItem == null) {           // || !ReferenceEquals(DraggedItem, targetItem)
 

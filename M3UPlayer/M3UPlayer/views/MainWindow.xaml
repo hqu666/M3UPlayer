@@ -375,6 +375,7 @@
   					    Source="{Binding TargetURI, Mode=TwoWay}" 
                         HorizontalAlignment="Stretch" 
                         VerticalAlignment="Stretch"
+                        NavigationCompleted="WebView_NavigationCompleted"
                      />
                     <!--Navigating="Frame_Navigating"    NavigationUIVisibility="Hidden" 
                         

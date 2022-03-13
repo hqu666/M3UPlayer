@@ -62,6 +62,26 @@ namespace M3UPlayer.Views
         }
 
         /// <summary>
+        /// 明示的な初期化
+        /// </summary>
+        async void InitializeAsync() {
+            string TAG = "InitializeAsync";
+            string dbMsg = "";
+            try {
+                //初期化の完了を待たないでwebView2.CoreWebView2にアクセスするとNullReferenceExceptionが発生するので対策
+                await webView.EnsureCoreWebView2Async(null);
+                //		webView.CoreWebView2.WebMessageReceived += UpdateAddressBar;
+                //ホストからメッセージを印刷するためのハンドラーを登録する web コンテンツに、スクリプトを挿入
+                await webView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("window.chrome.webview.postMessage(window.document.URL);");
+                //ホストに URL をポストする web コンテンツにスクリプトを挿入
+                //				await webView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("window.chrome.webview.addEventListener(\'message\', event => alert(event.data));");
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+        /// <summary>
         /// 読込み終了
         /// </summary>
         /// <param name="sender"></param>
@@ -152,29 +172,6 @@ namespace M3UPlayer.Views
             try
             {
                 SaveWindowBounds();
-                MyLog(TAG, dbMsg);
-            }
-            catch (Exception er)
-            {
-                MyErrorLog(TAG, dbMsg, er);
-            }
-        }
-
-        /// <summary>
-        /// 明示的な初期化
-        /// </summary>
-        async void InitializeAsync()
-        {
-            string TAG = "InitializeAsync";
-            string dbMsg = "";
-            try
-            {
-                await webView.EnsureCoreWebView2Async(null);
-                //		webView.CoreWebView2.WebMessageReceived += UpdateAddressBar;
-                //ホストからメッセージを印刷するためのハンドラーを登録する web コンテンツに、スクリプトを挿入
-                await webView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("window.chrome.webview.postMessage(window.document.URL);");
-                //ホストに URL をポストする web コンテンツにスクリプトを挿入
-                //				await webView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync("window.chrome.webview.addEventListener(\'message\', event => alert(event.data));");
                 MyLog(TAG, dbMsg);
             }
             catch (Exception er)
