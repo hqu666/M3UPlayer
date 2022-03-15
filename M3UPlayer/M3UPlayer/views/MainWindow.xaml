@@ -396,7 +396,7 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Button >
+                    <Button  Command="{Binding PlayBtClick}">
                         <Button.Background>
                             <ImageBrush ImageSource="/views/pl_r_btn.png" Stretch="UniformToFill"/>
                         </Button.Background>

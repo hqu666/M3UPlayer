@@ -1175,7 +1175,26 @@ namespace M3UPlayer.ViewModels
 
         #endregion
 
+        /// <summary>
+        /// テキストファイルを作成
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        private async static Task SaveFile(string path, string content) {//ファイルをセーブする
+            string TAG = "SaveFile";
+            string dbMsg = "";
+            try {
+                dbMsg += "path=" + path + "に\r\n" + content;
+                await Task.Run(() => {
+                    File.WriteAllText(path, content);
+                });
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
 
+        }
         readonly CountdownEvent condition = new CountdownEvent(1);
         /// <summary>
         /// プレイヤーへ
@@ -1207,19 +1226,32 @@ namespace M3UPlayer.ViewModels
 					//}
 					//Frame frame = new Frame();
 					dbMsg += "、Web=" + toWeb;
-					if (toWeb) {
+				if (toWeb) {
                     //TargetURI = new Uri(targetURLStr);
                     //NotifyPropertyChanged("TargetURI");
                     if (MyView == null) {
-					} else { 
-                        MyView.webView.CoreWebView2.Navigate(targetURLStr); //開きたいURL
+					} else {
+                        string tagStr = MakeVideoSouce(targetURLStr, 1000, 1000);
+                        dbMsg += "、tagStr\r\n" + tagStr;
+                        // 実行ディレクトリを取得
+                        var currentDirectory = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "souce.html";
+                        dbMsg += "、\r\n" + currentDirectory;
+                        SaveFile(currentDirectory, tagStr);
+                        // ローカルファイルのURIを作成
+                        Uri uri = new Uri(currentDirectory);
+                        TargetURI = uri;
+                        RaisePropertyChanged("TargetURI");
+                        // WebView2にローカルファイルのURIを設定
+                        MyView.webView.CoreWebView2.Navigate(TargetURI.AbsoluteUri);
 
-                    }
+						//		MyView.webView.CoreWebView2.Navigate(tagStr); //開きたいURL
+
+					}
                     //非同期実行
                     await Task.Run(() =>
                     {
                         //読み込み完了まで待機
-                        if (condition.Wait(5000)) {
+                        if (condition.Wait(1000)) {
                             dbMsg += "、ok";
                         } else {
                             dbMsg += "、timeout";
@@ -2952,12 +2984,29 @@ namespace M3UPlayer.ViewModels
         }
         #endregion
 
+        public ICommand PlayBtClick => new DelegateCommand(ClickPlayBt);
+        /// <summary>
+        /// Playボタンのクリック
+        /// </summary>
+        private void ClickPlayBt() {
+            string TAG = "ClickPlayBt";
+            string dbMsg = "";
+            try {
+                dbMsg += "IsPlaying=" + IsPlaying;
+                if (IsPlaying) {
 
 
+                    IsPlaying = false;
+                } else {
+                    IsPlaying = true;
+                }
+                dbMsg += ">>IsPlaying=" + IsPlaying;
 
-        //
-
-        ////
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
         ///以下使用待ち///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -3451,380 +3500,381 @@ List<String> PlayListFileNames = new List<String>();
         public string GetFileTypeStr(string checkFileName)
         {
             string TAG = "[GetFileTypeStr]";
-            string dbMsg = TAG;
-            //	try {
-            string retType = "";
+            string dbMsg = "";
             string retMIME = "";
-            string[] extStrs = checkFileName.Split('.');
-            string extentionStr = "." + extStrs[extStrs.Length - 1].ToLower();
-            dbMsg += "\n拡張子=" + extentionStr;
-            if (-1 < extentionStr.IndexOf(".mov", StringComparison.OrdinalIgnoreCase) ||
-                -1 < extentionStr.IndexOf(".qt", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-                retMIME = "video/quicktime";
-            }
-            else if (-1 < extentionStr.IndexOf(".mpg", StringComparison.OrdinalIgnoreCase) ||
-              -1 < extentionStr.IndexOf(".mpeg", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-                retMIME = "video/mpeg";
-            }
-            else if (-1 < extentionStr.IndexOf(".mp4", StringComparison.OrdinalIgnoreCase))
-            {          //動画コーデック：H.264/音声コーデック：MP3、AAC
-                retType = "video";
-                retMIME = "video/mp4";        //ver12:MP4 ビデオ ファイル <source src="movie.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
-            }
-            else if (-1 < extentionStr.IndexOf(".webm", StringComparison.OrdinalIgnoreCase))
-            {          //動画コーデック：VP8 / Vorbis
-                retType = "video";
-                retMIME = "video/webm";//  <source src="movie.webm" type='video/webm; codecs="vp8, vorbis"' />
-            }
-            else if (-1 < extentionStr.IndexOf(".ogv", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-                retMIME = "video/ogv";
-            }
-            else if (-1 < extentionStr.IndexOf(".avi", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-                retMIME = "video/x-msvideo";
-            }
-            else if (-1 < extentionStr.IndexOf(".3gp", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-                retMIME = "video/3gpp";     //audio/3gpp
-            }
-            else if (-1 < extentionStr.IndexOf(".3g2", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-                retMIME = "video/3gpp2";            //audio/3gpp2
-            }
-            else if (-1 < extentionStr.IndexOf(".asf", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-                retMIME = "video/x-ms-asf";
-            }
-            else if (-1 < extentionStr.IndexOf(".asx", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-                retMIME = "video/x-ms-asf";   //ver9:Windows Media メタファイル 
-            }
-            else if (-1 < extentionStr.IndexOf(".wax", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";   //ver9:Windows Media メタファイル 
-            }
-            else if (-1 < extentionStr.IndexOf(".wmv", StringComparison.OrdinalIgnoreCase))
-            {
-                retMIME = "video/x-ms-wmv";      //ver9:Windows Media 形式
-                retType = "video";
-            }
-            else if (-1 < extentionStr.IndexOf(".wvx", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-                retMIME = "video/x-ms-wvx";       //ver9:Windows Media メタファイル 
-            }
-            else if (-1 < extentionStr.IndexOf(".wmx", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-                retMIME = "video/x-ms-wmx";       //ver9:Windows Media メタファイル 
-            }
-            else if (-1 < extentionStr.IndexOf(".wmz", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-                retMIME = "application/x-ms-wmz";
-            }
-            else if (-1 < extentionStr.IndexOf(".wmd", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-                retMIME = "application/x-ms-wmd";
-            }
-            else if (-1 < extentionStr.IndexOf(".swf", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-                retMIME = "application/x-shockwave-flash";
-            }
-            else if (-1 < extentionStr.IndexOf(".flv", StringComparison.OrdinalIgnoreCase))
-            {          //動画コーデック：Sorenson Spark / On2VP6/音声コーデック：MP3
-                retType = "video";
-                retMIME = "application/x-shockwave-flash";
-                //	retMIME = "video/x-flv";
-            }
-            else if (-1 < extentionStr.IndexOf(".f4v", StringComparison.OrdinalIgnoreCase))
-            {          //動画コーデック：H.264/音声コーデック：MP3、AAC、HE - AAC
-                retType = "video";
-                retMIME = "video/mp4";
-            }
-            else if (-1 < extentionStr.IndexOf(".rm", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-                retMIME = "application/vnd.rn-realmedia";
-            }
-            else if (-1 < extentionStr.IndexOf(".ivf", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";     //ver10:Indeo Video Technology
-            }
-            else if (-1 < extentionStr.IndexOf(".dvr-ms", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";            //ver12:Microsoft デジタル ビデオ録画
-            }
-            else if (-1 < extentionStr.IndexOf(".m2ts", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";           //m2tsと同じ
-                                             /*
-											  .htaccess や Apache のMIME Type設定
-											  AddType application/x-mpegURL .m3u8
-AddType video/MP2T .ts
-										  */
-            }
-            else if (-1 < extentionStr.IndexOf(".ts", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";           //ver12:MPEG-2 TS ビデオ ファイル 
-            }
-            else if (-1 < extentionStr.IndexOf(".m1v", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-            }
-            else if (-1 < extentionStr.IndexOf(".mp2", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-            }
-            else if (-1 < extentionStr.IndexOf(".mpa", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-            }
-            else if (-1 < extentionStr.IndexOf(".mpe", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-            }
-            else if (-1 < extentionStr.IndexOf(".m4v", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-            }
-            else if (-1 < extentionStr.IndexOf(".mp4v", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "video";
-                //image/////////////////////////////////////////////////////////////////////////
-            }
-            else if (-1 < extentionStr.IndexOf(".jpg", StringComparison.OrdinalIgnoreCase) ||
-                   -1 < extentionStr.IndexOf(".jpeg", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "image";
-                retMIME = "image/jpeg";
-            }
-            else if (-1 < extentionStr.IndexOf(".gif", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "image";
-                retMIME = "image/gif";
-            }
-            else if (-1 < extentionStr.IndexOf(".png", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "image";
-                retMIME = "image/png";
-            }
-            else if (-1 < extentionStr.IndexOf(".ico", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "image";
-                retMIME = "image/vnd.microsoft.icon";
-            }
-            else if (-1 < extentionStr.IndexOf(".bmp", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "image";
-                retMIME = "image/x-ms-bmp";
-                //audio/////////////////////////////////////////////////////////////////////////
-            }
-            else if (-1 < extentionStr.IndexOf(".mp3", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "audio";
-                retMIME = "audio/mpeg";
-            }
-            else if (-1 < extentionStr.IndexOf(".m4a", StringComparison.OrdinalIgnoreCase) ||
-              -1 < extentionStr.IndexOf(".aac", StringComparison.OrdinalIgnoreCase)
-              )
-            {
-                retType = "audio";
-                retMIME = "audio/aac";         //var12;MP4 オーディオ ファイル
-            }
-            else if (-1 < extentionStr.IndexOf(".ogg", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "audio";
-                retMIME = "audio/ogg";
-            }
-            else if (-1 < extentionStr.IndexOf(".midi", StringComparison.OrdinalIgnoreCase) ||
-              -1 < extentionStr.IndexOf(".mid", StringComparison.OrdinalIgnoreCase) ||
-              -1 < extentionStr.IndexOf(".rmi", StringComparison.OrdinalIgnoreCase)
-              )
-            {
-                retType = "audio";
-                retMIME = "audio/midi";          //var9;MIDI 
-            }
-            else if (-1 < extentionStr.IndexOf(".ra", StringComparison.OrdinalIgnoreCase) ||
-              -1 < extentionStr.IndexOf(".ram", StringComparison.OrdinalIgnoreCase)
-              )
-            {
-                retType = "audio";
-                retMIME = "audio/vnd.rn-realaudio";
-            }
-            else if (-1 < extentionStr.IndexOf(".flac", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "audio";
-                retMIME = "audio/flac";
-            }
-            else if (-1 < extentionStr.IndexOf(".wma", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "audio";
-                retMIME = "audio/x-ms-wma";
-            }
-            else if (-1 < extentionStr.IndexOf(".wav", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "audio";
-                retMIME = "audio/wav";           //var9;Windows 用オーディオ   
-            }
-            else if (-1 < extentionStr.IndexOf(".aif", StringComparison.OrdinalIgnoreCase) ||
-              -1 < extentionStr.IndexOf(".aifc", StringComparison.OrdinalIgnoreCase) ||
-              -1 < extentionStr.IndexOf(".aiff", StringComparison.OrdinalIgnoreCase)
-              )
-            {
-                retType = "audio";           //var9;Audio Interchange File FormatI 
-            }
-            else if (-1 < extentionStr.IndexOf(".au", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "audio";          //var9;Sun Microsystems  
-            }
-            else if (-1 < extentionStr.IndexOf(".snd", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "audio";          //var9; NeXT  
-            }
-            else if (-1 < extentionStr.IndexOf(".cda", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "audio";          //var9;CD オーディオ トラック 
-            }
-            else if (-1 < extentionStr.IndexOf(".adt", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "audio";          //var12;Windows オーディオ ファイル 
-            }
-            else if (-1 < extentionStr.IndexOf(".adts", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "audio";           //var12;Windows オーディオ ファイル 
-            }
-            else if (-1 < extentionStr.IndexOf(".asx", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "audio";
-                //text/////////////////////////////////////////////////////////////////////////
-            }
-            else if (-1 < extentionStr.IndexOf(".txt", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "text";
-                retMIME = "text/plain";
-            }
-            else if (-1 < extentionStr.IndexOf(".html", StringComparison.OrdinalIgnoreCase) ||
-              -1 < extentionStr.IndexOf(".htm", StringComparison.OrdinalIgnoreCase)
-              )
-            {
-                retType = "text";
-                retMIME = "text/html";
-            }
-            else if (-1 < extentionStr.IndexOf(".xhtml", StringComparison.OrdinalIgnoreCase))
-            {
-                retMIME = "application/xhtml+xml";
-            }
-            else if (-1 < extentionStr.IndexOf(".xml", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "text";
-                retMIME = "text/xml";
-            }
-            else if (-1 < extentionStr.IndexOf(".rss", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "text";
-                retMIME = "application/rss+xml";
-            }
-            else if (-1 < extentionStr.IndexOf(".xml", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "text";
-                retMIME = "application/xml";            //、text/xml
-            }
-            else if (-1 < extentionStr.IndexOf(".css", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "text";
-                retMIME = "text/css";
-            }
-            else if (-1 < extentionStr.IndexOf(".js", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "text";
-                retMIME = "text/javascript";
-            }
-            else if (-1 < extentionStr.IndexOf(".vbs", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "text";
-                retMIME = "text/vbscript";
-            }
-            else if (-1 < extentionStr.IndexOf(".cgi", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "text";
-                retMIME = "application/x-httpd-cgi";
-            }
-            else if (-1 < extentionStr.IndexOf(".php", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "text";
-                retMIME = "application/x-httpd-php";
-                //application/////////////////////////////////////////////////////////////////////////
-            }
-            else if (-1 < extentionStr.IndexOf(".zip", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "application";
-                retMIME = "application/zip";
-            }
-            else if (-1 < extentionStr.IndexOf(".pdf", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "application";
-                retMIME = "application/pdf";
-            }
-            else if (-1 < extentionStr.IndexOf(".doc", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "application";
-                retMIME = "application/msword";
-            }
-            else if (-1 < extentionStr.IndexOf(".xls", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "application";
-                retMIME = "application/msexcel";
-            }
-            else if (-1 < extentionStr.IndexOf(".wmx", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "application";        //ver9:Windows Media Player スキン 
-            }
-            else if (-1 < extentionStr.IndexOf(".wms", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "application";       //ver9:Windows Media Player スキン  
-            }
-            else if (-1 < extentionStr.IndexOf(".wmz", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "application";       //ver9:Windows Media Player スキン  
-            }
-            else if (-1 < extentionStr.IndexOf(".wpl", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "application";       //ver9:Windows Media Player スキン  
-            }
-            else if (-1 < extentionStr.IndexOf(".wmd", StringComparison.OrdinalIgnoreCase))
-            {
-                retType = "application";       //ver9:Windows Media Download パッケージ   
-                                               /*		} else if (-1 < extentionStr.IndexOf(".m3u", StringComparison.OrdinalIgnoreCase)) {
-														   retType = "video";*/
+            try {
+				string retType = "";
+                string[] extStrs = checkFileName.Split('.');
+                string extentionStr = "." + extStrs[extStrs.Length - 1].ToLower();
+                dbMsg += ",拡張子=" + extentionStr;
+                if (-1 < extentionStr.IndexOf(".mov", StringComparison.OrdinalIgnoreCase) ||
+                    -1 < extentionStr.IndexOf(".qt", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                    retMIME = "video/quicktime";
+                }
+                else if (-1 < extentionStr.IndexOf(".mpg", StringComparison.OrdinalIgnoreCase) ||
+                  -1 < extentionStr.IndexOf(".mpeg", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                    retMIME = "video/mpeg";
+                }
+                else if (-1 < extentionStr.IndexOf(".mp4", StringComparison.OrdinalIgnoreCase))
+                {          //動画コーデック：H.264/音声コーデック：MP3、AAC
+                    retType = "video";
+                    retMIME = "video/mp4";        //ver12:MP4 ビデオ ファイル <source src="movie.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
+                }
+                else if (-1 < extentionStr.IndexOf(".webm", StringComparison.OrdinalIgnoreCase))
+                {          //動画コーデック：VP8 / Vorbis
+                    retType = "video";
+                    retMIME = "video/webm";//  <source src="movie.webm" type='video/webm; codecs="vp8, vorbis"' />
+                }
+                else if (-1 < extentionStr.IndexOf(".ogv", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                    retMIME = "video/ogv";
+                }
+                else if (-1 < extentionStr.IndexOf(".avi", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                    retMIME = "video/x-msvideo";
+                }
+                else if (-1 < extentionStr.IndexOf(".3gp", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                    retMIME = "video/3gpp";     //audio/3gpp
+                }
+                else if (-1 < extentionStr.IndexOf(".3g2", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                    retMIME = "video/3gpp2";            //audio/3gpp2
+                }
+                else if (-1 < extentionStr.IndexOf(".asf", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                    retMIME = "video/x-ms-asf";
+                }
+                else if (-1 < extentionStr.IndexOf(".asx", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                    retMIME = "video/x-ms-asf";   //ver9:Windows Media メタファイル 
+                }
+                else if (-1 < extentionStr.IndexOf(".wax", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";   //ver9:Windows Media メタファイル 
+                }
+                else if (-1 < extentionStr.IndexOf(".wmv", StringComparison.OrdinalIgnoreCase))
+                {
+                    retMIME = "video/x-ms-wmv";      //ver9:Windows Media 形式
+                    retType = "video";
+                }
+                else if (-1 < extentionStr.IndexOf(".wvx", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                    retMIME = "video/x-ms-wvx";       //ver9:Windows Media メタファイル 
+                }
+                else if (-1 < extentionStr.IndexOf(".wmx", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                    retMIME = "video/x-ms-wmx";       //ver9:Windows Media メタファイル 
+                }
+                else if (-1 < extentionStr.IndexOf(".wmz", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                    retMIME = "application/x-ms-wmz";
+                }
+                else if (-1 < extentionStr.IndexOf(".wmd", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                    retMIME = "application/x-ms-wmd";
+                }
+                else if (-1 < extentionStr.IndexOf(".swf", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                    retMIME = "application/x-shockwave-flash";
+                }
+                else if (-1 < extentionStr.IndexOf(".flv", StringComparison.OrdinalIgnoreCase))
+                {          //動画コーデック：Sorenson Spark / On2VP6/音声コーデック：MP3
+                    retType = "video";
+                    retMIME = "application/x-shockwave-flash";
+                    //	retMIME = "video/x-flv";
+                }
+                else if (-1 < extentionStr.IndexOf(".f4v", StringComparison.OrdinalIgnoreCase))
+                {          //動画コーデック：H.264/音声コーデック：MP3、AAC、HE - AAC
+                    retType = "video";
+                    retMIME = "video/mp4";
+                }
+                else if (-1 < extentionStr.IndexOf(".rm", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                    retMIME = "application/vnd.rn-realmedia";
+                }
+                else if (-1 < extentionStr.IndexOf(".ivf", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";     //ver10:Indeo Video Technology
+                }
+                else if (-1 < extentionStr.IndexOf(".dvr-ms", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";            //ver12:Microsoft デジタル ビデオ録画
+                }
+                else if (-1 < extentionStr.IndexOf(".m2ts", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";           //m2tsと同じ
+                                                 /*
+											      .htaccess や Apache のMIME Type設定
+											      AddType application/x-mpegURL .m3u8
+    AddType video/MP2T .ts
+										      */
+                }
+                else if (-1 < extentionStr.IndexOf(".ts", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";           //ver12:MPEG-2 TS ビデオ ファイル 
+                }
+                else if (-1 < extentionStr.IndexOf(".m1v", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                }
+                else if (-1 < extentionStr.IndexOf(".mp2", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                }
+                else if (-1 < extentionStr.IndexOf(".mpa", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                }
+                else if (-1 < extentionStr.IndexOf(".mpe", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                }
+                else if (-1 < extentionStr.IndexOf(".m4v", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                }
+                else if (-1 < extentionStr.IndexOf(".mp4v", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "video";
+                    //image/////////////////////////////////////////////////////////////////////////
+                }
+                else if (-1 < extentionStr.IndexOf(".jpg", StringComparison.OrdinalIgnoreCase) ||
+                       -1 < extentionStr.IndexOf(".jpeg", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "image";
+                    retMIME = "image/jpeg";
+                }
+                else if (-1 < extentionStr.IndexOf(".gif", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "image";
+                    retMIME = "image/gif";
+                }
+                else if (-1 < extentionStr.IndexOf(".png", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "image";
+                    retMIME = "image/png";
+                }
+                else if (-1 < extentionStr.IndexOf(".ico", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "image";
+                    retMIME = "image/vnd.microsoft.icon";
+                }
+                else if (-1 < extentionStr.IndexOf(".bmp", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "image";
+                    retMIME = "image/x-ms-bmp";
+                    //audio/////////////////////////////////////////////////////////////////////////
+                }
+                else if (-1 < extentionStr.IndexOf(".mp3", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "audio";
+                    retMIME = "audio/mpeg";
+                }
+                else if (-1 < extentionStr.IndexOf(".m4a", StringComparison.OrdinalIgnoreCase) ||
+                  -1 < extentionStr.IndexOf(".aac", StringComparison.OrdinalIgnoreCase)
+                  )
+                {
+                    retType = "audio";
+                    retMIME = "audio/aac";         //var12;MP4 オーディオ ファイル
+                }
+                else if (-1 < extentionStr.IndexOf(".ogg", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "audio";
+                    retMIME = "audio/ogg";
+                }
+                else if (-1 < extentionStr.IndexOf(".midi", StringComparison.OrdinalIgnoreCase) ||
+                  -1 < extentionStr.IndexOf(".mid", StringComparison.OrdinalIgnoreCase) ||
+                  -1 < extentionStr.IndexOf(".rmi", StringComparison.OrdinalIgnoreCase)
+                  )
+                {
+                    retType = "audio";
+                    retMIME = "audio/midi";          //var9;MIDI 
+                }
+                else if (-1 < extentionStr.IndexOf(".ra", StringComparison.OrdinalIgnoreCase) ||
+                  -1 < extentionStr.IndexOf(".ram", StringComparison.OrdinalIgnoreCase)
+                  )
+                {
+                    retType = "audio";
+                    retMIME = "audio/vnd.rn-realaudio";
+                }
+                else if (-1 < extentionStr.IndexOf(".flac", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "audio";
+                    retMIME = "audio/flac";
+                }
+                else if (-1 < extentionStr.IndexOf(".wma", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "audio";
+                    retMIME = "audio/x-ms-wma";
+                }
+                else if (-1 < extentionStr.IndexOf(".wav", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "audio";
+                    retMIME = "audio/wav";           //var9;Windows 用オーディオ   
+                }
+                else if (-1 < extentionStr.IndexOf(".aif", StringComparison.OrdinalIgnoreCase) ||
+                  -1 < extentionStr.IndexOf(".aifc", StringComparison.OrdinalIgnoreCase) ||
+                  -1 < extentionStr.IndexOf(".aiff", StringComparison.OrdinalIgnoreCase)
+                  )
+                {
+                    retType = "audio";           //var9;Audio Interchange File FormatI 
+                }
+                else if (-1 < extentionStr.IndexOf(".au", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "audio";          //var9;Sun Microsystems  
+                }
+                else if (-1 < extentionStr.IndexOf(".snd", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "audio";          //var9; NeXT  
+                }
+                else if (-1 < extentionStr.IndexOf(".cda", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "audio";          //var9;CD オーディオ トラック 
+                }
+                else if (-1 < extentionStr.IndexOf(".adt", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "audio";          //var12;Windows オーディオ ファイル 
+                }
+                else if (-1 < extentionStr.IndexOf(".adts", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "audio";           //var12;Windows オーディオ ファイル 
+                }
+                else if (-1 < extentionStr.IndexOf(".asx", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "audio";
+                    //text/////////////////////////////////////////////////////////////////////////
+                }
+                else if (-1 < extentionStr.IndexOf(".txt", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "text";
+                    retMIME = "text/plain";
+                }
+                else if (-1 < extentionStr.IndexOf(".html", StringComparison.OrdinalIgnoreCase) ||
+                  -1 < extentionStr.IndexOf(".htm", StringComparison.OrdinalIgnoreCase)
+                  )
+                {
+                    retType = "text";
+                    retMIME = "text/html";
+                }
+                else if (-1 < extentionStr.IndexOf(".xhtml", StringComparison.OrdinalIgnoreCase))
+                {
+                    retMIME = "application/xhtml+xml";
+                }
+                else if (-1 < extentionStr.IndexOf(".xml", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "text";
+                    retMIME = "text/xml";
+                }
+                else if (-1 < extentionStr.IndexOf(".rss", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "text";
+                    retMIME = "application/rss+xml";
+                }
+                else if (-1 < extentionStr.IndexOf(".xml", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "text";
+                    retMIME = "application/xml";            //、text/xml
+                }
+                else if (-1 < extentionStr.IndexOf(".css", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "text";
+                    retMIME = "text/css";
+                }
+                else if (-1 < extentionStr.IndexOf(".js", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "text";
+                    retMIME = "text/javascript";
+                }
+                else if (-1 < extentionStr.IndexOf(".vbs", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "text";
+                    retMIME = "text/vbscript";
+                }
+                else if (-1 < extentionStr.IndexOf(".cgi", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "text";
+                    retMIME = "application/x-httpd-cgi";
+                }
+                else if (-1 < extentionStr.IndexOf(".php", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "text";
+                    retMIME = "application/x-httpd-php";
+                    //application/////////////////////////////////////////////////////////////////////////
+                }
+                else if (-1 < extentionStr.IndexOf(".zip", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "application";
+                    retMIME = "application/zip";
+                }
+                else if (-1 < extentionStr.IndexOf(".pdf", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "application";
+                    retMIME = "application/pdf";
+                }
+                else if (-1 < extentionStr.IndexOf(".doc", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "application";
+                    retMIME = "application/msword";
+                }
+                else if (-1 < extentionStr.IndexOf(".xls", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "application";
+                    retMIME = "application/msexcel";
+                }
+                else if (-1 < extentionStr.IndexOf(".wmx", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "application";        //ver9:Windows Media Player スキン 
+                }
+                else if (-1 < extentionStr.IndexOf(".wms", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "application";       //ver9:Windows Media Player スキン  
+                }
+                else if (-1 < extentionStr.IndexOf(".wmz", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "application";       //ver9:Windows Media Player スキン  
+                }
+                else if (-1 < extentionStr.IndexOf(".wpl", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "application";       //ver9:Windows Media Player スキン  
+                }
+                else if (-1 < extentionStr.IndexOf(".wmd", StringComparison.OrdinalIgnoreCase))
+                {
+                    retType = "application";       //ver9:Windows Media Download パッケージ   
+                                                   /*		} else if (-1 < extentionStr.IndexOf(".m3u", StringComparison.OrdinalIgnoreCase)) {
+														       retType = "video";*/
 
+                }
+                else if (-1 < extentionStr.IndexOf(".wm", StringComparison.OrdinalIgnoreCase))
+                {        //以降wmで始まる拡張子が誤動作
+                    retType = "video";
+                    retMIME = "video/x-ms-wm";
+                }
+
+                //typeName.Text = retType;
+                //mineType.Text = retMIME;
+                dbMsg += ",retMIME=" + retMIME;
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
             }
-            else if (-1 < extentionStr.IndexOf(".wm", StringComparison.OrdinalIgnoreCase))
-            {        //以降wmで始まる拡張子が誤動作
-                retType = "video";
-                retMIME = "video/x-ms-wm";
-            }
-            //	}
-            //typeName.Text = retType;
-            //mineType.Text = retMIME;
-            return retType;
-            //		MyLog( dbMsg );
-            //		} catch (Exception er) {
-            //		Console.WriteLine( TAG + "でエラー発生" + er.Message + ";" + dbMsg );
-            //	}
+            return retMIME;
         }       //拡張子からタイプとMIMEを返す
 
         /// <summary>
@@ -4217,316 +4267,328 @@ AddType video/MP2T .ts
      //       }
      //   }
 
-
+        /// <summary>
+        /// webのビデオ再生HTMLを作成する
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="webWidth"></param>
+        /// <param name="webHeight"></param>
+        /// <returns></returns>
         private string MakeVideoSouce(string fileName, int webWidth, int webHeight)
         {
             string TAG = "[MakeVideoSouce]";
-            string dbMsg = TAG;
-            dbMsg += ",lsFullPathName=" + lsFullPathName;
-            lsFullPathName = lsFullPathName.Replace(@":\\\", @":\\");
-            dbMsg += ",fileName=" + fileName;
+            string dbMsg = "";
             string contlolPart = "";
-            string comentStr = "このタイプの表示は検討中です。";
-            string[] extStrs = fileName.Split('.');
-            string extentionStr = "." + extStrs[extStrs.Length - 1].ToLower();
-            string[] souceNames = fileName.Split(Path.DirectorySeparatorChar);
-            string souceName = souceNames[souceNames.Length - 1];
-            string mineTypeStr = "video/x-ms-asf";     //.asf
-            string clsId = "";
-            string codeBase = "";
-            string dbWorning = "";
+            try {
+                dbMsg += ",lsFullPathName=" + lsFullPathName;
+                lsFullPathName = lsFullPathName.Replace(@":\\\", @":\\");
+                dbMsg += ",fileName=" + fileName;
+                string comentStr = "このタイプの表示は検討中です。";
+                string[] extStrs = fileName.Split('.');
+                string extentionStr = "." + extStrs[extStrs.Length - 1].ToLower();
+                string[] souceNames = fileName.Split(Path.DirectorySeparatorChar);
+                string souceName = souceNames[souceNames.Length - 1];
+                string mineTypeStr = GetFileTypeStr(fileName);      // "video/x-ms-asf";     //.asf
+                dbMsg += ",mineTypeStr=" + mineTypeStr;
+                string clsId = "";
+                string codeBase = "";
+                string dbWorning = "";
 
-            if (lsFullPathName != "" && fileName != "未選択" && lsFullPathName != fileName)
-            {       //8/31;仮対応；書き換わり対策
-                dbMsg += ",***書き換わり発生*<<" + lsFullPathName + " ; " + fileName + ">>";
-                fileName = lsFullPathName;
-            }
-            if (extentionStr == ".webm" ||
-                extentionStr == ".ogv"
-                )
-            {
-                contlolPart += "\t\t\t<meta http - equiv = " + '"' + "X-UA-Compatible" + '"' + " content=" + '"' + "chrome=1" + '"' + " >\n";
-                //<meta http-equiv="X-UA-Compatible" content="chrome=1">			http://mrs.suzu841.com/mini_memo/numero_23.html
-                contlolPart += "\t\t</head>\n";
-                contlolPart += "\t\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n";
-                //	contlolPart += "\t\t<div class=" + '"' + "video-container" + '"' + ">\n";
-                contlolPart += "\t\t\t<video id=" + '"' + wiPlayerID + '"' + " controls autoplay style = " + '"' + "width:100%;height: auto;" + '"' + ">\n";
-                contlolPart += "\t\t\t\t<source src=" + '"' + "file://" + fileName + '"' + " type=" + "'" + mineTypeStr;
-                if (extentionStr == ".webm")
-                {
-                    contlolPart += "; codecs=" + '"' + "vp8, vorbis" + '"' + "'" + ">\n";
+                if (lsFullPathName != "" && fileName != "未選択" && lsFullPathName != fileName) {       //8/31;仮対応；書き換わり対策
+                    dbMsg += ",***書き換わり発生*<<" + lsFullPathName + " ; " + fileName + ">>";
+                    fileName = lsFullPathName;
                 }
-                else if (extentionStr == ".ogv")
-                {
-                    contlolPart += "; codecs=" + '"' + "theora, vorbis" + '"' + "'" + ">\n";
-                }
-                // "file://" +		//  <source src="movie.webm" type='video/webm; codecs="vp8, vorbis"' />
-                /*		contlolPart += "\t\t\t<video id=" + '"' + wiPlayerID + '"' + " src=" + '"' + "file://" + fileName + '"' +
-													" controls autoplay style = " + '"' + "width:100%;height: auto;" + '"' +
-														"></video>\n\t\t</div>";          */
-                contlolPart += "\t\t\t</video>\n";
-                //		contlolPart += "\t\t</div>"; 
-                comentStr = "読み込めないファイルは対策検討中です。。";
 
-            }
-            else if (extentionStr == ".flv" ||
-              extentionStr == ".f4v" ||
-              extentionStr == ".swf"
-              )
-            {
-                Uri urlObj = new Uri(fileName);
-                if (urlObj.IsFile)
-                {             //Uriオブジェクトがファイルを表していることを確認する
-                    fileName = urlObj.AbsoluteUri;                 //Windows形式のパス表現に変換する
-                    dbMsg += "Path=" + fileName;
-                }
-                dbMsg += ",assemblyPath=" + assemblyPath + ",assemblyName=" + assemblyName;
-                dbMsg += ",playerUrl=" + playerUrl;//,playerUrl=C:\Users\博臣\source\repos\file_tree_clock_web1\file_tree_clock_web1\bin\Debug\fladance.swf 
-                clsId = "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000";       //ブラウザーの ActiveX コントロール
-                codeBase = "http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0";
-                string pluginspage = "http://www.macromedia.com/go/getflashplayer";
-                dbMsg += "[" + webWidth + "×" + webHeight + "]";        //4/3=1.3		1478/957=1.53  801/392=2.04
-                                                                        /*		if (4 / 3 < webWidth / webHeight) {
-																					webWidth = webHeight/3*4;		.
-																				} else {
-																					webWidth = webHeight / 3 * 4;
-																				}
-																				dbMsg += ">>[" + webWidth + "×" + webHeight + "]";*/
-                playerUrl = assemblyPath.Replace(assemblyName, "fladance.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
-                                                                                      //		string nextMove = assemblyPath.Replace( assemblyName, "tonext.htm" );
-                string flashVvars = "fms_app=&video_file=" + fileName + "&" +       // & amp;
-                                                                                    //								"link_url ="+ nextMove + "&" +
-                                         "image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10" + '"';
+                contlolPart = "< !DOCTYPE html >< html lang = " + '"' + "ja" + '"' + " >\n";
+                contlolPart += "\t< head >\n\t\t< meta charSet = " + '"' + "utf - 8" + '"' + " />\n";
+                contlolPart += "\t\t< meta http - equiv = " + '"' + "X - UA - Compatible" + '"' + " content = " + '"' + "IE = edge,chrome = 1" + '"' + " />\n";
                 contlolPart += "\t</head>\n";
-                contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n\t\t";
-                contlolPart += "<object id=" + '"' + wiPlayerID + '"' +
-                                    " classid=" + '"' + clsId + '"' +
-                                " codebase=" + '"' + codeBase + '"' +
-                                " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
-                                 ">\n";
-                contlolPart += "\t\t\t<param name=" + '"' + "FlashVars" + '"' + " value=" + '"' + flashVvars + '"' + "/>\n";                        //常にバーを表示する
-                contlolPart += "\t\t\t<param name= " + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>\n";
-                contlolPart += "\t\t\t<param name =" + '"' + "movie" + '"' + " value=" + '"' + playerUrl + '"' + "/>\n";
-                contlolPart += "\t\t\t\t<embed name=" + '"' + wiPlayerID + '"' +
-                                                " src=" + '"' + playerUrl + '"' +            // "file://" + fileName
-                                                                                             //		"left=-10 width=100% height= auto" +            // '"' + webWidth + '"'
-                                                " width=" + '"' + webWidth + '"' + " height= " + '"' + webHeight + '"' +            // '"' + webWidth + '"'
-                                                " type=" + '"' + mineTypeStr + '"' +
-                                                " allowfullscreen=" + '"' + " true= " + '"' +
-                                                " flashvars=" + '"' + flashVvars + '"' +
-                                                " type=" + '"' + "application/x-shockwave-flash" + '"' +
-                                                " pluginspage=" + '"' + pluginspage + '"' +
-                                       "/>\n";
-
-                comentStr = souceName + " ; プレイヤーには「ふらだんす」http://www.streaming.jp/fladance/　を使っています。" + dbWorning;
-
-                /*				playerUrl = assemblyPath.Replace(assemblyName, "flvplayer-305.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
-																										   //	string flashVvars = "fms_app=&video_file=" + fileName + "&" +       // & amp;
-								contlolPart += "<object id=" + '"' + wiPlayerID + '"' +
-																					" width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
-																					" classid=" + '"' + clsId + '"' +
-																				" codebase=" + '"' + codeBase + '"' +
-																					 //	" type=" + '"' + "application/x-shockwave-flash" + '"' +
-																					 //						" data=" + '"' + playerUrl + '"' +
-																					 ">\n";
-								contlolPart += "\t\t\t<param name =" + '"' + "movie" + '"' + " value=" + '"' + playerUrl + '"' + "/>\n";
-								contlolPart += "\t\t\t<param name=" + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>\n";
-								contlolPart += "\t\t\t<param name=" + '"' + "FlashVars" + '"' + " value=" + '"' + fileName + '"' + "/>\n";
-								contlolPart += "\t\t\t\t<embed name=" + '"' + wiPlayerID + '"' +
-																" width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
-																" src=" + '"' + playerUrl + '"' +
-																" flashvars=" + '"' + fileName + '"' +           //" flashvars=" + '"' + @"flv=" + fileName + +'"' +
-																" allowFullScreen=" + '"' + "true" + '"' +
-													   ">\n";
-								contlolPart += "\t\t\t\t</ embed>\n";
-								comentStr = souceName + " ; プレイヤーには「Adobe Flash Player」https://www.mi-j.com/service/FLASH/player/index.html　を使っています。";
-				*/
-
-                /*
-				playerUrl = assemblyPath.Replace( assemblyName, "player_flv_maxi.swf" );       //☆デバッグ用を\bin\Debugにコピーしておく
-								contlolPart += "<object type=" + '"' + "application/x-shockwave-flash" + '"' +
-																			" data=" + '"' + playerUrl + '"' +
-																" width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
-																 ">\n";
-								contlolPart += "\t\t\t<param name =" + '"' + "movie" + '"' + " value=" + '"' + playerUrl + '"' + "/>\n";
-								contlolPart += "\t\t\t<param name=" + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>\n";
-								contlolPart += "\t\t\t<param name=" + '"' + "FlashVars" + '"' + " value=" + '"' + fileName + "&" +
-																				 "width=" + webWidth + "&" +
-																				 "height=" + webHeight + "&" +
-																				 "showstop=" + 1 + "&" +          //ストップボタンを表示
-																				 "showvolume=" + 1 + "&" +
-																				 "showtime=" + 1 + "&" +
-																				 "showfullscreen=" + 1 + "&" +
-																									 "showplayer = always" +
-									'"' + "/>\n";
-								contlolPart += "\t\t\t\t<embed name=" + '"' + "monFlash" + '"' +
-																" src=" + '"' + playerUrl + '"' +            // "file://" + fileName
-																" flashvars=" + '"' + @"flv=" + fileName + +'"' +
-																" pluginspage=" + '"' + pluginspage + '"' +
-																" type=" + '"' + "application/x-shockwave-flash" + '"' +
-													   "/>\n";
-								comentStr = souceName + " ; プレイヤーには「FLV Player」http://flv-player.net/　を使っています。";
+                contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#333333;" + '"' + " >\n";
+                contlolPart += "\t\t<div class=" + '"' + "middle" + '"' + " style =" + '"' + "padding: 0px; " + '"' + " >\n";
 
 
-												playerUrl = assemblyPath.Replace( assemblyName, "flaver.swf" );       //☆デバッグ用を\bin\Debugにコピーしておく
-						contlolPart += "<object id=" + '"' + "flvp" + '"' +
-															" data=" + '"' + playerUrl + '"' +
-														" type=" + '"' + "application/x-shockwave-flash" + '"' +
-														" width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
-														" ALIGN=" + '"' + "right" + '"' +
-														 ">\n";
-										contlolPart += "\t\t\t<param name =" + '"' + "movie" + '"' + " value=" + '"' + fileName + '"' + "/>\n";
-										contlolPart += "\t\t\t<param name=" + '"' + "FlashVars" + '"' + " value=" + '"' + fileName + '"' + "/>\n";
-										contlolPart += "\t\t\t<param name= " + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>\n";
-										contlolPart += "\t\t\t<param name= " + '"' + "allowScriptAccess" + '"' + " value=" + '"' + "always" + '"' + "/>\n";
-										comentStr = souceName + " ; プレイヤーには「FLAVER 3.0」http://rexef.com/webtool/flaver3/installation.html　を使っています。";
+                if (extentionStr == ".mp4") {
+                    //	contlolPart += "\t\t<div class=" + '"' + "video-container" + '"' + ">\n";
+                    contlolPart += "\t\t\t<video id=" + '"' + wiPlayerID + '"' + " controls autoplay style = " + '"' + "width:-webkit-fill-available ;height:-webkit-fill-available;text-align: center;" + '"' + ">\n";
+                    contlolPart += "\t\t\t\t<source src=" + '"' + "file://" + fileName + '"' + " type=" + '"' + mineTypeStr + '"' + ">\n";
+                    contlolPart += "\t\t\t</video>\n";
 
-	
-										*/
-                /*-		//		fileName = "media.flv";
-							//	fileName = "file:///"+fileName.Replace( Path.DirectorySeparatorChar ,'/');
-								codeBase = "http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,115,0";      //26,0,0,151は？
-								contlolPart += "<object id=" + '"' + "flvp" + '"' +
-													//			" type=" + '"' + mineTypeStr + '"' +
-														//		 " data=" + '"' + fileName + //"&fullscreen=true" + '"' +
-														//		 " data=" + '"' + "player_flv_mini.swf" + '"' +
-													" classid=" + '"' + clsId + '"' +
-												" codebase=" + '"' + codeBase + '"' +
-												" width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
-										//		" menu=" + true  +
-												 ">\n";
-							//	contlolPart += "\t\t\t<param name =" + '"' + "movie" + '"' + " value=" + '"' + "flvplayer-305.swf" + '"' + "/>\n";
-								contlolPart += "\t\t\t<param name =" + '"' + "bgcolor" + '"' + " value=" + '"' + "#FFFFFF" + '"' + "/>\n";
-								//		contlolPart += "\t\t\t<param name= " + '"' + "bgcolor" + '"' + " value=" + '"' + "#fff" + '"' + "/>\n";
-								contlolPart += "\t\t\t<param name =" + '"' + "loop" + '"' + " value=" + '"' + "false" + '"' + "/>\n";
-								contlolPart += "\t\t\t<param name =" + '"' + "quality" + '"' + " value=" + '"' + "high" + '"' + "/>\n";
-								contlolPart += "\t\t\t<param name =" + '"' + "menu" + '"' + " value=" + '"' + "true" + '"' + "/>\n";
-								//		contlolPart += "\t\t\t<param name =" + '"' + "allowScriptAccess" + '"' + " value = " + '"' + "sameDomain" + '"' + "/>\n";
-							//	contlolPart += "\t\t\t<param name= " + '"' + "allowScriptAccess" + '"' + " value=" + '"' + "always" + '"' + "/>\n";
-									contlolPart += "\t\t\t<param name=" + '"' + "FlashVars" + '"' + " value=" + '"' +
-																		"src=" + fileName + "&" +       // & amp;
-															 //			"flvmov=" + fileName + "&" +       // & amp;
-															 //		"flv=" + fileName +"&" +       // & amp;
-															 "width=" + webWidth + "&" + "height=" + webHeight + "&" +
-															 "showstop=" + 1 + "&" +                              //ストップボタンを表示
-															 "showvolume=" + 1 + "&" +                            //showvolume
-															 "showtime=" + 1 + "&" +                              //時間を表示
-															 "showfullscreen=" + 1 + "&" +                        //全画面表示ボタンを表示
-															 "showplayer=always" + '"' + "/>\n";                        //常にバーを表示する
+                } else if (extentionStr == ".webm" ||
+                    extentionStr == ".ogv"
+                    ) {
+                        contlolPart += "\t\t\t<meta http - equiv = " + '"' + "X-UA-Compatible" + '"' + " content=" + '"' + "chrome=1" + '"' + " >\n";
+                        //<meta http-equiv="X-UA-Compatible" content="chrome=1">			http://mrs.suzu841.com/mini_memo/numero_23.html
+                        contlolPart += "\t\t</head>\n";
+                        contlolPart += "\t\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n";
+                        //	contlolPart += "\t\t<div class=" + '"' + "video-container" + '"' + ">\n";
+                        contlolPart += "\t\t\t<video id=" + '"' + wiPlayerID + '"' + " controls autoplay style = " + '"' + "width:100%;height: auto;" + '"' + ">\n";
+                        contlolPart += "\t\t\t\t<source src=" + '"' + "file://" + fileName + '"' + " type=" + "'" + mineTypeStr;
+                        if (extentionStr == ".webm") {
+                            contlolPart += "; codecs=" + '"' + "vp8, vorbis" + '"' + "'" + ">\n";
+                        } else if (extentionStr == ".ogv") {
+                            contlolPart += "; codecs=" + '"' + "theora, vorbis" + '"' + "'" + ">\n";
+                        }
+                        // "file://" +		//  <source src="movie.webm" type='video/webm; codecs="vp8, vorbis"' />
+                        /*		contlolPart += "\t\t\t<video id=" + '"' + wiPlayerID + '"' + " src=" + '"' + "file://" + fileName + '"' +
+                                                            " controls autoplay style = " + '"' + "width:100%;height: auto;" + '"' +
+                                                                "></video>\n\t\t</div>";          */
+                        contlolPart += "\t\t\t</video>\n";
+                        //		contlolPart += "\t\t</div>"; 
+                        comentStr = "読み込めないファイルは対策検討中です。。";
+
+                } else if (extentionStr == ".flv" ||
+                   extentionStr == ".f4v" ||
+                   extentionStr == ".swf"
+                   ) {
+                        Uri urlObj = new Uri(fileName);
+                        if (urlObj.IsFile) {             //Uriオブジェクトがファイルを表していることを確認する
+                            fileName = urlObj.AbsoluteUri;                 //Windows形式のパス表現に変換する
+                            dbMsg += "Path=" + fileName;
+                        }
+                        dbMsg += ",assemblyPath=" + assemblyPath + ",assemblyName=" + assemblyName;
+                        dbMsg += ",playerUrl=" + playerUrl;//,playerUrl=C:\Users\博臣\source\repos\file_tree_clock_web1\file_tree_clock_web1\bin\Debug\fladance.swf 
+                        clsId = "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000";       //ブラウザーの ActiveX コントロール
+                        codeBase = "http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0";
+                        string pluginspage = "http://www.macromedia.com/go/getflashplayer";
+                        dbMsg += "[" + webWidth + "×" + webHeight + "]";        //4/3=1.3		1478/957=1.53  801/392=2.04
+                        /*		if (4 / 3 < webWidth / webHeight) {
+                                    webWidth = webHeight/3*4;		.
+                                } else {
+                                    webWidth = webHeight / 3 * 4;
+                                }
+                                dbMsg += ">>[" + webWidth + "×" + webHeight + "]";*/
+                        playerUrl = assemblyPath.Replace(assemblyName, "fladance.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
+                                                                                              //		string nextMove = assemblyPath.Replace( assemblyName, "tonext.htm" );
+                        string flashVvars = "fms_app=&video_file=" + fileName + "&" +       // & amp;
+                                                                                            //								"link_url ="+ nextMove + "&" +
+                                                 "image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10" + '"';
+                        contlolPart += "\t</head>\n";
+                        contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n\t\t";
+                        contlolPart += "<object id=" + '"' + wiPlayerID + '"' +
+                                            " classid=" + '"' + clsId + '"' +
+                                        " codebase=" + '"' + codeBase + '"' +
+                                        " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
+                                         ">\n";
+                        contlolPart += "\t\t\t<param name=" + '"' + "FlashVars" + '"' + " value=" + '"' + flashVvars + '"' + "/>\n";                        //常にバーを表示する
+                        contlolPart += "\t\t\t<param name= " + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>\n";
+                        contlolPart += "\t\t\t<param name =" + '"' + "movie" + '"' + " value=" + '"' + playerUrl + '"' + "/>\n";
+                        contlolPart += "\t\t\t\t<embed name=" + '"' + wiPlayerID + '"' +
+                                                    " src=" + '"' + playerUrl + '"' +            // "file://" + fileName
+                                                                                                 //		"left=-10 width=100% height= auto" +            // '"' + webWidth + '"'
+                                                    " width=" + '"' + webWidth + '"' + " height= " + '"' + webHeight + '"' +            // '"' + webWidth + '"'
+                                                    " type=" + '"' + mineTypeStr + '"' +
+                                                    " allowfullscreen=" + '"' + " true= " + '"' +
+                                                    " flashvars=" + '"' + flashVvars + '"' +
+                                                    " type=" + '"' + "application/x-shockwave-flash" + '"' +
+                                                    " pluginspage=" + '"' + pluginspage + '"' +
+                                           "/>\n";
+
+                        comentStr = souceName + " ; プレイヤーには「ふらだんす」http://www.streaming.jp/fladance/　を使っています。" + dbWorning;
+
+                    /*				playerUrl = assemblyPath.Replace(assemblyName, "flvplayer-305.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
+                                                                                                               //	string flashVvars = "fms_app=&video_file=" + fileName + "&" +       // & amp;
+                                    contlolPart += "<object id=" + '"' + wiPlayerID + '"' +
+                                                                                        " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
+                                                                                        " classid=" + '"' + clsId + '"' +
+                                                                                    " codebase=" + '"' + codeBase + '"' +
+                                                                                         //	" type=" + '"' + "application/x-shockwave-flash" + '"' +
+                                                                                         //						" data=" + '"' + playerUrl + '"' +
+                                                                                         ">\n";
+                                    contlolPart += "\t\t\t<param name =" + '"' + "movie" + '"' + " value=" + '"' + playerUrl + '"' + "/>\n";
+                                    contlolPart += "\t\t\t<param name=" + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>\n";
+                                    contlolPart += "\t\t\t<param name=" + '"' + "FlashVars" + '"' + " value=" + '"' + fileName + '"' + "/>\n";
+                                    contlolPart += "\t\t\t\t<embed name=" + '"' + wiPlayerID + '"' +
+                                                                    " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
+                                                                    " src=" + '"' + playerUrl + '"' +
+                                                                    " flashvars=" + '"' + fileName + '"' +           //" flashvars=" + '"' + @"flv=" + fileName + +'"' +
+                                                                    " allowFullScreen=" + '"' + "true" + '"' +
+                                                           ">\n";
+                                    contlolPart += "\t\t\t\t</ embed>\n";
+                                    comentStr = souceName + " ; プレイヤーには「Adobe Flash Player」https://www.mi-j.com/service/FLASH/player/index.html　を使っています。";
+                    */
+
+                    /*
+                    playerUrl = assemblyPath.Replace( assemblyName, "player_flv_maxi.swf" );       //☆デバッグ用を\bin\Debugにコピーしておく
+                                    contlolPart += "<object type=" + '"' + "application/x-shockwave-flash" + '"' +
+                                                                                " data=" + '"' + playerUrl + '"' +
+                                                                    " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
+                                                                     ">\n";
+                                    contlolPart += "\t\t\t<param name =" + '"' + "movie" + '"' + " value=" + '"' + playerUrl + '"' + "/>\n";
+                                    contlolPart += "\t\t\t<param name=" + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>\n";
+                                    contlolPart += "\t\t\t<param name=" + '"' + "FlashVars" + '"' + " value=" + '"' + fileName + "&" +
+                                                                                     "width=" + webWidth + "&" +
+                                                                                     "height=" + webHeight + "&" +
+                                                                                     "showstop=" + 1 + "&" +          //ストップボタンを表示
+                                                                                     "showvolume=" + 1 + "&" +
+                                                                                     "showtime=" + 1 + "&" +
+                                                                                     "showfullscreen=" + 1 + "&" +
+                                                                                                         "showplayer = always" +
+                                        '"' + "/>\n";
+                                    contlolPart += "\t\t\t\t<embed name=" + '"' + "monFlash" + '"' +
+                                                                    " src=" + '"' + playerUrl + '"' +            // "file://" + fileName
+                                                                    " flashvars=" + '"' + @"flv=" + fileName + +'"' +
+                                                                    " pluginspage=" + '"' + pluginspage + '"' +
+                                                                    " type=" + '"' + "application/x-shockwave-flash" + '"' +
+                                                           "/>\n";
+                                    comentStr = souceName + " ; プレイヤーには「FLV Player」http://flv-player.net/　を使っています。";
 
 
-								contlolPart += "\t\t\t\t<embed name=" + '"' + "flvp" + '"' +
-																" type=" + '"' + mineTypeStr + '"' +
-																" src=" + '"' + fileName + '"' +            // "file://" + fileName
-																											//		" allowScriptAccess=" + '"' + " sameDomain= " + '"' +
-																" width=" + '"' + webWidth + '"' + " height= " + '"' + webHeight + '"' + " bgcolor=" + '"' + "#FFFFFF" + '"' +
-																" pluginspage=" + '"' + pluginspage + '"' + 
-																" loop=" + '"' + "false" + '"' + " quality=" + '"' + "high" + '"' +
-													   "/>\n";
-				*/
-                //グローバルセキュリティ設定パネルで)「これらの場所にあるファイルを常に信頼する」で、[追加]-[フォルダを参照]にローカルディスクを登録する？
-                //	http://www.macromedia.com/support/documentation/jp/flashplayer/help/settings_manager04.html
-                //属性指定は	https://helpx.adobe.com/jp/flash/kb/231465.html
-                //C#でFlashファイルを読み込み表示する	http://sivaexstrage.orz.hm/blog/softwaredevelopment/800
-                //		contlolPart += "\n\t\t< param name = " + '"' + "FlashVars" + '"' + "value = " + '"' + "flv= + '"' +fileName + '"' +"&autoplay=1&margin=0" + '"' + "/>\n\t\t\t";
-                contlolPart += "\t\t</object>\n";
+                                                    playerUrl = assemblyPath.Replace( assemblyName, "flaver.swf" );       //☆デバッグ用を\bin\Debugにコピーしておく
+                            contlolPart += "<object id=" + '"' + "flvp" + '"' +
+                                                                " data=" + '"' + playerUrl + '"' +
+                                                            " type=" + '"' + "application/x-shockwave-flash" + '"' +
+                                                            " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
+                                                            " ALIGN=" + '"' + "right" + '"' +
+                                                             ">\n";
+                                            contlolPart += "\t\t\t<param name =" + '"' + "movie" + '"' + " value=" + '"' + fileName + '"' + "/>\n";
+                                            contlolPart += "\t\t\t<param name=" + '"' + "FlashVars" + '"' + " value=" + '"' + fileName + '"' + "/>\n";
+                                            contlolPart += "\t\t\t<param name= " + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>\n";
+                                            contlolPart += "\t\t\t<param name= " + '"' + "allowScriptAccess" + '"' + " value=" + '"' + "always" + '"' + "/>\n";
+                                            comentStr = souceName + " ; プレイヤーには「FLAVER 3.0」http://rexef.com/webtool/flaver3/installation.html　を使っています。";
+
+
+                                            */
+                    /*-		//		fileName = "media.flv";
+                                //	fileName = "file:///"+fileName.Replace( Path.DirectorySeparatorChar ,'/');
+                                    codeBase = "http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,115,0";      //26,0,0,151は？
+                                    contlolPart += "<object id=" + '"' + "flvp" + '"' +
+                                                        //			" type=" + '"' + mineTypeStr + '"' +
+                                                            //		 " data=" + '"' + fileName + //"&fullscreen=true" + '"' +
+                                                            //		 " data=" + '"' + "player_flv_mini.swf" + '"' +
+                                                        " classid=" + '"' + clsId + '"' +
+                                                    " codebase=" + '"' + codeBase + '"' +
+                                                    " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
+                                            //		" menu=" + true  +
+                                                     ">\n";
+                                //	contlolPart += "\t\t\t<param name =" + '"' + "movie" + '"' + " value=" + '"' + "flvplayer-305.swf" + '"' + "/>\n";
+                                    contlolPart += "\t\t\t<param name =" + '"' + "bgcolor" + '"' + " value=" + '"' + "#FFFFFF" + '"' + "/>\n";
+                                    //		contlolPart += "\t\t\t<param name= " + '"' + "bgcolor" + '"' + " value=" + '"' + "#fff" + '"' + "/>\n";
+                                    contlolPart += "\t\t\t<param name =" + '"' + "loop" + '"' + " value=" + '"' + "false" + '"' + "/>\n";
+                                    contlolPart += "\t\t\t<param name =" + '"' + "quality" + '"' + " value=" + '"' + "high" + '"' + "/>\n";
+                                    contlolPart += "\t\t\t<param name =" + '"' + "menu" + '"' + " value=" + '"' + "true" + '"' + "/>\n";
+                                    //		contlolPart += "\t\t\t<param name =" + '"' + "allowScriptAccess" + '"' + " value = " + '"' + "sameDomain" + '"' + "/>\n";
+                                //	contlolPart += "\t\t\t<param name= " + '"' + "allowScriptAccess" + '"' + " value=" + '"' + "always" + '"' + "/>\n";
+                                        contlolPart += "\t\t\t<param name=" + '"' + "FlashVars" + '"' + " value=" + '"' +
+                                                                            "src=" + fileName + "&" +       // & amp;
+                                                                 //			"flvmov=" + fileName + "&" +       // & amp;
+                                                                 //		"flv=" + fileName +"&" +       // & amp;
+                                                                 "width=" + webWidth + "&" + "height=" + webHeight + "&" +
+                                                                 "showstop=" + 1 + "&" +                              //ストップボタンを表示
+                                                                 "showvolume=" + 1 + "&" +                            //showvolume
+                                                                 "showtime=" + 1 + "&" +                              //時間を表示
+                                                                 "showfullscreen=" + 1 + "&" +                        //全画面表示ボタンを表示
+                                                                 "showplayer=always" + '"' + "/>\n";                        //常にバーを表示する
+
+
+                                    contlolPart += "\t\t\t\t<embed name=" + '"' + "flvp" + '"' +
+                                                                    " type=" + '"' + mineTypeStr + '"' +
+                                                                    " src=" + '"' + fileName + '"' +            // "file://" + fileName
+                                                                                                                //		" allowScriptAccess=" + '"' + " sameDomain= " + '"' +
+                                                                    " width=" + '"' + webWidth + '"' + " height= " + '"' + webHeight + '"' + " bgcolor=" + '"' + "#FFFFFF" + '"' +
+                                                                    " pluginspage=" + '"' + pluginspage + '"' + 
+                                                                    " loop=" + '"' + "false" + '"' + " quality=" + '"' + "high" + '"' +
+                                                           "/>\n";
+                    */
+                    //グローバルセキュリティ設定パネルで)「これらの場所にあるファイルを常に信頼する」で、[追加]-[フォルダを参照]にローカルディスクを登録する？
+                    //	http://www.macromedia.com/support/documentation/jp/flashplayer/help/settings_manager04.html
+                    //属性指定は	https://helpx.adobe.com/jp/flash/kb/231465.html
+                    //C#でFlashファイルを読み込み表示する	http://sivaexstrage.orz.hm/blog/softwaredevelopment/800
+                    //		contlolPart += "\n\t\t< param name = " + '"' + "FlashVars" + '"' + "value = " + '"' + "flv= + '"' +fileName + '"' +"&autoplay=1&margin=0" + '"' + "/>\n\t\t\t";
+                    contlolPart += "\t\t</object>\n";
+                } else if (extentionStr == ".rm") {
+                        contlolPart += "\t</head>\n";
+                        contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n";
+                        clsId = "clsid:CFCDAA03-8BE4-11CF-B84B-0020AFBBCCFA";       //ブラウザーの ActiveX コントロール
+                        contlolPart += "\t\t<object  id=" + '"' + wiPlayerID + '"' +
+                                            "  classid=" + '"' + clsId + '"' +
+                                            " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
+                                         ">\n";
+                        contlolPart += "\t\t\t<param name =" + '"' + "src" + '"' + " value=" + '"' + fileName + '"' + "/>\n";
+                        contlolPart += "\t\t\t<param name =" + '"' + "AUTOSTART" + '"' + " value=" + '"' + "TRUEF" + '"' + "/>\n";
+                        contlolPart += "\t\t\t<param name =" + '"' + "CONTROLS" + '"' + " value=" + '"' + "All" + '"' + "/>\n"; //http://www.tohoho-web.com/wwwmmd3.htm
+                    contlolPart += "\t\t</object>\n";
+                } else if (extentionStr == ".wmv" ||        //ver9:Windows Media 形式
+                    extentionStr == ".asf" ||
+                    extentionStr == ".wm" ||
+                    extentionStr == ".asx" ||        //ver9:Windows Media メタファイル 
+                    extentionStr == ".wax" ||        //ver9:Windows Media メタファイル 
+                    extentionStr == ".wvx" ||        //ver9:Windows Media メタファイル 
+                    extentionStr == ".wmx" ||        //ver9:Windows Media メタファイル 
+                    extentionStr == ".ivf" ||        //ver10:Indeo Video Technology
+                    extentionStr == ".dvr-ms" ||        //ver12:Microsoft デジタル ビデオ録画
+                    extentionStr == ".m2ts" ||        //ver12:MPEG-2 TS ビデオ ファイル 
+                    extentionStr == ".ts" ||
+                    extentionStr == ".mpg" ||
+                    extentionStr == ".m1v" ||
+                    extentionStr == ".mp2" ||
+                    extentionStr == ".mpa" ||
+                    extentionStr == ".mpe" ||
+                    extentionStr == ".mp4" ||        //ver12:MP4 ビデオ ファイル 
+                    extentionStr == ".m4v" ||
+                    extentionStr == ".mp4v" ||
+                    extentionStr == ".mpeg" ||
+                    extentionStr == ".mpeg" ||
+                    extentionStr == ".mpeg" ||
+                    extentionStr == ".3gp" ||
+                    extentionStr == ".3gpp" ||
+                    extentionStr == ".qt" ||
+                    extentionStr == ".mov"       //ver12:QuickTime ムービー ファイル 
+                    ) {
+                    /*	contlolPart += "\t\t\t<script type=" + '"' + "text/javascript" + '"' + " > \n";
+
+                        contlolPart += "\t\t\t</script>\n\n";
+
+                    contlolPart += "\t\t\t<script for=" + '"' + wiPlayerID + '"' +            //"MediaPlayer"		document.getElementById( )
+                                                    " event=" + '"' + "PlayStateChange(lOldState, lNewState)" + '"' +
+                                                    " type=" + '"' + "text/javascript" + '"' + ">\n";
+
+                    contlolPart += "\t\t\t\tdocument.getElementById(" + '"' + wiPlayerID + '"' + " ).PlayStateChanged = function( old_state, new_state ){\n" +
+                                    "\t\t\t\t\t var comentStr =" + "new_state" + ";\n" +
+                                    "\t\t\t\t\t switch (new_state) {\n" +
+                                    "\t\t\t\t\t\tcase 0:\n" +
+                                    "\t\t\t\t\t\t comentStr =" + '"' + "Windows Media Player の状態が定義されません。" + '"' + "\n" +
+                                    "\t\t\t\t\t\tbreak;\n" +
+                                    "\t\t\t\t\t\tcase 8:\n" +
+                                    "\t\t\t\t\t\t comentStr =" + '"' + "メディアの再生が完了し、最後の位置にあります。" + '"' + "\n" +
+                                    "\t\t\t\t\t\tbreak;\n" +
+                                    "\t\t\t\t\t}\n" +
+                                    "\t\t\t\t\t alert( " +  "comentStr" + " );\n" +         // it_dispRate.value = mplayer.Rate;	 '"' + "+new_state" + 
+                                    "\t\t\t\t\t document.getElementById(" + '"' + "statediv" + '"' + ").innerHTML = "  + "comentStr"  + ";\n" +
+                                    "\t\t\t\t" + "}\n" +
+                                    "\t\t\t</script>\n\n";          //https://msdn.microsoft.com/ja-jp/library/cc364798.aspx
+
+                        contlolPart += "\t\t\t<script for=" + '"' + wiPlayerID + '"' + " event=" + '"' + "EndOfStream(lResult)" + '"' + 
+                                            "\t\t\t\t type=" + '"' + "text/javascript" + '"' + ">\n" +
+                                                            //		"\t\t\t\t\t alert( " + '"' + "EndOfStream" + '"' + " );\n" +
+                                            "\t\t\t\t\t document.getElementById(" + '"' + "statediv" + '"' + ").innerHTML = " +'"' + "次へ" + '"' + ";\n" +
+                                            "\t\t\t</script>\n\n";          //http://www.tohoho-web.com/wwwmmd2.htm
+                        */
+                    contlolPart += "\t\t</head>\n";
+                    contlolPart += "\t\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n";
+                    clsId = "CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6";   //Windows Media Player9
+                    contlolPart += "\t\t\t<object classid =" + '"' + clsId + '"' + " id=" + '"' + wiPlayerID + '"' + "  width = " + '"' + webWidth + '"' + " height = " + '"' + webHeight + '"' + ">\n";
+                    contlolPart += "\t\t\t\t<param name =" + '"' + "url" + '"' + "value = " + '"' + "file://" + fileName + '"' + "/>\n";
+                    contlolPart += "\t\t\t\t<param name =" + '"' + "stretchToFit" + '"' + " value = true />\n";//右クリックして縮小/拡大で200％
+                    contlolPart += "\t\t\t\t<param name =" + '"' + "autoStart" + '"' + " value = " + true + "/>\n";
+                    //     contlolPart += "\t\t\t\t<param name =" + '"' + "Volume" + '"' + " value = " + appSettings.SoundVolume + "/>\n";
+                    contlolPart += "\t\t\t</object>\n";
+                    comentStr = souceName + " ; " + "Windows Media Playerで読み込めないファイルは対策検討中です。";
+                    ///参照 http://so-zou.jp/web-app/tech/html/sample/embed-video.htm/////
+                    /////https://support.microsoft.com/ja-jp/help/316992/file-types-supported-by-windows-media-player
+                } else {
+                    comentStr = "この形式は対応確認中です。";
+                }
+                /*		contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "開始" + '"' + " onclick=" + '"' + wiPlayerID + ".play()" + '"' + ">\n" +
+                                        "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "停止" + '"' + " onclick=" + '"' + wiPlayerID + ".stop();" + wiPlayerID + " .CurrentPosition=0;" + '"' + ">\n" +
+                                        "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "一時停止" + '"' + " onclick=" + '"' + wiPlayerID + ".pause()" + '"' + ">\n";
+            */
+                contlolPart += "\t\t</div>\n";
+                //        contlolPart += "\t\t\t<div id =" + '"' + "statediv" + '"' + ">" + souceName + "</div>\n";     //span	 '"' + 
+                contlolPart += "\t</body>\n</html>\n";
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
             }
-            else if (extentionStr == ".rm")
-            {
-                contlolPart += "\t</head>\n";
-                contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n";
-                clsId = "clsid:CFCDAA03-8BE4-11CF-B84B-0020AFBBCCFA";       //ブラウザーの ActiveX コントロール
-                contlolPart += "\t\t<object  id=" + '"' + wiPlayerID + '"' +
-                                    "  classid=" + '"' + clsId + '"' +
-                                    " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
-                                 ">\n";
-                contlolPart += "\t\t\t<param name =" + '"' + "src" + '"' + " value=" + '"' + fileName + '"' + "/>\n";
-                contlolPart += "\t\t\t<param name =" + '"' + "AUTOSTART" + '"' + " value=" + '"' + "TRUEF" + '"' + "/>\n";
-                contlolPart += "\t\t\t<param name =" + '"' + "CONTROLS" + '"' + " value=" + '"' + "All" + '"' + "/>\n"; //http://www.tohoho-web.com/wwwmmd3.htm
-                contlolPart += "\t\t</object>\n";
-            }
-            else if (extentionStr == ".wmv" ||        //ver9:Windows Media 形式
-              extentionStr == ".asf" ||
-              extentionStr == ".wm" ||
-              extentionStr == ".asx" ||        //ver9:Windows Media メタファイル 
-              extentionStr == ".wax" ||        //ver9:Windows Media メタファイル 
-              extentionStr == ".wvx" ||        //ver9:Windows Media メタファイル 
-              extentionStr == ".wmx" ||        //ver9:Windows Media メタファイル 
-              extentionStr == ".ivf" ||        //ver10:Indeo Video Technology
-              extentionStr == ".dvr-ms" ||        //ver12:Microsoft デジタル ビデオ録画
-              extentionStr == ".m2ts" ||        //ver12:MPEG-2 TS ビデオ ファイル 
-              extentionStr == ".ts" ||
-              extentionStr == ".mpg" ||
-              extentionStr == ".m1v" ||
-              extentionStr == ".mp2" ||
-              extentionStr == ".mpa" ||
-              extentionStr == ".mpe" ||
-              extentionStr == ".mp4" ||        //ver12:MP4 ビデオ ファイル 
-              extentionStr == ".m4v" ||
-              extentionStr == ".mp4" ||
-              extentionStr == ".mp4v" ||
-              extentionStr == ".mpeg" ||
-              extentionStr == ".mpeg" ||
-              extentionStr == ".mpeg" ||
-              extentionStr == ".3gp" ||
-              extentionStr == ".3gpp" ||
-              extentionStr == ".qt" ||
-              extentionStr == ".mov"       //ver12:QuickTime ムービー ファイル 
-              )
-            {
-                /*	contlolPart += "\t\t\t<script type=" + '"' + "text/javascript" + '"' + " > \n";
-
-					contlolPart += "\t\t\t</script>\n\n";
-
-				contlolPart += "\t\t\t<script for=" + '"' + wiPlayerID + '"' +            //"MediaPlayer"		document.getElementById( )
-												" event=" + '"' + "PlayStateChange(lOldState, lNewState)" + '"' +
-												" type=" + '"' + "text/javascript" + '"' + ">\n";
-
-				contlolPart += "\t\t\t\tdocument.getElementById(" + '"' + wiPlayerID + '"' + " ).PlayStateChanged = function( old_state, new_state ){\n" +
-								"\t\t\t\t\t var comentStr =" + "new_state" + ";\n" +
-								"\t\t\t\t\t switch (new_state) {\n" +
-								"\t\t\t\t\t\tcase 0:\n" +
-								"\t\t\t\t\t\t comentStr =" + '"' + "Windows Media Player の状態が定義されません。" + '"' + "\n" +
-								"\t\t\t\t\t\tbreak;\n" +
-								"\t\t\t\t\t\tcase 8:\n" +
-								"\t\t\t\t\t\t comentStr =" + '"' + "メディアの再生が完了し、最後の位置にあります。" + '"' + "\n" +
-								"\t\t\t\t\t\tbreak;\n" +
-								"\t\t\t\t\t}\n" +
-								"\t\t\t\t\t alert( " +  "comentStr" + " );\n" +         // it_dispRate.value = mplayer.Rate;	 '"' + "+new_state" + 
-								"\t\t\t\t\t document.getElementById(" + '"' + "statediv" + '"' + ").innerHTML = "  + "comentStr"  + ";\n" +
-								"\t\t\t\t" + "}\n" +
-								"\t\t\t</script>\n\n";          //https://msdn.microsoft.com/ja-jp/library/cc364798.aspx
-
-					contlolPart += "\t\t\t<script for=" + '"' + wiPlayerID + '"' + " event=" + '"' + "EndOfStream(lResult)" + '"' + 
-										"\t\t\t\t type=" + '"' + "text/javascript" + '"' + ">\n" +
-														//		"\t\t\t\t\t alert( " + '"' + "EndOfStream" + '"' + " );\n" +
-										"\t\t\t\t\t document.getElementById(" + '"' + "statediv" + '"' + ").innerHTML = " +'"' + "次へ" + '"' + ";\n" +
-										"\t\t\t</script>\n\n";          //http://www.tohoho-web.com/wwwmmd2.htm
-					*/
-                contlolPart += "\t\t</head>\n";
-                contlolPart += "\t\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n";
-                clsId = "CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6";   //Windows Media Player9
-                contlolPart += "\t\t\t<object classid =" + '"' + clsId + '"' + " id=" + '"' + wiPlayerID + '"' + "  width = " + '"' + webWidth + '"' + " height = " + '"' + webHeight + '"' + ">\n";
-                contlolPart += "\t\t\t\t<param name =" + '"' + "url" + '"' + "value = " + '"' + "file://" + fileName + '"' + "/>\n";
-                contlolPart += "\t\t\t\t<param name =" + '"' + "stretchToFit" + '"' + " value = true />\n";//右クリックして縮小/拡大で200％
-                contlolPart += "\t\t\t\t<param name =" + '"' + "autoStart" + '"' + " value = " + true + "/>\n";
-           //     contlolPart += "\t\t\t\t<param name =" + '"' + "Volume" + '"' + " value = " + appSettings.SoundVolume + "/>\n";
-                contlolPart += "\t\t\t</object>\n";
-                comentStr = souceName + " ; " + "Windows Media Playerで読み込めないファイルは対策検討中です。";
-                ///参照 http://so-zou.jp/web-app/tech/html/sample/embed-video.htm/////
-                /////https://support.microsoft.com/ja-jp/help/316992/file-types-supported-by-windows-media-player
-            }
-            else
-            {
-                comentStr = "この形式は対応確認中です。";
-            }
-            /*		contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "開始" + '"' + " onclick=" + '"' + wiPlayerID + ".play()" + '"' + ">\n" +
-									"\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "停止" + '"' + " onclick=" + '"' + wiPlayerID + ".stop();" + wiPlayerID + " .CurrentPosition=0;" + '"' + ">\n" +
-									"\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "一時停止" + '"' + " onclick=" + '"' + wiPlayerID + ".pause()" + '"' + ">\n";
-		*/
-            contlolPart += "\t\t\t<div id =" + '"' + "statediv" + '"' + ">" + souceName + "</div>\n";     //span	 '"' + 
-
-            MyLog(TAG, dbMsg);
             return contlolPart;
         }           //Video用のタグを作成
 
