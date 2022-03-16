@@ -1175,26 +1175,6 @@ namespace M3UPlayer.ViewModels
 
         #endregion
 
-        /// <summary>
-        /// テキストファイルを作成
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="content"></param>
-        /// <returns></returns>
-        private async static Task SaveFile(string path, string content) {//ファイルをセーブする
-            string TAG = "SaveFile";
-            string dbMsg = "";
-            try {
-                dbMsg += "path=" + path + "に\r\n" + content;
-                await Task.Run(() => {
-                    File.WriteAllText(path, content);
-                });
-                MyLog(TAG, dbMsg);
-            } catch (Exception er) {
-                MyErrorLog(TAG, dbMsg, er);
-            }
-
-        }
         readonly CountdownEvent condition = new CountdownEvent(1);
         /// <summary>
         /// プレイヤーへ
@@ -1243,10 +1223,12 @@ namespace M3UPlayer.ViewModels
                         RaisePropertyChanged("TargetURI");
                         // WebView2にローカルファイルのURIを設定
                         MyView.webView.CoreWebView2.Navigate(TargetURI.AbsoluteUri);
+                        await MyView.webView.ExecuteScriptAsync($"document.getElementById('wiPlayer').play();");
+                        IsPlaying = true;
 
-						//		MyView.webView.CoreWebView2.Navigate(tagStr); //開きたいURL
+                        //		MyView.webView.CoreWebView2.Navigate(tagStr); //開きたいURL
 
-					}
+                    }
                     //非同期実行
                     await Task.Run(() =>
                     {
@@ -2984,29 +2966,37 @@ namespace M3UPlayer.ViewModels
         }
         #endregion
 
+
+        /// <summary>
+        /// プレイヤーコントロール　//////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// </summary>
+        /// http://memopad.bitter.jp/w3c/html5/html5_video_dom.html
         public ICommand PlayBtClick => new DelegateCommand(ClickPlayBt);
         /// <summary>
         /// Playボタンのクリック
         /// </summary>
-        private void ClickPlayBt() {
+        private async void ClickPlayBt() {
             string TAG = "ClickPlayBt";
             string dbMsg = "";
             try {
                 dbMsg += "IsPlaying=" + IsPlaying;
                 if (IsPlaying) {
-
+                    //Yahooの検索欄に文字を設定する
+                    await MyView.webView.ExecuteScriptAsync($"document.getElementById('wiPlayer').pause();");
 
                     IsPlaying = false;
                 } else {
+                    await MyView.webView.ExecuteScriptAsync($"document.getElementById('wiPlayer').play();");
                     IsPlaying = true;
                 }
+                RaisePropertyChanged("IsPlaying");
                 dbMsg += ">>IsPlaying=" + IsPlaying;
-
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
+        ////////////////////////////////////////////////////////////////////////////////////////////////////// プレイヤーコントロール　///
 
         ///以下使用待ち///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -4240,32 +4230,55 @@ List<String> PlayListFileNames = new List<String>();
             return retStr;
         }
 
-     //   #region WebBlock
+        //   #region WebBlock
 
-     //   private void WebBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
-     //   {
-     //       string TAG = "[WebBrowser1_DocumentCompleted]";
-     //       string dbMsg = TAG;
-     //       try
-     //       {
-     //           /*	HtmlDocument wDoc = playerWebBrowser.Document;
-					//string wText = playerWebBrowser.DocumentText;
+        //   private void WebBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+        //   {
+        //       string TAG = "[WebBrowser1_DocumentCompleted]";
+        //       string dbMsg = TAG;
+        //       try
+        //       {
+        //           /*	HtmlDocument wDoc = playerWebBrowser.Document;
+        //string wText = playerWebBrowser.DocumentText;
 
-					//				if (( wText.Contains( "object" ) ) || ( wText.Contains( "embed" ) )) {
-					//					HtmlElement playerElem = playerWebBrowser.Document.GetElementById( wiPlayerID );
-					//					playerElem.AttachEventHandler( "PlayStateChangeEvent", new EventHandler( PlayStateChangeEvent ) );     //PlayState.MediaEnded		CurrentState 
-					//					dbMsg += ",Controls=" + playerWebBrowser.Controls;
-					//					dbMsg += ",ReadyState=" + playerWebBrowser.ReadyState;
-					//				}
-					//*/
-     //           MyLog(TAG, dbMsg);
-     //       }
-     //       catch (Exception er)
-     //       {
-     //           dbMsg += "<<以降でエラー発生>>" + er.Message;
-     //           MyLog(TAG, dbMsg);
-     //       }
-     //   }
+        //				if (( wText.Contains( "object" ) ) || ( wText.Contains( "embed" ) )) {
+        //					HtmlElement playerElem = playerWebBrowser.Document.GetElementById( wiPlayerID );
+        //					playerElem.AttachEventHandler( "PlayStateChangeEvent", new EventHandler( PlayStateChangeEvent ) );     //PlayState.MediaEnded		CurrentState 
+        //					dbMsg += ",Controls=" + playerWebBrowser.Controls;
+        //					dbMsg += ",ReadyState=" + playerWebBrowser.ReadyState;
+        //				}
+        //*/
+        //           MyLog(TAG, dbMsg);
+        //       }
+        //       catch (Exception er)
+        //       {
+        //           dbMsg += "<<以降でエラー発生>>" + er.Message;
+        //           MyLog(TAG, dbMsg);
+        //       }
+        //   }
+
+
+        /// <summary>
+        /// テキストファイルを作成
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        private async static Task SaveFile(string path, string content) {//ファイルをセーブする
+            string TAG = "SaveFile";
+            string dbMsg = "";
+            try {
+                dbMsg += "path=" + path + "に\r\n" + content;
+                await Task.Run(() => {
+                    File.WriteAllText(path, content);
+                });
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+
+        }
+
 
         /// <summary>
         /// webのビデオ再生HTMLを作成する
@@ -4299,9 +4312,9 @@ List<String> PlayListFileNames = new List<String>();
                     fileName = lsFullPathName;
                 }
 
-                contlolPart = "< !DOCTYPE html >< html lang = " + '"' + "ja" + '"' + " >\n";
-                contlolPart += "\t< head >\n\t\t< meta charSet = " + '"' + "utf - 8" + '"' + " />\n";
-                contlolPart += "\t\t< meta http - equiv = " + '"' + "X - UA - Compatible" + '"' + " content = " + '"' + "IE = edge,chrome = 1" + '"' + " />\n";
+                contlolPart = "<!DOCTYPE html><htmllang = " + '"' + "ja" + '"' + " >\n";
+                contlolPart += "\t<head>\n\t\t<meta charSet = " + '"' + "utf - 8" + '"' + " />\n";
+                contlolPart += "\t\t<meta http - equiv = " + '"' + "X - UA - Compatible" + '"' + " content = " + '"' + "IE = edge,chrome = 1" + '"' + " />\n";
                 contlolPart += "\t</head>\n";
                 contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#333333;" + '"' + " >\n";
                 contlolPart += "\t\t<div class=" + '"' + "middle" + '"' + " style =" + '"' + "padding: 0px; " + '"' + " >\n";
@@ -4309,9 +4322,16 @@ List<String> PlayListFileNames = new List<String>();
 
                 if (extentionStr == ".mp4") {
                     //	contlolPart += "\t\t<div class=" + '"' + "video-container" + '"' + ">\n";
-                    contlolPart += "\t\t\t<video id=" + '"' + wiPlayerID + '"' + " controls autoplay style = " + '"' + "width:-webkit-fill-available ;height:-webkit-fill-available;text-align: center;" + '"' + ">\n";
+                    contlolPart += "\t\t\t<video id=" + '"' + wiPlayerID + '"' + " controls autoplay playsinline style = " + '"' + "width:-webkit-fill-available ;height:-webkit-fill-available;text-align: center;" + '"' + ">\n";
                     contlolPart += "\t\t\t\t<source src=" + '"' + "file://" + fileName + '"' + " type=" + '"' + mineTypeStr + '"' + ">\n";
                     contlolPart += "\t\t\t</video>\n";
+
+                    //                    src：動画ファイルの場所
+                    //controls：動画コントロールを表示する
+                    //muted：ミュート（消音）にする
+                    //autoplay：Webページを表示した際に自動再生を行う(muted時のみ)
+                    //playsinline：スマートフォンのブラウザでもWebページ内で再生する
+                    //loop：動画を繰り返し再生する
 
                 } else if (extentionStr == ".webm" ||
                     extentionStr == ".ogv"
