@@ -710,8 +710,7 @@ namespace M3UPlayer.Views
 											 ellipse.Fill.ToString(),
 											 DragDropEffects.Copy);
 					}
-
-
+					MyLog(TAG, dbMsg);
 					return;
 				} else {// if(!_isDragging) 
 					dbMsg += "している";
@@ -770,8 +769,6 @@ namespace M3UPlayer.Views
 					_isDragging = false;
 				} else {
 					VM.PLMouseUp();
-
-					
 				}
 
 				//DataGrid droplist = (DataGrid)sender;
@@ -796,8 +793,8 @@ namespace M3UPlayer.Views
 				//		dbMsg += ">参考>ReferenceEquals";
 				//	}
 
-					//reset
-					ResetDragDrop();
+				//reset
+				ResetDragDrop();
 				//} else {
 				//	dbMsg += "droplist == null";
 				//}

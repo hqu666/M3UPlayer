@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 //using Google.Apis.Auth.OAuth2;
 //using Google.Apis.Calendar.v3;
@@ -14,6 +15,10 @@ namespace M3UPlayer {
         public static string WebStratUrl = "https://www.yahoo.co.jp/?fr=top_ga1_ext1_bookmark";         //webViewのデフォルト表示ページ
 		public static string CurrentFolder = "";                    //現在の対象フォルダ
 		public static string RootFolderURL;
+		/// <summary>
+		/// webソースの書き出し先
+		/// </summary>
+		public static string currentDirectory = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "souce.html";
 
 
 		////認証情報/API キー

@@ -1207,27 +1207,21 @@ namespace M3UPlayer.ViewModels
 					//Frame frame = new Frame();
 					dbMsg += "、Web=" + toWeb;
 				if (toWeb) {
-                    //TargetURI = new Uri(targetURLStr);
-                    //NotifyPropertyChanged("TargetURI");
                     if (MyView == null) {
 					} else {
                         string tagStr = MakeVideoSouce(targetURLStr, 1000, 1000);
                         dbMsg += "、tagStr\r\n" + tagStr;
                         // 実行ディレクトリを取得
-                        var currentDirectory = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "souce.html";
-                        dbMsg += "、\r\n" + currentDirectory;
-                        SaveFile(currentDirectory, tagStr);
-                        // ローカルファイルのURIを作成
-                        Uri uri = new Uri(currentDirectory);
-                        TargetURI = uri;
-                        RaisePropertyChanged("TargetURI");
-                        // WebView2にローカルファイルのURIを設定
-                        MyView.webView.CoreWebView2.Navigate(TargetURI.AbsoluteUri);
-                        await MyView.webView.ExecuteScriptAsync($"document.getElementById('wiPlayer').play();");
+						dbMsg += "、\r\n" + Constant.currentDirectory;
+                        SaveFile(Constant.currentDirectory, tagStr);
+						// ローカルファイルのURIを作成
+						Uri uri = new Uri(Constant.currentDirectory);
+						TargetURI = uri;
+						RaisePropertyChanged("TargetURI");
+						// WebView2にローカルファイルのURIを設定
+						MyView.webView.CoreWebView2.Navigate(TargetURI.AbsoluteUri);
+						await MyView.webView.ExecuteScriptAsync($"document.getElementById('wiPlayer').play();");
                         IsPlaying = true;
-
-                        //		MyView.webView.CoreWebView2.Navigate(tagStr); //開きたいURL
-
                     }
                     //非同期実行
                     await Task.Run(() =>
@@ -1961,30 +1955,31 @@ namespace M3UPlayer.ViewModels
 					//	//get the target item
 					//	PlayListModel
                     targetItem = SelectedPlayListFiles[0];
+                    IsPlaying = false;
 
-					//	if (targetItem == null) {           // || !ReferenceEquals(DraggedItem, targetItem)
+                    //	if (targetItem == null) {           // || !ReferenceEquals(DraggedItem, targetItem)
 
-					//		//// create tempporary row
-					//		//var temp = DraggedItem.Row.Table.NewRow();
-					//		//temp.ItemArray = DraggedItem.Row.ItemArray;
-					//		//int tempIndex = _shareTable.Rows.IndexOf(DraggedItem.Row);
+                    //		//// create tempporary row
+                    //		//var temp = DraggedItem.Row.Table.NewRow();
+                    //		//temp.ItemArray = DraggedItem.Row.ItemArray;
+                    //		//int tempIndex = _shareTable.Rows.IndexOf(DraggedItem.Row);
 
-					//		////remove the source from the list
-					//		//_shareTable.Rows.Remove(DraggedItem.Row);
+                    //		////remove the source from the list
+                    //		//_shareTable.Rows.Remove(DraggedItem.Row);
 
-					//		////get target index
-					//		//var targetIndex = _shareTable.Rows.IndexOf(targetItem.Row);
+                    //		////get target index
+                    //		//var targetIndex = _shareTable.Rows.IndexOf(targetItem.Row);
 
-					//		////insert temporary at the target's location
-					//		//_shareTable.Rows.InsertAt(temp, targetIndex);
+                    //		////insert temporary at the target's location
+                    //		//_shareTable.Rows.InsertAt(temp, targetIndex);
 
-					//		////select the dropped item
-					//		//shareGrid.SelectedItem = shareGrid.Items[targetIndex];
-					//	}
+                    //		////select the dropped item
+                    //		//shareGrid.SelectedItem = shareGrid.Items[targetIndex];
+                    //	}
 
-					//reset
-					//ResetDragDrop();
-				} else {
+                    //reset
+                    //ResetDragDrop();
+                } else {
 					dbMsg += "選択値無し";
 				}
                 dbMsg += ",UrlStr=" + targetItem.UrlStr;
@@ -2306,7 +2301,7 @@ namespace M3UPlayer.ViewModels
                   //  cofDialog.Dispose();ではない
                 }
                 dbMsg += "[" + dropRow + "/" + PLList.Count + "]へ" + dropPlayListFiles.Count + "件移動";
-                int insertRow = dropRow+1;
+                int insertRow = dropRow;
 
                 foreach (PlayListModel one in dropPlayListFiles) {
                     int removeIndex = PLList.IndexOf(one);
@@ -2328,6 +2323,7 @@ namespace M3UPlayer.ViewModels
                 RaisePropertyChanged("PLList");
 				RaisePropertyChanged("PLListSelectedItem");
                 IsDoSavePlayList(false);
+                dbMsg += ">>[" + insertRow + "/" + PLList.Count + "]";
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
