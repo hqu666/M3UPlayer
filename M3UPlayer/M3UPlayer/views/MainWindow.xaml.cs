@@ -105,7 +105,7 @@ namespace M3UPlayer.Views
 		}
 
 		//Drag: https://hilapon.hatenadiary.org/entry/20110209/1297247754 ///////////////////////////////////////////////////////////////////////
-		public bool _isDragging;
+		public bool _isDragging=false;
 		private bool _isEditing;
 		private ObservableCollection<PlayListModel> _shareTable;
 		/// <summary>
@@ -702,7 +702,7 @@ namespace M3UPlayer.Views
 						VM.PlayList_Drop(dropRow);
 						_isDragging = false;
 					}
-
+					VM.Drag_now = false;
 
 					Ellipse? ellipse = sender as Ellipse;
 					if (ellipse != null && e.LeftButton == MouseButtonState.Pressed) {

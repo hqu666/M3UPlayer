@@ -327,10 +327,18 @@
                             Orientation="Horizontal" 
                             HorizontalAlignment="Right"
                             >
-                    <Button Width="40" Height="40" MinWidth="30"
+                    <Button Width="40" Height="40" MinWidth="30" BorderBrush="Transparent" Foreground="#00000000" RenderTransformOrigin="0.5,0.5"
                                     >
+                        <Button.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform/>
+                                <RotateTransform Angle="-90"/>
+                                <TranslateTransform X="0"/>
+                            </TransformGroup>
+                        </Button.RenderTransform>
                         <Button.Background>
-                            <ImageBrush ImageSource="/views/ffbtn.png" Stretch="UniformToFill"/>
+                            <ImageBrush ImageSource="/views/rewbtn.png" Stretch="UniformToFill"/>
                         </Button.Background>
                     </Button>
                     <Button Width="40" Height="40" MinWidth="30" Margin="20,5,5,5"
@@ -345,8 +353,16 @@
                             />
 
                     <Button 
-                                     Width="40" Height="40" MinWidth="30"
-                                    >
+                           Width="40" Height="40" MinWidth="30" RenderTransformOrigin="0.5,0.5"
+                            >
+                        <Button.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform/>
+                                <RotateTransform Angle="-90"/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Button.RenderTransform>
                         <Button.Background>
                             <ImageBrush ImageSource="/views/ffbtn.png" Stretch="UniformToFill"/>
                         </Button.Background>
@@ -396,10 +412,16 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Button  Command="{Binding PlayBtClick}">
-                        <Button.Background>
-                            <ImageBrush ImageSource="/views/pl_r_btn.png" Stretch="UniformToFill"/>
-                        </Button.Background>
+                    <Button  
+                        x:Name="PlayBt"
+                        Command="{Binding PlayBtClick}" 
+                        Background="#00DDDDDD" 
+                        BorderBrush="#00000000" 
+                        Foreground="#00000000" Margin="0,0,0,0" BorderThickness="0,0,0,0"
+                        >
+                        <Image x:Name="PlayBtImage" Source="/views/pl_r_btn.png" Width="86" Height="86" >
+                        </Image>
+                        <!--<Image x:Name="PlayBtImage"  Source="{Binding PlayBtImageSource}"/>-->
                     </Button>
 
                     <Grid  Grid.Column="1">
@@ -416,7 +438,7 @@
                                         Margin="0,0,0,0" 
                                        Background="Transparent" 
                                        Text="{Binding PositionStr}" 
-                                       FontSize="36" 
+                                       FontSize="32" 
                                        Foreground="White" />
                             <StackPanel  Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                                 <TextBlock 

@@ -39,6 +39,8 @@ using System.Collections;
 using Microsoft.Web.WebView2.Core;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
 //using AxShockwaveFlashObjects;
 
 namespace M3UPlayer.ViewModels
@@ -245,21 +247,58 @@ namespace M3UPlayer.ViewModels
 			}
 		}
 
-		private bool _IsPlaying;
+
+        private ImageBrush _PlayBtImageSource;
+        /// <summary>
+        /// 再生ボタンの画像
+        /// </summary>
+        public ImageBrush PlayBtImageSource {
+            get => _PlayBtImageSource;
+            set {
+                if (_PlayBtImageSource == value)
+                    return;
+                _PlayBtImageSource = value;
+                RaisePropertyChanged("PlayBtImageSource");
+            }
+        }
+
+		BitmapImage playImage;
+		BitmapImage pouseImage;
+
+        private bool _IsPlaying;
 		/// <summary>
 		/// 再生中
 		/// </summary>
 		public bool IsPlaying {
 			get => _IsPlaying;
 			set {
-				if (_IsPlaying == value)
-					return;
-				_IsPlaying = value;
-				RaisePropertyChanged("IsPlaying");
+                string TAG = "IsPlaying(set)";
+                string dbMsg = "";
+                try {
+                    dbMsg += "value=" + value;
+                    if (_IsPlaying == value)
+                        return;
+                    _IsPlaying = value;
+                    RaisePropertyChanged("IsPlaying");
+                    dbMsg += ">>IsPlaying==" + IsPlaying;
+					if (IsPlaying) {
+						MyView.PlayBtImage.Source = pouseImage;
+                    } else {
+                        MyView.PlayBtImage.Source = playImage;
+                    }
+                    RaisePropertyChanged("PlayBtImageSource");
+					//         dbMsg += ">>PlayBtImageSource==" + PlayBtImageSource.ToString();
+					MyLog(TAG, dbMsg);
+                } catch (Exception er) {
+                    MyErrorLog(TAG, dbMsg, er);
+                }
 			}
 		}
 
-		private int _SoundValue;
+
+
+
+        private int _SoundValue;
 		/// <summary>
 		/// 音量
 		/// </summary>
@@ -436,12 +475,16 @@ namespace M3UPlayer.ViewModels
             string TAG = "Initialize";
             string dbMsg = "";
             try{
-				MakePlayListMenu();
+                MakePlayListMenu();
 				PlayListItemViewExplore.IsEnabled = false;
 				PlayListItemMove.IsEnabled = false;
 				PlayListDeleteCannotRead.IsEnabled = false;
 				PlayListDeleteDoubling.IsEnabled = false;
 				PLList = new ObservableCollection<PlayListModel>();
+				pouseImage = new BitmapImage(new Uri("/views/pousebtn.png", UriKind.Relative));
+                playImage = new BitmapImage(new Uri("/views/pl_r_btn.png", UriKind.Relative));
+    //            pouseBrush = new ImageBrush(pouseImage);
+				//playBrush = new ImageBrush(playImage);
 
                 // ICommandの場合
                 //	EditCommand = CreateCommand(t_events => MyDoubleClickCommand(t_events));
@@ -468,7 +511,15 @@ namespace M3UPlayer.ViewModels
                 PlayListSelectionMode = "Extended";
                 RaisePropertyChanged("PlayListSelectionMode");
                 Drag_now = false;
-          //      WVM = new WsbViewModel();
+                RaisePropertyChanged("Drag_now");
+                //BitmapImage playImage = new BitmapImage(new Uri("/views/pl_r_btn.png", UriKind.Relative));
+                //MyView.PlayBtImageBrush = new ImageBrush(playImage);
+                //IsPlaying = true;
+                //RaisePropertyChanged("IsPlaying");
+                IsPlaying = false;
+                RaisePropertyChanged("IsPlaying");
+
+                //      WVM = new WsbViewModel();
                 MyLog(TAG, dbMsg);
             } catch (Exception er)
             {
@@ -4318,7 +4369,7 @@ List<String> PlayListFileNames = new List<String>();
 
                 if (extentionStr == ".mp4") {
                     //	contlolPart += "\t\t<div class=" + '"' + "video-container" + '"' + ">\n";
-                    contlolPart += "\t\t\t<video id=" + '"' + wiPlayerID + '"' + " controls autoplay playsinline style = " + '"' + "width:-webkit-fill-available ;height:-webkit-fill-available;text-align: center;" + '"' + ">\n";
+                    contlolPart += "\t\t\t<video id=" + '"' + wiPlayerID + '"' + " controls style = " + '"' + "width:-webkit-fill-available ;height:-webkit-fill-available;text-align: center;" + '"' + ">\n";
                     contlolPart += "\t\t\t\t<source src=" + '"' + "file://" + fileName + '"' + " type=" + '"' + mineTypeStr + '"' + ">\n";
                     contlolPart += "\t\t\t</video>\n";
 
