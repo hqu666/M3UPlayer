@@ -25,6 +25,10 @@ namespace M3UPlayer.Views
     public partial class MainWindow : Window
     {
 		MainViewModel VM;
+		/// <summary>
+		/// ドラッグ中
+		/// </summary>
+		public bool IsDragging;
 
 		public MainWindow()
         {
@@ -49,8 +53,8 @@ namespace M3UPlayer.Views
 			targetItem.UrlStr = "https://www.yahoo.co.jp/";
 		//	targetItem.UrlStr = "https://www.google.co.jp/maps/";
 			targetItem.Summary = "StartUp";
-		//	VM.PlayListToPlayer(targetItem);
-
+			//	VM.PlayListToPlayer(targetItem);
+			IsDragging = false;
 		}
 
 		///webView2 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -105,7 +109,6 @@ namespace M3UPlayer.Views
 		}
 
 		//Drag: https://hilapon.hatenadiary.org/entry/20110209/1297247754 ///////////////////////////////////////////////////////////////////////
-		public bool _isDragging=false;
 		private bool _isEditing;
 		private ObservableCollection<PlayListModel> _shareTable;
 		/// <summary>
@@ -131,7 +134,7 @@ namespace M3UPlayer.Views
 		//	string dbMsg = "";
 		//	try {
 		//		_isEditing = true;
-		//		if (_isDragging) ResetDragDrop();
+		//		if (IsDragging) ResetDragDrop();
 		//		MyLog(TAG, dbMsg);
 		//	} catch (Exception er) {
 		//		MyErrorLog(TAG, dbMsg, er);
@@ -168,7 +171,7 @@ namespace M3UPlayer.Views
 		//	//	if (row == null || row.IsEditing) return;
 
 		//		//set flag that indicates we're capturing mouse movements
-		//		_isDragging = true;
+		//		IsDragging = true;
 		//		DraggedItem = (PlayListModel)droplist.SelectedItem;
 		//		//				DraggedItem = (PlayListModel)row.Item;
 		//		MyLog(TAG, dbMsg);
@@ -190,7 +193,7 @@ namespace M3UPlayer.Views
 		//		PlayListModel selectedItem = (PlayListModel)droplist.SelectedItem;
 		//		dbMsg += ",Summary=" + selectedItem.Summary;
 		//		dbMsg += ",UrlStr=" + selectedItem.UrlStr;
-		//		if (!_isDragging || _isEditing) {
+		//		if (!IsDragging || _isEditing) {
 		//			return;
 		//		}
 
@@ -238,7 +241,7 @@ namespace M3UPlayer.Views
 		//		PlayListModel selectedItem = (PlayListModel)droplist.SelectedItem;
 		//		dbMsg += ",Summary=" + selectedItem.Summary;
 		//		dbMsg += ",UrlStr=" + selectedItem.UrlStr;
-		//		if (!_isDragging || e.LeftButton != MouseButtonState.Pressed) return;
+		//		if (!IsDragging || e.LeftButton != MouseButtonState.Pressed) return;
 
 		//		//display the popup if it hasn't been opened yet
 		//		if (!popup1.IsOpen) {
@@ -271,7 +274,7 @@ namespace M3UPlayer.Views
 			string dbMsg = "";
 			try {
 				DraggedItem = null;
-				_isDragging = false;
+				IsDragging = false;
 				popup1.IsOpen = false;
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
@@ -333,7 +336,7 @@ namespace M3UPlayer.Views
 					int dropRow = row.GetIndex();
 					dbMsg += ",dropRow=" + dropRow + "" + dropPlayListFiles.Count + "件";
 					VM.PlayListItemMoveTo(dropRow , dropPlayListFiles);
-					_isDragging = false;
+					IsDragging = false;
 				}
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
@@ -457,6 +460,7 @@ namespace M3UPlayer.Views
 				//		}
 				//	}
 				//}
+				IsDragging = false;
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
@@ -665,30 +669,37 @@ namespace M3UPlayer.Views
 			string TAG = "[PlayList_MouseDown]";// + fileName;
 			string dbMsg = "";
 			try {
-				DataGrid droplist = (DataGrid)sender;
-				if (droplist != null) {
-					dbMsg += ",AllowDrop=" + droplist.AllowDrop;
-					dbMsg += "[" + droplist.SelectedIndex + "]";
-					DraggedItem = (PlayListModel)droplist.SelectedItem;
-			//		dbMsg += ",UrlStr=" + DraggedItem.UrlStr;
-					_isDragging = true;
-				} else {
-					dbMsg += "droplist == null";
-				}
+				//	DataGrid droplist = (DataGrid)sender;
+				//	if (droplist != null) {
+				//		dbMsg += ",AllowDrop=" + droplist.AllowDrop;
+				//		dbMsg += "[" + droplist.SelectedIndex + "]";
+				//		DraggedItem = (PlayListModel)droplist.SelectedItem;
+				////		dbMsg += ",UrlStr=" + DraggedItem.UrlStr;
+				////20220320		IsDragging = true;
+				//	} else {
+				//		dbMsg += "droplist == null";
+				IsDragging = false;
+				MoveCount = 0;
+				//	}
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
 		}
 
+		private int MoveCount=0;
+
+
 		private void PlayList_MouseMove(object sender, MouseEventArgs e) {
 			string TAG = "PlayList_MouseMove";
 			string dbMsg = "";
 			try {
+				dbMsg += "[" + MoveCount  + "]";
+
 				dbMsg += "左クリック";
-				if (e.LeftButton != MouseButtonState.Pressed) {
+				if (e.LeftButton == MouseButtonState.Released) {
 					dbMsg += "してない";
-					if (_isDragging) {
+					if (IsDragging) {
 						dbMsg += "離した";
 						var dataGrid = sender as DataGrid;
 						var point = e.GetPosition(dataGrid);
@@ -700,7 +711,7 @@ namespace M3UPlayer.Views
 						int dropRow = row.GetIndex();
 						dbMsg += ",dropRow=" + dropRow;
 						VM.PlayList_Drop(dropRow);
-						_isDragging = false;
+						IsDragging = false;
 					}
 					VM.Drag_now = false;
 
@@ -710,17 +721,19 @@ namespace M3UPlayer.Views
 											 ellipse.Fill.ToString(),
 											 DragDropEffects.Copy);
 					}
-					MyLog(TAG, dbMsg);
-					return;
-				} else {// if(!_isDragging) 
+					MoveCount = 0;
+				} else if (e.LeftButton == MouseButtonState.Pressed) {
 					dbMsg += "している";
-					_isDragging = VM.PlayList_DragEnter();
-					//display the popup if it hasn't been opened yet
-					if (!popup1.IsOpen) {
-						popup1.IsOpen = true;
-						dbMsg += "DataGrid内のpopアップを表示させる";
-					}
+					if (!IsDragging && 2 < MoveCount) {
+						dbMsg += "、まだドラッグしていない";
+						IsDragging = VM.PlayList_DragEnter();              //Drag_nowが返される
+																			//display the popup if it hasn't been opened yet
+						if (!popup1.IsOpen) {
+							popup1.IsOpen = true;
+							dbMsg += "DataGrid内のpopアップを表示させる";
+						}
 
+					}
 					Size popupSize = new Size(popup1.ActualWidth, popup1.ActualHeight);
 					popup1.PlacementRectangle = new Rect(e.GetPosition(this), popupSize);
 
@@ -734,11 +747,8 @@ namespace M3UPlayer.Views
 											 DragDropEffects.Copy);
 					}
 				}
-
-				//		if (!_isDragging || e.LeftButton != MouseButtonState.Pressed) return;
-
-
-				//			MyLog(TAG, dbMsg);
+				MyLog(TAG, dbMsg);
+				MoveCount++;
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
@@ -754,7 +764,8 @@ namespace M3UPlayer.Views
 			string TAG = "[PlayList_MouseUp]";
 			string dbMsg = "";
 			try {
-				if (_isDragging) {
+				dbMsg += "IsDragging=" + IsDragging;
+				if (IsDragging) {
 					dbMsg += "Drag中";
 					var dataGrid = sender as DataGrid;
 					var point = e.GetPosition(dataGrid);
@@ -766,25 +777,27 @@ namespace M3UPlayer.Views
 					int dropRow = row.GetIndex();
 					dbMsg += ",dropRow=" + dropRow;
 					VM.PlayList_Drop(dropRow);
-					_isDragging = false;
+					ResetDragDrop();
 				} else {
+					dbMsg += "Drag中ではない";
 					VM.PLMouseUp();
 				}
-
+				IsDragging = false;
+				MoveCount = 0;              
 				//DataGrid droplist = (DataGrid)sender;
-				//if (droplist != null) {
-				//	dbMsg += ",AllowDrop=" + droplist.AllowDrop;
-				//	dbMsg += "[" + droplist.SelectedIndex + "]";
-				//	PlayListModel targetItem = (PlayListModel)droplist.SelectedItem;
-				//	//get the target item
-				//	if (DraggedItem != null) {
-				//		dbMsg += "<<Dragged=" + DraggedItem.Summary;
-				//		if (DraggedItem == targetItem) {
-				//			VM.PlayListToPlayer(targetItem);
-				//		} else {
-				//			VM.PlayListItemMoveTo(DraggedItem, targetItem);
-				//		}
-				//	} else {
+											//if (droplist != null) {
+											//	dbMsg += ",AllowDrop=" + droplist.AllowDrop;
+											//	dbMsg += "[" + droplist.SelectedIndex + "]";
+											//	PlayListModel targetItem = (PlayListModel)droplist.SelectedItem;
+											//	//get the target item
+											//	if (DraggedItem != null) {
+											//		dbMsg += "<<Dragged=" + DraggedItem.Summary;
+											//		if (DraggedItem == targetItem) {
+											//			VM.PlayListToPlayer(targetItem);
+											//		} else {
+											//			VM.PlayListItemMoveTo(DraggedItem, targetItem);
+											//		}
+											//	} else {
 
 				//	}
 
@@ -794,7 +807,6 @@ namespace M3UPlayer.Views
 				//	}
 
 				//reset
-				ResetDragDrop();
 				//} else {
 				//	dbMsg += "droplist == null";
 				//}

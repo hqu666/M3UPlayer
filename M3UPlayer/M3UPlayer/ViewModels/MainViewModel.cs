@@ -485,7 +485,6 @@ namespace M3UPlayer.ViewModels
                 playImage = new BitmapImage(new Uri("/views/pl_r_btn.png", UriKind.Relative));
     //            pouseBrush = new ImageBrush(pouseImage);
 				//playBrush = new ImageBrush(playImage);
-
                 // ICommandの場合
                 //	EditCommand = CreateCommand(t_events => MyDoubleClickCommand(t_events));
                 dbMsg += ",CurrentPlayListFileName=" + CurrentPlayListFileName;

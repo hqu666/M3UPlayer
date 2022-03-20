@@ -353,9 +353,9 @@
                             />
 
                     <Button 
-                           Width="40" Height="40" MinWidth="30" RenderTransformOrigin="0.5,0.5"
+                           Width="40" Height="40" MinWidth="30" RenderTransformOrigin="0.5,0.5" Background="{x:Null}" Content="  ↑" Foreground="White" FontSize="18" FontWeight="Bold" BorderBrush="#00000000" BorderThickness="0,0,0,0" Padding="0,0,0,0" HorizontalContentAlignment="Center"
                             >
-                        <Button.RenderTransform>
+                        <!--<Button.RenderTransform>
                             <TransformGroup>
                                 <ScaleTransform/>
                                 <SkewTransform/>
@@ -365,7 +365,7 @@
                         </Button.RenderTransform>
                         <Button.Background>
                             <ImageBrush ImageSource="/views/ffbtn.png" Stretch="UniformToFill"/>
-                        </Button.Background>
+                        </Button.Background>-->
                     </Button>
 
                 </StackPanel>
@@ -416,11 +416,14 @@
                         x:Name="PlayBt"
                         Command="{Binding PlayBtClick}" 
                         Background="#00DDDDDD" 
+                        Margin="0,0,0,0" 
                         BorderBrush="#00000000" 
-                        Foreground="#00000000" Margin="0,0,0,0" BorderThickness="0,0,0,0"
+                        BorderThickness="0,0,0,0" 
+                        Width="98" Height="98" 
+                        Foreground="#00000000"
                         >
-                        <Image x:Name="PlayBtImage" Source="/views/pl_r_btn.png" Width="86" Height="86" >
-                        </Image>
+                        <Image x:Name="PlayBtImage" Source="/views/pl_r_btn.png" Width="86" Height="86" />
+
                         <!--<Image x:Name="PlayBtImage"  Source="{Binding PlayBtImageSource}"/>-->
                     </Button>
 
