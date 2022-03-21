@@ -1246,10 +1246,10 @@ namespace M3UPlayer.ViewModels
                     //	//myview.mainframe.children.removeat(0);
                     //}
                 string targetURLStr = targetItem.UrlStr;
-                    dbMsg += "、targetURLStr=" + targetURLStr;
-                    string extention = System.IO.Path.GetExtension(targetURLStr);
-					dbMsg += "、拡張子=" + extention;
-                    bool toWeb = true;  // false;
+                dbMsg += "、targetURLStr=" + targetURLStr;
+                string extention = System.IO.Path.GetExtension(targetURLStr);
+				dbMsg += "、拡張子=" + extention;
+                bool toWeb = true;  // false;
 					//if (-1 < Array.IndexOf(WebVideo, extention) ||
 					//	targetURLStr.StartsWith("https")) {
 					//	toWeb = true;
@@ -1264,33 +1264,20 @@ namespace M3UPlayer.ViewModels
                         // 実行ディレクトリを取得
 						dbMsg += "、\r\n" + Constant.currentDirectory;
                         SaveFile(Constant.currentDirectory, tagStr);
-						// ローカルファイルのURIを作成
-						Uri uri = new Uri(Constant.currentDirectory);
+                        // ローカルファイルのURIを作成
+                        Uri uri = new Uri(Constant.currentDirectory);
 						TargetURI = uri;
 						RaisePropertyChanged("TargetURI");
 						// WebView2にローカルファイルのURIを設定
 						MyView.webView.CoreWebView2.Navigate(TargetURI.AbsoluteUri);
-						await MyView.webView.ExecuteScriptAsync($"document.getElementById('wiPlayer').play();");
-                        IsPlaying = true;
+						IsPlaying = false;
+                        //非同期実行
+                        await Task.Run(() =>
+                        {
+                            MyView.webView.ExecuteScriptAsync($"document.getElementById('wiPlayer').play();");
+                        });
+                        ClickPlayBt();
                     }
-                    //非同期実行
-                    await Task.Run(() =>
-                    {
-                        //読み込み完了まで待機
-                        if (condition.Wait(1000)) {
-                            dbMsg += "、ok";
-                        } else {
-                            dbMsg += "、timeout";
-                        }
-                    });
-                    //MyView.frame.Navigate(WVM);
-                    ////		WVM.TargetURLStr = targetURLStr;
-                    //WVM.SetMyUrl(targetURLStr);
-                    ////WVM.TargeStr = targetURLStr;
-                    ////WebPage WP = new WebPage();                  //Page
-                    ////WP.DataContext = WVM;
-                    ////frame.Navigate(WP);
-                    ////MyView.FrameGrid.Children.Add(frame);
                 } else if(-1 < Array.IndexOf(FlashVideo, extention)) {
 						//// Create the interop host control.
 						//System.Windows.Forms.Integration.WindowsFormsHost host =
@@ -2005,7 +1992,6 @@ namespace M3UPlayer.ViewModels
 					//	//get the target item
 					//	PlayListModel
                     targetItem = SelectedPlayListFiles[0];
-                    IsPlaying = false;
 
                     //	if (targetItem == null) {           // || !ReferenceEquals(DraggedItem, targetItem)
 
@@ -2033,6 +2019,7 @@ namespace M3UPlayer.ViewModels
 					dbMsg += "選択値無し";
 				}
                 dbMsg += ",UrlStr=" + targetItem.UrlStr;
+                IsPlaying = false;
                 PlayListToPlayer(targetItem);
                 MyLog(TAG, dbMsg);
 			} catch (Exception er) {
