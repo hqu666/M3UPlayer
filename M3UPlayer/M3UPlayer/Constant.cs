@@ -16,6 +16,10 @@ namespace M3UPlayer {
 		public static string CurrentFolder = "";                    //現在の対象フォルダ
 		public static string RootFolderURL;
 		/// <summary>
+		/// webに書き込むプレイヤー名
+		/// </summary>
+		public static string PlayerName = "wiPlayer";
+		/// <summary>
 		/// webソースの書き出し先
 		/// </summary>
 		public static string currentDirectory = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "souce.html";

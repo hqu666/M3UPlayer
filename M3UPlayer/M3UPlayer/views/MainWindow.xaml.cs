@@ -747,7 +747,7 @@ namespace M3UPlayer.Views
 											 DragDropEffects.Copy);
 					}
 				}
-				MyLog(TAG, dbMsg);
+			//	MyLog(TAG, dbMsg);
 				MoveCount++;
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);

@@ -282,8 +282,10 @@ namespace M3UPlayer.ViewModels
                     RaisePropertyChanged("IsPlaying");
                     dbMsg += ">>IsPlaying==" + IsPlaying;
 					if (IsPlaying) {
-						MyView.PlayBtImage.Source = pouseImage;
+                        MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
+                        MyView.PlayBtImage.Source = pouseImage;
                     } else {
+                        MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").pause();");
                         MyView.PlayBtImage.Source = playImage;
                     }
                     RaisePropertyChanged("PlayBtImageSource");
@@ -1271,12 +1273,11 @@ namespace M3UPlayer.ViewModels
 						// WebView2にローカルファイルのURIを設定
 						MyView.webView.CoreWebView2.Navigate(TargetURI.AbsoluteUri);
 						IsPlaying = false;
-                        //非同期実行
-                        await Task.Run(() =>
-                        {
-                            MyView.webView.ExecuteScriptAsync($"document.getElementById('wiPlayer').play();");
-                        });
-                        ClickPlayBt();
+						//非同期実行
+						await Task.Run(() => {
+							MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
+						});
+						ClickPlayBt();
                     }
                 } else if(-1 < Array.IndexOf(FlashVideo, extention)) {
 						//// Create the interop host control.
@@ -3014,12 +3015,8 @@ namespace M3UPlayer.ViewModels
             try {
                 dbMsg += "IsPlaying=" + IsPlaying;
                 if (IsPlaying) {
-                    //Yahooの検索欄に文字を設定する
-                    await MyView.webView.ExecuteScriptAsync($"document.getElementById('wiPlayer').pause();");
-
                     IsPlaying = false;
                 } else {
-                    await MyView.webView.ExecuteScriptAsync($"document.getElementById('wiPlayer').play();");
                     IsPlaying = true;
                 }
                 RaisePropertyChanged("IsPlaying");
@@ -3127,7 +3124,7 @@ namespace M3UPlayer.ViewModels
         string lsFullPathName = ""; //リストで選択されたアイテムのフルパス
         string plaingItem = "";             //再生中アイテムのフルパス;連続再生スタート時、自動送り、プレイリストからのアイテムクリックで更新
         string listUpDir = "";             //プレイリストにリストアップするデレクトリ
-        string wiPlayerID = "wiPlayer";         //webに埋め込むプレイヤーのID
+        string wiPlayerID = Constant.PlayerName;       //webに埋め込むプレイヤーのID
  //       List<PlayListItems> PlayListBoxItem = new List<PlayListItems>();
         List<int> treeSelectList = new List<int>();
         string nowLPlayList = "";               //現在使っているプレイリスト
