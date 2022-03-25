@@ -447,7 +447,7 @@
                                 <TextBlock 
                                         Margin="0,0,6,0" 
                                        Background="Transparent" 
-                                       Text="{Binding DurationStr}" 
+                                       Text="{Binding DurationStr, Mode=TwoWay}"
                                        FontSize="24" 
                                        Foreground="White"/>
                             </StackPanel>

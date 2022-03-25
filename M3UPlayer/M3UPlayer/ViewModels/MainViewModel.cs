@@ -6,7 +6,8 @@ using System.Linq;
 using System.Windows;
 using System.Text;
 using System.Windows.Controls;
-
+using System.Windows.Threading;
+using System.Threading;
 using M3UPlayer.Views;
 //using ShockwaveFlashObjects;
 
@@ -182,6 +183,9 @@ namespace M3UPlayer.ViewModels
             set { Properties.Settings.Default.NowSelectedFile = value; }
         }
 
+        /// <summary>
+        /// 全長:duration
+        /// </summary>
         private string _DurationStr;
 		/// <summary>
 		/// 全長
@@ -213,10 +217,10 @@ namespace M3UPlayer.ViewModels
 		}
 		
 		private string _PositionStr;
-		/// <summary>
-		/// 再生ポジション
-		/// </summary>
-		public string PositionStr {
+        /// <summary>
+        /// 再生ポジション：currentTime
+        /// </summary>
+        public string PositionStr {
 			//get { return GetDataBindItem<string>("Title").Value; }
 			//private set { GetDataBindItem<string>("Title").Value = value; }
 			get => _PositionStr;
@@ -1228,10 +1232,44 @@ namespace M3UPlayer.ViewModels
         #endregion
 
         readonly CountdownEvent condition = new CountdownEvent(1);
+
+        public async void GetDuration() {
+            //int oldIndex,
+            string TAG = "GetDuration";
+            string dbMsg = "";
+            try {
+				//await Task.Run(() => Dispatcher.Invoke(() => MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;")));
+				MyView.Dispatcher.Invoke(() => {
+
+
+
+					//Task<string> Duration = Task.Run<string>(new Func<string>(MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;")));
+
+
+					//	string Dtr = MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;");
+					//	DurationStr = Duration.Result;
+
+					//string DurationStr = Task.Run<string>(() => MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;"));
+
+					//System.InvalidOperationException: 'このオブジェクトは別のスレッドに所有されているため、呼び出しスレッドはこのオブジェクトにアクセスできません。'
+
+					dbMsg += "、DurationStr=" + DurationStr;
+					RaisePropertyChanged("DurationStr");
+				});
+				MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+
+
+
         /// <summary>
         /// プレイヤーへ
         /// </summary>
         /// <param name="targetItem">PlayListModelでurlを渡す</param>
+        /// 
         public async void PlayListToPlayer( PlayListModel targetItem) {
 			//int oldIndex,
 			string TAG = "PlayListToPlayer";
@@ -1261,6 +1299,7 @@ namespace M3UPlayer.ViewModels
 				if (toWeb) {
                     if (MyView == null) {
 					} else {
+                        //video要素、audio要素をJavaScriptから操作する http://www.htmq.com/video/
                         string tagStr = MakeVideoSouce(targetURLStr, 1000, 1000);
                         dbMsg += "、tagStr\r\n" + tagStr;
                         // 実行ディレクトリを取得
@@ -1270,11 +1309,12 @@ namespace M3UPlayer.ViewModels
                         Uri uri = new Uri(Constant.currentDirectory);
 						TargetURI = uri;
 						RaisePropertyChanged("TargetURI");
-						// WebView2にローカルファイルのURIを設定
-						MyView.webView.CoreWebView2.Navigate(TargetURI.AbsoluteUri);
-						IsPlaying = false;
-						//非同期実行
-						await Task.Run(() => {
+                        // WebView2にローカルファイルのURIを設定
+                        MyView.webView.CoreWebView2.Navigate(TargetURI.AbsoluteUri);
+                        IsPlaying = false;
+                        //非同期実行
+                        GetDuration();
+                        await Task.Run(() => {
 							MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
 						});
 						ClickPlayBt();
@@ -4326,6 +4366,7 @@ List<String> PlayListFileNames = new List<String>();
                 dbMsg += ",lsFullPathName=" + lsFullPathName;
                 lsFullPathName = lsFullPathName.Replace(@":\\\", @":\\");
                 dbMsg += ",fileName=" + fileName;
+                bool isVideoTAG=false;
                 string comentStr = "このタイプの表示は検討中です。";
                 string[] extStrs = fileName.Split('.');
                 string extentionStr = "." + extStrs[extStrs.Length - 1].ToLower();
@@ -4342,11 +4383,11 @@ List<String> PlayListFileNames = new List<String>();
                     fileName = lsFullPathName;
                 }
 
-                contlolPart = "<!DOCTYPE html><htmllang = " + '"' + "ja" + '"' + " >\n";
-                contlolPart += "\t<head>\n\t\t<meta charSet = " + '"' + "utf - 8" + '"' + " />\n";
+                contlolPart = "<!DOCTYPE html>\n<html lang=" + '"' + "ja" + '"' + ">\n";
+                contlolPart += "\t<head>\n\t\t<meta charset=utf-8>\n";
                 contlolPart += "\t\t<meta http - equiv = " + '"' + "X - UA - Compatible" + '"' + " content = " + '"' + "IE = edge,chrome = 1" + '"' + " />\n";
                 contlolPart += "\t</head>\n";
-                contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#333333;" + '"' + " >\n";
+                contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#333333;" + '"' + " onLoad=" + '"' + "myOnLoad()" + '"' + ">\n";
                 contlolPart += "\t\t<div class=" + '"' + "middle" + '"' + " style =" + '"' + "padding: 0px; " + '"' + " >\n";
 
 
@@ -4362,7 +4403,7 @@ List<String> PlayListFileNames = new List<String>();
                     //autoplay：Webページを表示した際に自動再生を行う(muted時のみ)
                     //playsinline：スマートフォンのブラウザでもWebページ内で再生する
                     //loop：動画を繰り返し再生する
-
+                    isVideoTAG = true;
                 } else if (extentionStr == ".webm" ||
                     extentionStr == ".ogv"
                     ) {
@@ -4385,7 +4426,7 @@ List<String> PlayListFileNames = new List<String>();
                         contlolPart += "\t\t\t</video>\n";
                         //		contlolPart += "\t\t</div>"; 
                         comentStr = "読み込めないファイルは対策検討中です。。";
-
+                    isVideoTAG = true;
                 } else if (extentionStr == ".flv" ||
                    extentionStr == ".f4v" ||
                    extentionStr == ".swf"
@@ -4633,7 +4674,88 @@ List<String> PlayListFileNames = new List<String>();
                                         "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "一時停止" + '"' + " onclick=" + '"' + wiPlayerID + ".pause()" + '"' + ">\n";
             */
                 contlolPart += "\t\t</div>\n";
-                //        contlolPart += "\t\t\t<div id =" + '"' + "statediv" + '"' + ">" + souceName + "</div>\n";     //span	 '"' + 
+				//        contlolPart += "\t\t\t<div id =" + '"' + "statediv" + '"' + ">" + souceName + "</div>\n";     //span	 '"' + 
+				if (isVideoTAG) {
+					contlolPart += "\t\t<div style=" + '"' + "background-color:#333333; color:#ffffff;" + '"' + ">\n";
+                    contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "再生" + '"' + " onClick=" + '"' + "playVideo()" + '"' + ">\n";
+                    contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "一時停止" + '"' + " onClick=" + '"' + "pauseVideo()" + '"' + ">\n";
+                    contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "↑" + '"' + " onClick=" + '"' + "upVolume()" + '"' + ">\n";
+                    contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "↓" + '"' + " onClick=" + '"' + "downVolume()" + '"' + ">\n";
+                    contlolPart += "\t\t\t現在（秒）<span id=" + '"' + "currentTimeSP" + '"' + ">0</span>\n";
+                    contlolPart += "\t\t\t / <span id=" + '"' + "durationSP" + '"' + "></span>\n";
+                    contlolPart += "\t\t\t<span id=" + '"' + "kanryou" + '"' + "></span>\n";
+                    contlolPart += "\t\t</div>\n";
+                    contlolPart += "\t\t<script type=" + '"' + "text/javascript" + '"' + ">\n";
+                    contlolPart += "\t\t\tvar v = document.getElementById(" + '"' + wiPlayerID + '"' + ");\n";
+                    contlolPart += "\t\t\tvar isEnded = true;\n\n";
+                    contlolPart += "\t\t\tfunction getHMS(sec) {\n";
+                    contlolPart += "\t\t\t\tvar retStr = " + '"' + '"' + ";\n";
+                    contlolPart += "\t\t\t\tvar retH = Math.floor(sec/3600);\n";
+                    contlolPart += "\t\t\t\tif(0 < retH){\n";
+                    contlolPart += "\t\t\t\t\tretStr = retH + " + '"' + ":" + '"' + ";\n";
+                    contlolPart += "\t\t\t\t\tsec = sec - retH * 3600;\n";
+                    contlolPart += "\t\t\t\t}\n";
+                    contlolPart += "\t\t\t\tvar retM = Math.floor(sec/60);\n";
+                    contlolPart += "\t\t\t\tif(0 < retM){\n";
+                    contlolPart += "\t\t\t\t\tif(retM < 10){\n";
+                    contlolPart += "\t\t\t\t\t\tretStr += " + '"' + "0" + '"' + " + retM + " + '"' + ":" + '"' + ";\n";
+                    contlolPart += "\t\t\t\t\t}else{\n";
+                    contlolPart += "\t\t\t\t\t\tretStr += retM + " + '"' + ":" + '"' + ";\n";
+                    contlolPart += "\t\t\t\t\t}\n";
+                    contlolPart += "\t\t\t\t\tsec = sec - retM * 60;\n";
+                    contlolPart += "\t\t\t\t}else{\n";
+                    contlolPart += "\t\t\t\t\tretStr += " + '"' + "00:" + '"' + ";\n";
+                    contlolPart += "\t\t\t\t}\n";
+                    contlolPart += "\t\t\t\tsec = Math.floor(sec);\n";
+                    contlolPart += "\t\t\t\tif(0 < sec){\n";
+                    contlolPart += "\t\t\t\t\tif(sec < 10){\n";
+                    contlolPart += "\t\t\t\t\t\tretStr += " + '"' + "0" + '"' + " + sec;\n";
+                    contlolPart += "\t\t\t\t\t}else{\n";
+                    contlolPart += "\t\t\t\t\t\tretStr += sec;\n";
+                    contlolPart += "\t\t\t\t\t}\n";
+                    contlolPart += "\t\t\t\t}else{\n";
+                    contlolPart += "\t\t\t\t\tretStr = retStr + " + '"' + "00" + '"' + ";\n";
+                    contlolPart += "\t\t\t\t}\n";
+                    contlolPart += "\t\t\t\treturn retStr;\n";
+                    contlolPart += "\t\t\t}\n\n";
+                    contlolPart += "\t\t\tfunction getDuration() {\n";               //動画の長さ（秒）を表示
+                    contlolPart += "\t\t\t\tvar myDuration = v.duration;\n";
+                    contlolPart += "\t\t\t\treturn myDuration;\n";
+                    contlolPart += "\t\t\t}\n\n";
+                    contlolPart += "\t\t\tfunction getCurrentTime() {\n";                //現在の再生位置（秒）を表示
+                    contlolPart += "\t\t\t\tvar myCurrentTime = v.currentTime;\n";
+                    contlolPart += "\t\t\t\treturn myCurrentTime;\n";
+                    contlolPart += "\t\t\t}\n\n";
+                    contlolPart += "\t\t\tfunction playVideo() {\n";                //再生完了の表示をクリア
+                    contlolPart += "\t\t\t\tdocument.getElementById(" + '"' + "kanryou" + '"' + ").innerHTML = " + '"' + '"' + ";\n";                //動画を再生
+                    contlolPart += "\t\t\t\tv.play();\n";
+                    contlolPart += "\t\t\t\tisEnded=false;\n";                //現在の再生位置が変更された時
+                    contlolPart += "\t\t\t}\n\n";
+                    contlolPart += "\t\t\tfunction pauseVideo() {\n";            //動画を一時停止
+                    contlolPart += "\t\t\t\tv.pause();\n";
+                    contlolPart += "\t\t\t}\n\n";
+                    contlolPart += "\t\t\tfunction upVolume() {\n";            //音量を上げる
+                    contlolPart += "\t\t\t\tv.volume = v.volume + 0.25;\n";
+                    contlolPart += "\t\t\t}\n\n";
+                    contlolPart += "\t\t\tfunction downVolume() {\n";            //音量を下げる
+                    contlolPart += "\t\t\t\tv.volume = v.volume - 0.25;\n";
+                    contlolPart += "\t\t\t}\n\n";
+                    contlolPart += "\t\t\tfunction myOnLoad() {\n";
+                    contlolPart += "\t\t\t\tdocument.getElementById(" + '"' + "durationSP" + '"' + ").innerHTML = getHMS(getDuration());\n";
+                    contlolPart += "\t\t\t\tv.addEventListener(" + '"' + "timeupdate" + '"' + ", function(){\n";
+                    contlolPart += "\t\t\t\t\tdocument.getElementById(" + '"' + "currentTimeSP" + '"' + ").innerHTML = getHMS(getCurrentTime());\n";
+                    contlolPart += "\t\t\t\t}, false);\n";            //メディアリソースの末尾に達して、再生が停止した時
+                    contlolPart += "\t\t\t\tv.addEventListener(" + '"' + "ended" + '"' + ", function(){\n";
+                    contlolPart += "\t\t\t\t\tdocument.getElementById(" + '"' + "kanryou" + '"' + ").innerHTML = " + '"' + "動画の再生が完了しました。" + '"' + ";\n";
+                    contlolPart += "\t\t\t\t\tisEnded=true;\n";
+                    contlolPart += "\t\t\t\t}, false);\n";
+                    //            v.addEventListener("loadeddata", function(){
+                    //                playVideo();
+                    //            }, false);
+                    contlolPart += "\t\t\t}\n";
+                    contlolPart += "\t\t</script>\n";
+
+                }
                 contlolPart += "\t</body>\n</html>\n";
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {

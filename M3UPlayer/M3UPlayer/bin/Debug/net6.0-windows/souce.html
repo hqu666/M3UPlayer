@@ -1,13 +1,97 @@
-<!DOCTYPE html><htmllang = "ja" >
+<!DOCTYPE html>
+<html lang="ja">
 	<head>
-		<meta charSet = "utf - 8" />
+		<meta charset=utf-8>
 		<meta http - equiv = "X - UA - Compatible" content = "IE = edge,chrome = 1" />
 	</head>
-	<body style = "background-color: #000000;color:#333333;" >
+	<body style = "background-color: #000000;color:#333333;" onLoad="myOnLoad()">
 		<div class="middle" style ="padding: 0px; " >
 			<video id="wiPlayer" controls style = "width:-webkit-fill-available ;height:-webkit-fill-available;text-align: center;">
-				<source src="file://H:\Video\藤井風\Fujii Kaze - Kaerou1080c.mp4" type="video/mp4">
+				<source src="file://H:\Video\Fujii Kaze - Tabiji.mp4" type="video/mp4">
 			</video>
 		</div>
+		<div style="background-color:#333333; color:#ffffff;">
+			<input type="button" value="再生" onClick="playVideo()">
+			<input type="button" value="一時停止" onClick="pauseVideo()">
+			<input type="button" value="↑" onClick="upVolume()">
+			<input type="button" value="↓" onClick="downVolume()">
+			現在（秒）<span id="currentTimeSP">0</span>
+			 / <span id="durationSP"></span>
+			<span id="kanryou"></span>
+		</div>
+		<script type="text/javascript">
+			var v = document.getElementById("wiPlayer");
+			var isEnded = true;
+
+			function getHMS(sec) {
+				var retStr = "";
+				var retH = Math.floor(sec/3600);
+				if(0 < retH){
+					retStr = retH + ":";
+					sec = sec - retH * 3600;
+				}
+				var retM = Math.floor(sec/60);
+				if(0 < retM){
+					if(retM < 10){
+						retStr += "0" + retM + ":";
+					}else{
+						retStr += retM + ":";
+					}
+					sec = sec - retM * 60;
+				}else{
+					retStr += "00:";
+				}
+				sec = Math.floor(sec);
+				if(0<sec){
+					if(sec < 10){
+						retStr += "0" + sec;
+					}else{
+						retStr += sec;
+					}
+				}else{
+					retStr = retStr + "00";
+				}
+				return retStr;
+			}
+
+			function getDuration() {
+				var myDuration = v.duration;
+				return myDuration;
+			}
+
+			function getCurrentTime() {
+				var myCurrentTime = v.currentTime;
+				return myCurrentTime;
+			}
+
+			function playVideo() {
+				document.getElementById("kanryou").innerHTML = "";
+				v.play();
+				isEnded=false;
+			}
+
+			function pauseVideo() {
+				v.pause();
+			}
+
+			function upVolume() {
+				v.volume = v.volume + 0.25;
+			}
+
+			function downVolume() {
+				v.volume = v.volume - 0.25;
+			}
+
+			function myOnLoad() {
+				document.getElementById("durationSP").innerHTML = getHMS(getDuration());
+				v.addEventListener("timeupdate", function(){
+					document.getElementById("currentTimeSP").innerHTML = getHMS(getCurrentTime());
+				}, false);
+				v.addEventListener("ended", function(){
+					document.getElementById("kanryou").innerHTML = "動画の再生が完了しました。";
+					isEnded=true;
+				}, false);
+			}
+		</script>
 	</body>
 </html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset=utf-8>
+		<title>video要素、audio要素をJavaScriptから操作する　サンプル</title>
+	</head>
+	<body style = "background-color: #000000;color:#333333;" onLoad="myOnLoad()">
+		<div class="middle" style ="padding: 0px; " >
+			<video id="wiPlayer" controls style = "width:-webkit-fill-available ;height:-webkit-fill-available;text-align: center;">
+				<source src="file://H:\Video\640\Fujii Kaze - Tabiji 480.mp4" type="video/mp4">
+			</video>
+		</div>
+		<div style="background-color:#333333; color:#ffffff;">
+			<input type="button" value="再生" onClick="playVideo()">
+			<input type="button" value="一時停止" onClick="pauseVideo()">
+			<input type="button" value="↑" onClick="upVolume()">
+			<input type="button" value="↓" onClick="downVolume()">
+			現在（秒）<span id="currentTimeSP">0</span>
+			 / <span id="durationSP"></span>
+			<span id="kanryou"></span>
+		</div>
+		<script type="text/javascript">
+			var v = document.getElementById("wiPlayer");
+			var isEnded = true;
+
+			function getHMS(sec) {
+				var retStr = "";
+				var retH = Math.floor(sec/3600);
+				if(0 < retH){
+					retStr = retH + ":";
+					sec = sec - retH * 3600;
+				}
+				var retM = Math.floor(sec/60);
+				if(0 < retM){
+					if(retM < 10){
+						retStr += "0" + retM + ":";
+					}else{
+						retStr += retM + ":";
+					}
+					sec = sec - retM * 60;
+				}else{
+					retStr += "00:";
+				}
+				sec = Math.floor(sec);
+				if(0 < sec){
+					if(sec < 10){
+						retStr += "0" + sec;
+					}else{
+						retStr += sec;
+					}
+				}else{
+					retStr = retStr + "00";
+				}
+				return retStr;
+			}
+
+			function getDuration() {
+				//動画の長さ（秒）を表示
+				var myDuration = v.duration;
+				return myDuration;
+			}
+
+			function getCurrentTime() {
+				//現在の再生位置（秒）を表示
+				var myCurrentTime = v.currentTime;
+				return myCurrentTime;
+			}
+
+			function playVideo() {
+				//再生完了の表示をクリア
+				document.getElementById("kanryou").innerHTML = "";
+				//動画を再生
+				v.play();
+				isEnded=false;
+			}
+
+			function pauseVideo() {
+				//動画を一時停止
+				v.pause();
+			}
+
+			function upVolume() {
+				//音量を上げる
+				v.volume = v.volume + 0.25;
+			}
+
+			function downVolume() {
+				//音量を下げる
+				v.volume = v.volume - 0.25;
+			}
+
+			function myOnLoad() {
+				document.getElementById("durationSP").innerHTML = getHMS(getDuration());
+				//現在の再生位置が変更された時
+				v.addEventListener("timeupdate", function(){
+					document.getElementById("currentTimeSP").innerHTML = getHMS(getCurrentTime());
+				}, false);
+				//メディアリソースの末尾に達して、再生が停止した時
+				v.addEventListener("ended", function(){
+					document.getElementById("kanryou").innerHTML = "動画の再生が完了しました。";
+					isEnded=true;
+				}, false);
+				v.addEventListener("loadeddata", function(){
+						playVideo();
+				}, false);
+			}
+
+		</script>
+
+	</body> 
+</html>
