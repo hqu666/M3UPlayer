@@ -195,10 +195,19 @@ namespace M3UPlayer.ViewModels
 			//private set { GetDataBindItem<string>("Title").Value = value; }
 			get => _DurationStr;
 			set {
-				if (_DurationStr == value)
-					return;
-				_DurationStr = value;
-				RaisePropertyChanged("DurationStr");
+                string TAG = "DurationStr(set)";
+                string dbMsg = "";
+                try {
+                    dbMsg += "value=" + value;
+                    if (_DurationStr == value)
+                        return;
+                    _DurationStr = value;
+                    RaisePropertyChanged("DurationStr");
+                    MyLog(TAG, dbMsg);
+                } catch (Exception er) {
+                    MyErrorLog(TAG, dbMsg, er);
+                }
+
 			}
 		}
 
@@ -1233,30 +1242,40 @@ namespace M3UPlayer.ViewModels
 
         readonly CountdownEvent condition = new CountdownEvent(1);
 
+
+        /// <summary>
+        /// メディアリソースの長さを取得
+        /// </summary>
         public async void GetDuration() {
             //int oldIndex,
             string TAG = "GetDuration";
             string dbMsg = "";
             try {
-				//await Task.Run(() => Dispatcher.Invoke(() => MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;")));
-				MyView.Dispatcher.Invoke(() => {
+                ////await Task.Run(() => Dispatcher.Invoke(() => MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;")));
+                //MyView.Dispatcher.Invoke(() => {
 
 
 
-					//Task<string> Duration = Task.Run<string>(new Func<string>(MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;")));
+                //	//Task<string> Duration = Task.Run<string>(new Func<string>(MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;")));
 
 
-					//	string Dtr = MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;");
-					//	DurationStr = Duration.Result;
+                //	//	string Dtr = MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;");
+                //	//	DurationStr = Duration.Result;
 
-					//string DurationStr = Task.Run<string>(() => MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;"));
+                //	//string DurationStr = Task.Run<string>(() => MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;"));
 
-					//System.InvalidOperationException: 'このオブジェクトは別のスレッドに所有されているため、呼び出しスレッドはこのオブジェクトにアクセスできません。'
+                //	//System.InvalidOperationException: 'このオブジェクトは別のスレッドに所有されているため、呼び出しスレッドはこのオブジェクトにアクセスできません。'
+                string rStr = await MyView.webView.ExecuteScriptAsync($"document.getElementById(" +'"' + "durationSP" + '"' + ").innerHTML;");
+                dbMsg += "、rStr=" + rStr;
+                if (0<rStr.Length) {
+					//       DurationStr = rStr;
+					DurationStr = await MyView.webView.ExecuteScriptAsync("getDuration(\\)");
 
 					dbMsg += "、DurationStr=" + DurationStr;
-					RaisePropertyChanged("DurationStr");
-				});
-				MyLog(TAG, dbMsg);
+                    RaisePropertyChanged("DurationStr");
+                }
+                //});
+                MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
@@ -3066,6 +3085,10 @@ namespace M3UPlayer.ViewModels
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
+
+
+
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////// プレイヤーコントロール　///
 
         ///以下使用待ち///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4366,7 +4389,6 @@ List<String> PlayListFileNames = new List<String>();
                 dbMsg += ",lsFullPathName=" + lsFullPathName;
                 lsFullPathName = lsFullPathName.Replace(@":\\\", @":\\");
                 dbMsg += ",fileName=" + fileName;
-                bool isVideoTAG=false;
                 string comentStr = "このタイプの表示は検討中です。";
                 string[] extStrs = fileName.Split('.');
                 string extentionStr = "." + extStrs[extStrs.Length - 1].ToLower();
@@ -4392,7 +4414,7 @@ List<String> PlayListFileNames = new List<String>();
 
 
                 if (extentionStr == ".mp4") {
-                    //	contlolPart += "\t\t<div class=" + '"' + "video-container" + '"' + ">\n";
+                    // ★video要素、audio要素をJavaScriptから操作する   http://www.htmq.com/video/#ui 
                     contlolPart += "\t\t\t<video id=" + '"' + wiPlayerID + '"' + " controls style = " + '"' + "width:-webkit-fill-available ;height:-webkit-fill-available;text-align: center;" + '"' + ">\n";
                     contlolPart += "\t\t\t\t<source src=" + '"' + "file://" + fileName + '"' + " type=" + '"' + mineTypeStr + '"' + ">\n";
                     contlolPart += "\t\t\t</video>\n";
@@ -4403,14 +4425,13 @@ List<String> PlayListFileNames = new List<String>();
                     //autoplay：Webページを表示した際に自動再生を行う(muted時のみ)
                     //playsinline：スマートフォンのブラウザでもWebページ内で再生する
                     //loop：動画を繰り返し再生する
-                    isVideoTAG = true;
                 } else if (extentionStr == ".webm" ||
                     extentionStr == ".ogv"
                     ) {
-                        contlolPart += "\t\t\t<meta http - equiv = " + '"' + "X-UA-Compatible" + '"' + " content=" + '"' + "chrome=1" + '"' + " >\n";
-                        //<meta http-equiv="X-UA-Compatible" content="chrome=1">			http://mrs.suzu841.com/mini_memo/numero_23.html
-                        contlolPart += "\t\t</head>\n";
-                        contlolPart += "\t\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n";
+                        //contlolPart += "\t\t\t<meta http - equiv = " + '"' + "X-UA-Compatible" + '"' + " content=" + '"' + "chrome=1" + '"' + " >\n";
+                        ////<meta http-equiv="X-UA-Compatible" content="chrome=1">			http://mrs.suzu841.com/mini_memo/numero_23.html
+                        //contlolPart += "\t\t</head>\n";
+                        //contlolPart += "\t\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n";
                         //	contlolPart += "\t\t<div class=" + '"' + "video-container" + '"' + ">\n";
                         contlolPart += "\t\t\t<video id=" + '"' + wiPlayerID + '"' + " controls autoplay style = " + '"' + "width:100%;height: auto;" + '"' + ">\n";
                         contlolPart += "\t\t\t\t<source src=" + '"' + "file://" + fileName + '"' + " type=" + "'" + mineTypeStr;
@@ -4426,7 +4447,6 @@ List<String> PlayListFileNames = new List<String>();
                         contlolPart += "\t\t\t</video>\n";
                         //		contlolPart += "\t\t</div>"; 
                         comentStr = "読み込めないファイルは対策検討中です。。";
-                    isVideoTAG = true;
                 } else if (extentionStr == ".flv" ||
                    extentionStr == ".f4v" ||
                    extentionStr == ".swf"
@@ -4674,8 +4694,8 @@ List<String> PlayListFileNames = new List<String>();
                                         "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "一時停止" + '"' + " onclick=" + '"' + wiPlayerID + ".pause()" + '"' + ">\n";
             */
                 contlolPart += "\t\t</div>\n";
-				//        contlolPart += "\t\t\t<div id =" + '"' + "statediv" + '"' + ">" + souceName + "</div>\n";     //span	 '"' + 
-				if (isVideoTAG) {
+                //        contlolPart += "\t\t\t<div id =" + '"' + "statediv" + '"' + ">" + souceName + "</div>\n";     //span	 '"' + 
+                if (contlolPart.Contains("<video")) {
 					contlolPart += "\t\t<div style=" + '"' + "background-color:#333333; color:#ffffff;" + '"' + ">\n";
                     contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "再生" + '"' + " onClick=" + '"' + "playVideo()" + '"' + ">\n";
                     contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "一時停止" + '"' + " onClick=" + '"' + "pauseVideo()" + '"' + ">\n";
