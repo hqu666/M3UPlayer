@@ -7,7 +7,7 @@
 	<body style = "background-color: #000000;color:#333333;" onLoad="myOnLoad()">
 		<div class="middle" style ="padding: 0px; " >
 			<video id="wiPlayer" controls style = "width:-webkit-fill-available ;height:-webkit-fill-available;text-align: center;">
-				<source src="file://H:\Video\640\Fujii Kaze _Free_ Live 2021 at NISSAN stadium640.mp4" type="video/mp4">
+				<source src="file://H:\Video\Fujii Kaze - Tabiji.mp4" type="video/mp4">
 			</video>
 		</div>
 		<div style="background-color:#333333; color:#ffffff;">
@@ -83,14 +83,13 @@
 			}
 
 			function myOnLoad() {
-				document.getElementById("durationSP").innerHTML = getHMS(getDuration());
 				v.addEventListener("timeupdate", function(){
-					document.getElementById("currentTimeSP").innerHTML = getHMS(getCurrentTime());
 					window.chrome.webview.postMessage(getCurrentTime()+"");
 				}, false);
 				v.addEventListener("ended", function(){
 					document.getElementById("kanryou").innerHTML = "動画の再生が完了しました。";
 					isEnded=true;
+					window.chrome.webview.postMessage("ended");
 				}, false);
 			}
 		</script>
