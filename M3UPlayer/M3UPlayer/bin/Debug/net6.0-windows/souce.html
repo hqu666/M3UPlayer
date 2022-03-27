@@ -86,6 +86,7 @@
 				document.getElementById("durationSP").innerHTML = getHMS(getDuration());
 				v.addEventListener("timeupdate", function(){
 					document.getElementById("currentTimeSP").innerHTML = getHMS(getCurrentTime());
+					window.chrome.webview.postMessage(getCurrentTime()+"");
 				}, false);
 				v.addEventListener("ended", function(){
 					document.getElementById("kanryou").innerHTML = "動画の再生が完了しました。";

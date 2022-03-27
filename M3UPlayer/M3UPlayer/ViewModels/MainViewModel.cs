@@ -1345,6 +1345,28 @@ namespace M3UPlayer.ViewModels
             }
         }
 
+        /// <summary>
+        /// 現在の再生ポジション
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void webView_CurrentTimeeReceived(object sender, Microsoft.Web.WebView2.Core.CoreWebView2WebMessageReceivedEventArgs e) {
+            string TAG = "webView_CurrentTimeeReceived";
+            string dbMsg = "";
+            try {
+                //JavaScriptのaddEventListenerからpostMessageされた文字列を受け取る
+                var s = e.TryGetWebMessageAsString();
+                dbMsg += ",s=" + s;
+                string CurrentTime = await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime;");
+                PositionStr = GetHMS(CurrentTime);
+                dbMsg += "、PositionStr=" + PositionStr;
+                RaisePropertyChanged("PositionStr");
+            //    MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
 
         /// <summary>
         /// プレイヤーへ
@@ -1381,11 +1403,14 @@ namespace M3UPlayer.ViewModels
                     if (MyView == null) {
 					} else {
 						//             CallWeb();
-						////WebView2のロード完了時のイベント
+						//WebView2のロード完了時のイベント
 						MyView.webView.NavigationCompleted += WebView_NavigationCompleted; PlayListSaveBTVisble = "Hidden";
+                        //JavaScriptからのデータ送信    https://knooto.info/csharp-webview2-snippets/
+                        MyView.webView.WebMessageReceived += webView_CurrentTimeeReceived;
 
-						//video要素、audio要素をJavaScriptから操作する http://www.htmq.com/video/
-						string tagStr = MakeVideoSouce(targetURLStr, 1000, 1000);
+
+                        //video要素、audio要素をJavaScriptから操作する http://www.htmq.com/video/
+                        string tagStr = MakeVideoSouce(targetURLStr, 1000, 1000);
                         dbMsg += "、tagStr\r\n" + tagStr;
                         // 実行ディレクトリを取得
 						dbMsg += "、\r\n" + Constant.currentDirectory;
@@ -4806,7 +4831,7 @@ List<String> PlayListFileNames = new List<String>();
                     contlolPart += "\t\t\tfunction playVideo() {\n";                //再生完了の表示をクリア
                     contlolPart += "\t\t\t\tdocument.getElementById(" + '"' + "kanryou" + '"' + ").innerHTML = " + '"' + '"' + ";\n";                //動画を再生
                     contlolPart += "\t\t\t\tv.play();\n";
-                    contlolPart += "\t\t\t\tisEnded=false;\n";                //現在の再生位置が変更された時
+                    contlolPart += "\t\t\t\tisEnded=false;\n"; 
                     contlolPart += "\t\t\t}\n\n";
                     contlolPart += "\t\t\tfunction pauseVideo() {\n";            //動画を一時停止
                     contlolPart += "\t\t\t\tv.pause();\n";
@@ -4819,8 +4844,10 @@ List<String> PlayListFileNames = new List<String>();
                     contlolPart += "\t\t\t}\n\n";
                     contlolPart += "\t\t\tfunction myOnLoad() {\n";
                     contlolPart += "\t\t\t\tdocument.getElementById(" + '"' + "durationSP" + '"' + ").innerHTML = getHMS(getDuration());\n";
+                    //現在の再生位置が変更された時
                     contlolPart += "\t\t\t\tv.addEventListener(" + '"' + "timeupdate" + '"' + ", function(){\n";
                     contlolPart += "\t\t\t\t\tdocument.getElementById(" + '"' + "currentTimeSP" + '"' + ").innerHTML = getHMS(getCurrentTime());\n";
+                    contlolPart += "\t\t\t\t\twindow.chrome.webview.postMessage(getCurrentTime()+" + '"' + '"' +");\n";
                     contlolPart += "\t\t\t\t}, false);\n";            //メディアリソースの末尾に達して、再生が停止した時
                     contlolPart += "\t\t\t\tv.addEventListener(" + '"' + "ended" + '"' + ", function(){\n";
                     contlolPart += "\t\t\t\t\tdocument.getElementById(" + '"' + "kanryou" + '"' + ").innerHTML = " + '"' + "動画の再生が完了しました。" + '"' + ";\n";
