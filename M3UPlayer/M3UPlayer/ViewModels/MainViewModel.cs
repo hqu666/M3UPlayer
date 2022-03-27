@@ -518,33 +518,27 @@ namespace M3UPlayer.ViewModels
                 }
                 dbMsg += ",NowSelectedFile=" + NowSelectedFile;
 				dbMsg += " [" + NowSelectedPosition + "]";
-				//CallWeb();
-				PlayListSaveBTVisble = "Hidden";
 				PlayListSaveRoot.IsEnabled = false;
 				RaisePropertyChanged("PlayListSaveBTVisble");
                 PlayListSelectionMode = "Extended";
                 RaisePropertyChanged("PlayListSelectionMode");
                 Drag_now = false;
                 RaisePropertyChanged("Drag_now");
-                //BitmapImage playImage = new BitmapImage(new Uri("/views/pl_r_btn.png", UriKind.Relative));
-                //MyView.PlayBtImageBrush = new ImageBrush(playImage);
-                //IsPlaying = true;
-                //RaisePropertyChanged("IsPlaying");
                 IsPlaying = false;
                 RaisePropertyChanged("IsPlaying");
 
                 //      WVM = new WsbViewModel();
                 MyLog(TAG, dbMsg);
-            } catch (Exception er)
-            {
+            } catch (Exception er){
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
 
-		/// <summary>
-		/// 終了前イベントのメソッド
-		/// </summary>
-		public void BeforeClose() {
+
+        /// <summary>
+        /// 終了前イベントのメソッド
+        /// </summary>
+        public void BeforeClose() {
 			string TAG = "BeforeClose";
 			string dbMsg = "";
 			try {
@@ -558,9 +552,26 @@ namespace M3UPlayer.ViewModels
 			}
 		}
 
+        /// <summary>
+        /// webVeiw2の初期設定
+        /// </summary>
 		public void CallWeb()
         {
-            FrameSource = "WebPage.xaml";
+            string TAG = "CallWeb";
+            string dbMsg = "";
+            try {
+                if (MyView.webView.CoreWebView2 != null) {
+                    //JavaScriptからC#のメソッドが実行できる様に仕込む
+                    MyView.webView.CoreWebView2.AddHostObjectToScript("class", CsClass);
+                    dbMsg += ",class,CsClass追加";
+                    //ダミーで良ければ　CS_Util　に差し替え
+                } else {
+                    dbMsg += ",CoreWebView2==null";
+                }
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
         }
 
         /// <summary>
@@ -1242,46 +1253,97 @@ namespace M3UPlayer.ViewModels
 
         readonly CountdownEvent condition = new CountdownEvent(1);
 
+        /// <summary>
+        /// 文字で渡された秒を時分秒の文字列で返す
+        /// </summary>
+        /// <param name="secStr"></param>
+        /// <returns></returns>
+        public string GetHMS(string secStr) {
+            string TAG = "GetHMS";
+            string dbMsg = "";
+            string retStr = "";
+            try {
+				decimal sec = Decimal.Parse(secStr);
+                dbMsg += "、sec=" + sec;
+                var retH = Math.Floor(sec / 3600);
+                if (0 < retH) {
+                    retStr = retH + ":";
+                    sec = sec - retH * 3600;
+                }
+                var retM = Math.Floor(sec / 60);
+                if (0 < retM) {
+                    if (retM < 10) {
+                        retStr += "0" + retM + ":";
+                    } else {
+                        retStr += retM + ":";
+                    }
+                    sec = sec - retM * 60;
+                } else {
+                    retStr += "00:";
+                }
+                sec = Math.Floor(sec);
+                if (0 < sec) {
+                    if (sec < 10) {
+                        retStr += "0" + sec;
+                    } else {
+                        retStr += sec;
+                    }
+                } else {
+                    retStr = retStr + "00";
+                }
+                dbMsg += "、retStr=" + retStr;
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+            return retStr;
+        }
+
 
         /// <summary>
         /// メディアリソースの長さを取得
         /// </summary>
         public async void GetDuration() {
-            //int oldIndex,
             string TAG = "GetDuration";
             string dbMsg = "";
             try {
-                ////await Task.Run(() => Dispatcher.Invoke(() => MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;")));
-                //MyView.Dispatcher.Invoke(() => {
-
-
-
-                //	//Task<string> Duration = Task.Run<string>(new Func<string>(MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;")));
-
-
-                //	//	string Dtr = MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;");
-                //	//	DurationStr = Duration.Result;
-
-                //	//string DurationStr = Task.Run<string>(() => MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;"));
-
-                //	//System.InvalidOperationException: 'このオブジェクトは別のスレッドに所有されているため、呼び出しスレッドはこのオブジェクトにアクセスできません。'
-                string rStr = await MyView.webView.ExecuteScriptAsync($"document.getElementById(" +'"' + "durationSP" + '"' + ").innerHTML;");
-                dbMsg += "、rStr=" + rStr;
-                if (0<rStr.Length) {
-					//       DurationStr = rStr;
-					DurationStr = await MyView.webView.ExecuteScriptAsync("getDuration(\\)");
-
-					dbMsg += "、DurationStr=" + DurationStr;
+                //string rStr = await MyView.webView.ExecuteScriptAsync($"document.getElementById(" +'"' + "durationSP" + '"' + ").innerHTML;");
+                //dbMsg += "、rStr=" + rStr;
+                //if (0<rStr.Length) {
+                    string Duration = await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;");
+                    DurationStr = GetHMS(Duration);
+                    dbMsg += "、DurationStr=" + DurationStr;
                     RaisePropertyChanged("DurationStr");
-                }
-                //});
+                //}
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
 
+        // https://teratail.com/questions/363162?sort=3
+        /// <summary>JavaScriptで呼ぶ関数を保持するオブジェクト</summary>
+        private JsToCs CsClass = new JsToCs();
 
+        /// <summary>WebView2のロード完了時</summary>
+        private void WebView_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e) {
+            string TAG = "WebView_NavigationCompleted";
+            string dbMsg = "";
+            try {
+                if (MyView.webView.CoreWebView2 != null) {
+                    //JavaScriptからC#のメソッドが実行できる様に仕込む
+                    MyView.webView.CoreWebView2.AddHostObjectToScript("class", CsClass);
+                    dbMsg += ",class,CsClass追加";
+                    //ダミーで良ければ　CS_Util　に差し替え
+                    GetDuration();
+                } else {
+                    dbMsg += ",CoreWebView2==null";
+                }
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
 
         /// <summary>
@@ -1318,8 +1380,12 @@ namespace M3UPlayer.ViewModels
 				if (toWeb) {
                     if (MyView == null) {
 					} else {
-                        //video要素、audio要素をJavaScriptから操作する http://www.htmq.com/video/
-                        string tagStr = MakeVideoSouce(targetURLStr, 1000, 1000);
+						//             CallWeb();
+						////WebView2のロード完了時のイベント
+						MyView.webView.NavigationCompleted += WebView_NavigationCompleted; PlayListSaveBTVisble = "Hidden";
+
+						//video要素、audio要素をJavaScriptから操作する http://www.htmq.com/video/
+						string tagStr = MakeVideoSouce(targetURLStr, 1000, 1000);
                         dbMsg += "、tagStr\r\n" + tagStr;
                         // 実行ディレクトリを取得
 						dbMsg += "、\r\n" + Constant.currentDirectory;
@@ -1331,8 +1397,8 @@ namespace M3UPlayer.ViewModels
                         // WebView2にローカルファイルのURIを設定
                         MyView.webView.CoreWebView2.Navigate(TargetURI.AbsoluteUri);
                         IsPlaying = false;
-                        //非同期実行
-                        GetDuration();
+
+         //               GetDuration();
                         await Task.Run(() => {
 							MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
 						});
@@ -1696,7 +1762,6 @@ namespace M3UPlayer.ViewModels
         //	SFPlayer.CallFunction("<invoke name=\"loadAndPlayVideo\" returntype=\"xml\"><arguments><string>" + videoPath + "</string></arguments></invoke>");
         //}
         #endregion
-
 
 
         //2008:C#でFLVファイルをお手軽再生   http://zecl.hatenablog.com/entry/20081119/p1///////////////////////////////
@@ -2378,8 +2443,6 @@ namespace M3UPlayer.ViewModels
 
         ////プレイリストのアイテム移動////////////////////////////////////
 
-
-
         /// <summary>
         /// プレイリスト上での移動
         /// </summary>
@@ -2455,7 +2518,6 @@ namespace M3UPlayer.ViewModels
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
-
 
         #region プレイリストのコンテキストメニュー
         public ContextMenu PlayListMenu { get; set; }
@@ -2902,7 +2964,6 @@ namespace M3UPlayer.ViewModels
         #endregion
 
 
-
         #endregion
         //ファイル選択///////////////////////////////////////////////////////////playList//
         //        //プレイリスト///////////////////////////////////////////////////////////FileListVewの操作//
@@ -3024,7 +3085,6 @@ namespace M3UPlayer.ViewModels
         #endregion
 
 
-
         #region ExploreShow	　エクスプローラー表示
         //private ViewModelCommand _ExploreShow;
 
@@ -3059,7 +3119,6 @@ namespace M3UPlayer.ViewModels
         }
         #endregion
 
-
         /// <summary>
         /// プレイヤーコントロール　//////////////////////////////////////////////////////////////////////////////////////////////////////
         /// </summary>
@@ -3085,8 +3144,6 @@ namespace M3UPlayer.ViewModels
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
-
-
 
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////// プレイヤーコントロール　///
@@ -11098,5 +11155,15 @@ List<String> PlayListFileNames = new List<String>();
 
 
         //http://www.usefullcode.net/2016/03/index.html
+
+        //↓属性設定が無いとエラーになります
+        /// <summary>WebView2に読み込ませるためのJsで実行する関数を保持させたクラス</summary>
+        [ClassInterface(ClassInterfaceType.AutoDual)]
+        [ComVisible(true)]
+        public class JsToCs {
+            public void MessageShow(string strText) {
+                MessageBox.Show("Jsからの呼び出し>" + strText);
+            }
+        }
     }
 }
