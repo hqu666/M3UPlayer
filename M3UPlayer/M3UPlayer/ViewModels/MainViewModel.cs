@@ -1299,11 +1299,14 @@ namespace M3UPlayer.ViewModels {
                 //dbMsg += "、rStr=" + rStr;
                 //if (0<rStr.Length) {
                 string Duration = await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;");
-                DurationStr = GetHMS(Duration);
-                dbMsg += "、DurationStr=" + DurationStr;
-                RaisePropertyChanged("DurationStr");
-                SliderMaximum = double.Parse(Duration);
-                RaisePropertyChanged("SliderMaximum");
+                dbMsg += "、Duration=" + Duration;
+                if (Duration != null) {
+                    DurationStr = GetHMS(Duration);
+                    dbMsg += "、DurationStr=" + DurationStr;
+                    RaisePropertyChanged("DurationStr");
+                    SliderMaximum = double.Parse(Duration);
+                    RaisePropertyChanged("SliderMaximum");
+                }
                 //}
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
@@ -1322,7 +1325,7 @@ namespace M3UPlayer.ViewModels {
             try {
                 if (MyView.webView.CoreWebView2 != null) {
                     //JavaScriptからC#のメソッドが実行できる様に仕込む
-                    MyView.webView.CoreWebView2.AddHostObjectToScript("class", CsClass);
+                    //MyView.webView.CoreWebView2.AddHostObjectToScript("class", CsClass);  //20220331コメントアウト
                     dbMsg += ",class,CsClass追加";
                     //ダミーで良ければ　CS_Util　に差し替え
                     GetDuration();
@@ -1336,7 +1339,7 @@ namespace M3UPlayer.ViewModels {
         }
 
         /// <summary>
-        /// 現在の再生ポジション
+        /// JavaScriptのaddEventListenerからpostMessageされた文字列を受け取る
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -1349,6 +1352,7 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += ",s=" + s;
                 if (s.Equals("ended")) {
                     dbMsg += "、再生終了";
+      //              await Task.Delay(1000);
                     ForwardList();
                     MyLog(TAG, dbMsg);
                 } else {
@@ -4688,16 +4692,18 @@ AddType video/MP2T .ts
                     contlolPart += "\t\t\t\tv.addEventListener(" + '"' + "timeupdate" + '"' + ", function(){\n";
                     contlolPart += "\t\t\t\t\twindow.chrome.webview.postMessage(getCurrentTime()+" + '"' + '"' + ");\n";
                     contlolPart += "\t\t\t\t}, false);\n";            //メディアリソースの末尾に達して、再生が停止した時
-                    contlolPart += "\t\t\t\tv.addEventListener(" + '"' + "ended" + '"' + ", function(){\n";
-                    contlolPart += "\t\t\t\t}, false);\n";
-                    //メディアリソースの末尾に達して、再生が停止した時
-                    contlolPart += "\t\t\t\tv.addEventListener(" + '"' + "ended" + '"' + ", function(){\n";
-                    contlolPart += "\t\t\t\t\twindow.chrome.webview.postMessage(" + '"' + "ended" + '"' + ");\n";
-                    contlolPart += "\t\t\t\t}, false);\n";
-                    //            v.addEventListener("loadeddata", function(){
-                    //                playVideo();
-                    //            }, false);
-                    contlolPart += "\t\t\t}\n";
+																	  //メディアリソースの末尾に達して、再生が停止した時
+					contlolPart += "\t\t\t\tv.addEventListener(" + '"' + "ended" + '"' + ", function(){\n";
+					contlolPart += "\t\t\t\t\twindow.chrome.webview.postMessage(" + '"' + "ended" + '"' + ");\n";
+					contlolPart += "\t\t\t\t});\n";
+					//            v.addEventListener("loadeddata", function(){
+					//                playVideo();
+					//            }, false);
+					contlolPart += "\t\t\t}\n";
+                    ////メディアリソースの末尾に達して、再生が停止した時
+                    //contlolPart += "\t\t\tv.onended = function ( event ) {\n";
+                    //contlolPart += "\t\t\t\twindow.chrome.webview.postMessage(" + '"' + "ended" + '"' + ");\n";
+                    //contlolPart += "\t\t\t};\n";
                     contlolPart += "\t\t</script>\n";
 
                 }
