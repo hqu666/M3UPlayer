@@ -44,10 +44,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 //using AxShockwaveFlashObjects;
 
-namespace M3UPlayer.ViewModels
-{
-	public class MainViewModel : INotifyPropertyChanged {
-		public Views.MainWindow MyView { get; set; }
+namespace M3UPlayer.ViewModels {
+    public class MainViewModel : INotifyPropertyChanged {
+        public Views.MainWindow MyView { get; set; }
         /// <summary>
         /// WindowsMediaPlayerのコントローラ
         /// </summary>
@@ -66,8 +65,8 @@ namespace M3UPlayer.ViewModels
                     if (_PLList == value)
                         return;
                     _PLList = value;
-                    dbMsg += PLList.Count +"件 " ;
-					if (0< PLList.Count) {
+                    dbMsg += PLList.Count + "件 ";
+                    if (0 < PLList.Count) {
                         dbMsg += PLList[0];
                         dbMsg += "～" + PLList[PLList.Count - 1];
                     }
@@ -116,7 +115,7 @@ namespace M3UPlayer.ViewModels
         /// 複数行選択ならExtended、単行選択ならSingle
         /// </summary>
         public string PlayListSelectionMode { get; set; }
-        
+
         // 一つの行が選択された時点
         private int _SelectedPlayListIndex;
         /// <summary>
@@ -129,19 +128,19 @@ namespace M3UPlayer.ViewModels
                 string TAG = "SelectedPlayListIndex(set)";
                 string dbMsg = "";
                 try {
-                    if (_SelectedPlayListIndex == value || value<0)
+                    if (_SelectedPlayListIndex == value || value < 0)
                         return;
                     _SelectedPlayListIndex = value;
                     RaisePropertyChanged("SelectedPlayListIndex");
-                    dbMsg += "["+ SelectedPlayListIndex + "]"+ MyView.PlayList.CurrentItem + "Drag_now=" + Drag_now;
+                    dbMsg += "[" + SelectedPlayListIndex + "]" + MyView.PlayList.CurrentItem + "Drag_now=" + Drag_now;
                     // 選択されているものがあって、Dragで無ければ 
                     if (MyView.PlayList.SelectedItems != null && !Drag_now) {
                         SelectedPlayListFiles = new List<PlayListModel>();
                         IList selectedItems = MyView.PlayList.SelectedItems;
                         dbMsg += "、selectedItems=" + selectedItems.Count + "件";
-						if (selectedItems.Count == 1) {
+                        if (selectedItems.Count == 1) {
                             PlayListModel? PLItem = new PlayListModel();      //直接代入でクラッシュしたのでローカル変数に取得
-							PLItem = (PlayListModel)PLList[SelectedPlayListIndex];
+                            PLItem = (PlayListModel)PLList[SelectedPlayListIndex];
                             SelectedPlayListFiles.Add(PLItem);
                         } else {
                             foreach (object pli in selectedItems) {
@@ -158,8 +157,8 @@ namespace M3UPlayer.ViewModels
                         }
                     }
 
-                    foreach (PlayListModel pli in MyView.PlayList.Items) { 
-                    
+                    foreach (PlayListModel pli in MyView.PlayList.Items) {
+
                     }
                     MyLog(TAG, dbMsg);
                 } catch (Exception er) {
@@ -187,14 +186,14 @@ namespace M3UPlayer.ViewModels
         /// 全長:duration
         /// </summary>
         private string _DurationStr;
-		/// <summary>
-		/// 全長
-		/// </summary>
-		public string DurationStr {
-			//get { return GetDataBindItem<string>("Title").Value; }
-			//private set { GetDataBindItem<string>("Title").Value = value; }
-			get => _DurationStr;
-			set {
+        /// <summary>
+        /// 全長
+        /// </summary>
+        public string DurationStr {
+            //get { return GetDataBindItem<string>("Title").Value; }
+            //private set { GetDataBindItem<string>("Title").Value = value; }
+            get => _DurationStr;
+            set {
                 string TAG = "DurationStr(set)";
                 string dbMsg = "";
                 try {
@@ -203,62 +202,78 @@ namespace M3UPlayer.ViewModels
                         return;
                     _DurationStr = value;
                     RaisePropertyChanged("DurationStr");
-                    MyLog(TAG, dbMsg);
+                    //             MyLog(TAG, dbMsg);
                 } catch (Exception er) {
                     MyErrorLog(TAG, dbMsg, er);
                 }
 
-			}
-		}
+            }
+        }
 
-		private double _SliderMaximum;
-		/// <summary>
-		/// スライダー上限
-		/// </summary>
-		public double SliderMaximum {
-			get => _SliderMaximum;
-			set {
-				if (_SliderMaximum == value)
-					return;
-				_SliderMaximum = value;
-				RaisePropertyChanged("SliderMaximum");
-			}
-		}
-		
-		private string _PositionStr;
+        private double _SliderMaximum;
+        /// <summary>
+        /// スライダー上限
+        /// </summary>
+        public double SliderMaximum {
+            get => _SliderMaximum;
+            set {
+                string TAG = "SliderMaximum(set)";
+                string dbMsg = "";
+                try {
+                    dbMsg += "value=" + value;
+                    if (_SliderMaximum == value)
+                        return;
+                    _SliderMaximum = value;
+                    RaisePropertyChanged("SliderMaximum");
+                    MyLog(TAG, dbMsg);
+                } catch (Exception er) {
+                    MyErrorLog(TAG, dbMsg, er);
+                }
+            }
+        }
+
+        private string _PositionStr;
         /// <summary>
         /// 再生ポジション：currentTime
         /// </summary>
         public string PositionStr {
-			//get { return GetDataBindItem<string>("Title").Value; }
-			//private set { GetDataBindItem<string>("Title").Value = value; }
-			get => _PositionStr;
-			set {
-				if (_PositionStr == value)
-					return;
-				_PositionStr = value;
-				RaisePropertyChanged("PositionStr");
-			}
-		}
+            //get { return GetDataBindItem<string>("Title").Value; }
+            //private set { GetDataBindItem<string>("Title").Value = value; }
+            get => _PositionStr;
+            set {
+                if (_PositionStr == value)
+                    return;
+                _PositionStr = value;
+                RaisePropertyChanged("PositionStr");
+            }
+        }
 
-		private double _SliderValue;
-		/// <summary>
-		/// スライダー位置 
-		/// </summary>
-		public double SliderValue {
-			get => _SliderValue;
-			set {
-				if (_SliderValue == value)
-					return;
-				_SliderValue = value;
-				//if (axWmp != null) {
-				//	_timer.Stop();
-				//	axWmp.SetPlayPosition(value);
-				//	_timer.Start();
-				//}
-				RaisePropertyChanged("SliderValue");
-			}
-		}
+        private double _SliderValue;
+        /// <summary>
+        /// スライダー位置 
+        /// </summary>
+        public double SliderValue {
+            get => _SliderValue;
+            set {
+                string TAG = "SliderValue(set)";
+                string dbMsg = "";
+                try {
+                    dbMsg += "value=" + value;
+                    if (_SliderValue == value)
+                        return;
+                    _SliderValue = value;
+                    //if (axWmp != null) {
+                    //	_timer.Stop();
+                    //	axWmp.SetPlayPosition(value);
+                    //	_timer.Start();
+                    //}
+                    RaisePropertyChanged("SliderValue");
+                    //                  MyLog(TAG, dbMsg);
+                } catch (Exception er) {
+                    MyErrorLog(TAG, dbMsg, er);
+                }
+            }
+        }
 
 
         private ImageBrush _PlayBtImageSource;
@@ -275,16 +290,16 @@ namespace M3UPlayer.ViewModels
             }
         }
 
-		BitmapImage playImage;
-		BitmapImage pouseImage;
+        BitmapImage playImage;
+        BitmapImage pouseImage;
 
         private bool _IsPlaying;
-		/// <summary>
-		/// 再生中
-		/// </summary>
-		public bool IsPlaying {
-			get => _IsPlaying;
-			set {
+        /// <summary>
+        /// 再生中
+        /// </summary>
+        public bool IsPlaying {
+            get => _IsPlaying;
+            set {
                 string TAG = "IsPlaying(set)";
                 string dbMsg = "";
                 try {
@@ -294,7 +309,7 @@ namespace M3UPlayer.ViewModels
                     _IsPlaying = value;
                     RaisePropertyChanged("IsPlaying");
                     dbMsg += ">>IsPlaying==" + IsPlaying;
-					if (IsPlaying) {
+                    if (IsPlaying) {
                         MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
                         MyView.PlayBtImage.Source = pouseImage;
                     } else {
@@ -302,87 +317,87 @@ namespace M3UPlayer.ViewModels
                         MyView.PlayBtImage.Source = playImage;
                     }
                     RaisePropertyChanged("PlayBtImageSource");
-					//         dbMsg += ">>PlayBtImageSource==" + PlayBtImageSource.ToString();
-					MyLog(TAG, dbMsg);
+                    //         dbMsg += ">>PlayBtImageSource==" + PlayBtImageSource.ToString();
+                    MyLog(TAG, dbMsg);
                 } catch (Exception er) {
                     MyErrorLog(TAG, dbMsg, er);
                 }
-			}
-		}
+            }
+        }
 
 
 
 
         private int _SoundValue;
-		/// <summary>
-		/// 音量
-		/// </summary>
-		public int SoundValue {
-			get => _SoundValue;
-			set {
-				if (_SoundValue == value)
-					return;
-				_SoundValue = value;
-				//if (axWmp != null) {
-				//	axWmp.SetVolume(value);
-				//}
-				RaisePropertyChanged("SoundValue");
-			}
-		}
+        /// <summary>
+        /// 音量
+        /// </summary>
+        public int SoundValue {
+            get => _SoundValue;
+            set {
+                if (_SoundValue == value)
+                    return;
+                _SoundValue = value;
+                //if (axWmp != null) {
+                //	axWmp.SetVolume(value);
+                //}
+                RaisePropertyChanged("SoundValue");
+            }
+        }
 
-		private bool _IsMute;
-		/// <summary>
-		/// 消音
-		/// </summary>
-		public bool IsMute {
-			get => _IsMute;
-			set {
-				if (_IsMute == value)
-					return;
-				_IsMute = value;
-				RaisePropertyChanged("IsMute");
-			}
-		}
+        private bool _IsMute;
+        /// <summary>
+        /// 消音
+        /// </summary>
+        public bool IsMute {
+            get => _IsMute;
+            set {
+                if (_IsMute == value)
+                    return;
+                _IsMute = value;
+                RaisePropertyChanged("IsMute");
+            }
+        }
 
-		///// <summary>
-		///// 選択されている
-		///// </summary>
-		//public string PlsyListFileURL;
-		public string ComboLastItemKey = "AddNew";
+        ///// <summary>
+        ///// 選択されている
+        ///// </summary>
+        //public string PlsyListFileURL;
+        public string ComboLastItemKey = "AddNew";
         public string ComboLastItemVal = "新規リスト";
-		private int _ListItemCount;
+        private int _ListItemCount;
         /// <summary>
         /// プレイリストの登録件数。
         /// 0で無ければコンテキストメニューも各アイテムを有効にする。
         /// </summary>
 		public int ListItemCount {
-			get { return _ListItemCount; }
-			set { if (_ListItemCount == value)
-					return;
-					_ListItemCount = value;
-				if (0<value) {
-					PlayListItemViewExplore.IsEnabled = true;
-					PlayListItemMove.IsEnabled = true;
-					PlayListDeleteCannotRead.IsEnabled = true;
-					PlayListDeleteDoubling.IsEnabled = true;
+            get { return _ListItemCount; }
+            set {
+                if (_ListItemCount == value)
+                    return;
+                _ListItemCount = value;
+                if (0 < value) {
+                    PlayListItemViewExplore.IsEnabled = true;
+                    PlayListItemMove.IsEnabled = true;
+                    PlayListDeleteCannotRead.IsEnabled = true;
+                    PlayListDeleteDoubling.IsEnabled = true;
                     PlayListItemRemove.IsEnabled = true;
                     PlayListSaveRoot.IsEnabled = true;
-				} else {
-					PlayListItemViewExplore.IsEnabled = false;
-					PlayListItemMove.IsEnabled = false;
-					PlayListDeleteCannotRead.IsEnabled = false;
-					PlayListDeleteDoubling.IsEnabled = false;
+                } else {
+                    PlayListItemViewExplore.IsEnabled = false;
+                    PlayListItemMove.IsEnabled = false;
+                    PlayListDeleteCannotRead.IsEnabled = false;
+                    PlayListDeleteDoubling.IsEnabled = false;
                     PlayListItemRemove.IsEnabled = false;
                 }
             }
-		}
+        }
         #region 設定ファイルの項目
         public string[] PlayLists;
         /// <summary>
         /// 登録されたプレイリストファイルのリスト文字列
         /// </summary>
-        public string PlayListStr
-        {
+        public string PlayListStr {
             get { return Properties.Settings.Default.PlayListStr; }
             set { Properties.Settings.Default.PlayListStr = value; }
         }
@@ -390,31 +405,30 @@ namespace M3UPlayer.ViewModels
         /// 選択されているファイルのURL
         /// 常にSettingsから読み出し、更新される
         /// </summary>
-        public string CurrentPlayListFileName
-        {
+        public string CurrentPlayListFileName {
             get { return Properties.Settings.Default.CurrentPlayListFileName; }
             set {
-				    if (value.Contains(".m3u")) {
-                        Properties.Settings.Default.CurrentPlayListFileName = value;
-                    }
+                if (value.Contains(".m3u")) {
+                    Properties.Settings.Default.CurrentPlayListFileName = value;
+                }
             }
         }
 
         private string _PlayListComboSelected;
-       /// <summary>
-       /// 選択jされたプレイリストファイル
-       /// </summary>
+        /// <summary>
+        /// 選択jされたプレイリストファイル
+        /// </summary>
         public string PlayListComboSelected {
             get => _PlayListComboSelected;
             set {
                 if (_PlayListComboSelected == value)
                     return;
-                    _PlayListComboSelected = value;
-                    RaisePropertyChanged("PlayListComboSelected");
-                }
+                _PlayListComboSelected = value;
+                RaisePropertyChanged("PlayListComboSelected");
             }
+        }
 
-   //     public WsbViewModel WVM;
+        //     public WsbViewModel WVM;
         private Uri _TargetURI;
         /// <summary>
         /// webViewのSource
@@ -443,16 +457,14 @@ namespace M3UPlayer.ViewModels
         /// <summary>
         /// 最後に再生したメディアファイルの再生ポジション
         /// </summary>
-        public TimeSpan NowSelectedPosition
-        {
+        public TimeSpan NowSelectedPosition {
             get { return Properties.Settings.Default.NowSelectedPosition; }
             set { Properties.Settings.Default.NowSelectedPosition = value; }
         }
         /// <summary>
         /// フルスクリーンで起動するか
         /// </summary>
-        public bool IsFullScreen
-        {
+        public bool IsFullScreen {
             get { return Properties.Settings.Default.IsFullScreen; }
             set { Properties.Settings.Default.IsFullScreen = value; }
         }
@@ -462,64 +474,64 @@ namespace M3UPlayer.ViewModels
                                               "mpa",".mpe",".webm",  ".ogv",".3gp",  ".3g2",  ".asf",  ".asx",
                                                 ".dvr-ms",".ivf",".wax",".wmv", ".wvx",  ".wm",  ".wmx",  ".wmz",
                                              };
-		public string[] WebVideo = new string[] { ".webm", ".3gp",  ".rm",".dvr-ms",".ivf"};
-		public string[] FlashVideo = new string[] { ".flv", ".f4v", ".swf"};
-		#endregion
+        public string[] WebVideo = new string[] { ".webm", ".3gp", ".rm", ".dvr-ms", ".ivf" };
+        public string[] FlashVideo = new string[] { ".flv", ".f4v", ".swf" };
+        #endregion
 
-		public string FrameSource { get; set; }
-		public object FrameDataContext { get; set; }
-		/// <summary>
-		/// EXPLORERのプロセス
-		/// </summary>
-		public System.Diagnostics.Process pEXPLORER;
-		public double VWidth = 960;
-		public double VHeight = 540;
+        public string FrameSource { get; set; }
+        public object FrameDataContext { get; set; }
+        /// <summary>
+        /// EXPLORERのプロセス
+        /// </summary>
+        public System.Diagnostics.Process pEXPLORER;
+        public double VWidth = 960;
+        public double VHeight = 540;
 
-		/// <summary>
-		/// メイン画面
-		/// </summary>
-		public MainViewModel(){
-					Initialize();
-				}
+        /// <summary>
+        /// メイン画面
+        /// </summary>
+        public MainViewModel() {
+            Initialize();
+        }
 
 
         /// <summary>
         /// 起動メソッド
         /// </summary>
-        public void Initialize(){
+        public void Initialize() {
             string TAG = "Initialize";
             string dbMsg = "";
-            try{
+            try {
                 MakePlayListMenu();
-				PlayListItemViewExplore.IsEnabled = false;
-				PlayListItemMove.IsEnabled = false;
-				PlayListDeleteCannotRead.IsEnabled = false;
-				PlayListDeleteDoubling.IsEnabled = false;
-				PLList = new ObservableCollection<PlayListModel>();
-				pouseImage = new BitmapImage(new Uri("/views/pousebtn.png", UriKind.Relative));
+                PlayListItemViewExplore.IsEnabled = false;
+                PlayListItemMove.IsEnabled = false;
+                PlayListDeleteCannotRead.IsEnabled = false;
+                PlayListDeleteDoubling.IsEnabled = false;
+                PLList = new ObservableCollection<PlayListModel>();
+                pouseImage = new BitmapImage(new Uri("/views/pousebtn.png", UriKind.Relative));
                 playImage = new BitmapImage(new Uri("/views/pl_r_btn.png", UriKind.Relative));
-    //            pouseBrush = new ImageBrush(pouseImage);
-				//playBrush = new ImageBrush(playImage);
+                //            pouseBrush = new ImageBrush(pouseImage);
+                //playBrush = new ImageBrush(playImage);
                 // ICommandの場合
                 //	EditCommand = CreateCommand(t_events => MyDoubleClickCommand(t_events));
                 dbMsg += ",CurrentPlayListFileName=" + CurrentPlayListFileName;
                 PLComboSource = new Dictionary<string, string>();
-         //       PLComboSelectedItem = new List<string>();
+                //       PLComboSelectedItem = new List<string>();
                 AddPlayListCombo("");
                 MakePlayListComboMenu();
-				dbMsg += "[" + VWidth + "×" + VHeight + "]";
-				if (CurrentPlayListFileName.Contains(".M3u")) {
-					ListUpFiles(CurrentPlayListFileName);
-					//PlayListsからCurrentPlayListFileNameのインデックスを取得
-					int listIndex = Array.IndexOf(PlayLists, CurrentPlayListFileName);
-					PLComboSelectedIndex = listIndex;
-				} else if(0 <= PlayLists.Length) {
+                dbMsg += "[" + VWidth + "×" + VHeight + "]";
+                if (CurrentPlayListFileName.Contains(".M3u")) {
+                    ListUpFiles(CurrentPlayListFileName);
+                    //PlayListsからCurrentPlayListFileNameのインデックスを取得
+                    int listIndex = Array.IndexOf(PlayLists, CurrentPlayListFileName);
+                    PLComboSelectedIndex = listIndex;
+                } else if (0 <= PlayLists.Length) {
                     PLComboSelectedIndex = 0;
                 }
                 dbMsg += ",NowSelectedFile=" + NowSelectedFile;
-				dbMsg += " [" + NowSelectedPosition + "]";
-				PlayListSaveRoot.IsEnabled = false;
-				RaisePropertyChanged("PlayListSaveBTVisble");
+                dbMsg += " [" + NowSelectedPosition + "]";
+                PlayListSaveRoot.IsEnabled = false;
+                RaisePropertyChanged("PlayListSaveBTVisble");
                 PlayListSelectionMode = "Extended";
                 RaisePropertyChanged("PlayListSelectionMode");
                 Drag_now = false;
@@ -529,7 +541,7 @@ namespace M3UPlayer.ViewModels
 
                 //      WVM = new WsbViewModel();
                 MyLog(TAG, dbMsg);
-            } catch (Exception er){
+            } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
@@ -539,24 +551,23 @@ namespace M3UPlayer.ViewModels
         /// 終了前イベントのメソッド
         /// </summary>
         public void BeforeClose() {
-			string TAG = "BeforeClose";
-			string dbMsg = "";
-			try {
-				if (PlayListSaveBTVisble != null) {
+            string TAG = "BeforeClose";
+            string dbMsg = "";
+            try {
+                if (PlayListSaveBTVisble != null) {
                     if (PlayListSaveBTVisble.Equals("Visible")) {
                         IsDoSavePlayList(false);
                     }
                 }
             } catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
         /// <summary>
         /// webVeiw2の初期設定
         /// </summary>
-		public void CallWeb()
-        {
+		public void CallWeb() {
             string TAG = "CallWeb";
             string dbMsg = "";
             try {
@@ -581,28 +592,21 @@ namespace M3UPlayer.ViewModels
         /// <param name="emCord"></param>
         /// <returns></returns>
         /// テキスト系ファイルの読込み	http://www.atmarkit.co.jp/ait/articles/0306/13/news003.html
-        private string ReadTextFile(string fileName, string emCord)
-        {
+        private string ReadTextFile(string fileName, string emCord) {
             string TAG = "[ReadTextFile]";
             string dbMsg = TAG;
             string retStr = "";
-            try
-            {
+            try {
                 dbMsg += ",fileName=" + fileName + ",emCord=" + emCord;
                 StreamReader sr;
-                if (emCord != null)
-                {               //エンコードが省略されるとUTF-8で読み込まれる
+                if (emCord != null) {               //エンコードが省略されるとUTF-8で読み込まれる
                     sr = new StreamReader(fileName);
-                }
-                else
-                {
+                } else {
                     sr = new StreamReader(fileName, Encoding.GetEncoding(emCord));
                 }
                 retStr = sr.ReadToEnd();                                                        //内容をすべて読み込む
                 sr.Close();                                                                     //閉じる☆必須
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 Console.WriteLine(TAG + "でエラー発生" + e.Message + ";" + dbMsg);
             }
             MyLog(TAG, dbMsg);
@@ -616,35 +620,31 @@ namespace M3UPlayer.ViewModels
         private void ListUpFiles(string FileURL) {
             string TAG = "ListUpFiles";
             string dbMsg = "";
-            try
-            {
+            try {
                 dbMsg += "、FileURL=" + FileURL;
                 string rText = ReadTextFile(FileURL, "UTF-8"); //"Shift_JIS"では文字化け発生
                 string[] delimiter = { "\r\n" };
                 string[] Strs = rText.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
-                PLList =new ObservableCollection<PlayListModel>();
+                PLList = new ObservableCollection<PlayListModel>();
                 var list = new List<string>();
                 list.AddRange(videoFiles);
-                foreach (string item in Strs)
-                {
-                    dbMsg += "\r\n"+ item;
+                foreach (string item in Strs) {
+                    dbMsg += "\r\n" + item;
                     //拡張部分を破棄してURLを読み出す
                     string[] items = item.Split(',');
                     string url = items[0];
-					PlayListModel playListModel = MakeOneItem(url);
-					if (playListModel.UrlStr != null) {
-						PLList.Add(playListModel);
-					}
-				}
+                    PlayListModel playListModel = MakeOneItem(url);
+                    if (playListModel.UrlStr != null) {
+                        PLList.Add(playListModel);
+                    }
+                }
                 RaisePropertyChanged("PLList");
-                ListItemCount=PLList.Count();
+                ListItemCount = PLList.Count();
                 RaisePropertyChanged("ListItemCount");
                 dbMsg += "\r\n" + ListItemCount + "件";
 
                 MyLog(TAG, dbMsg);
-            }
-            catch (Exception er)
-            {
+            } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
 
@@ -656,17 +656,17 @@ namespace M3UPlayer.ViewModels
         /// <param name="item"></param>
         /// <returns></returns>
         private PlayListModel MakeOneItem(string item) {
-			string TAG = "MakeOneItem";
-			string dbMsg = "";
-			PlayListModel playListModel = new PlayListModel();
-			try {
-				dbMsg += "、FileURL=" + item;
-				string url = item;
+            string TAG = "MakeOneItem";
+            string dbMsg = "";
+            PlayListModel playListModel = new PlayListModel();
+            try {
+                dbMsg += "、FileURL=" + item;
+                string url = item;
                 //拡張部分を破棄してURLを読み出す
                 string[] items = item.Split(',');
-				if (1 < items.Length) {
-					url = items[0];
-				}
+                if (1 < items.Length) {
+                    url = items[0];
+                }
                 playListModel.UrlStr = item;
                 dbMsg += ">UrlStr=" + playListModel.UrlStr;
                 dbMsg += ",fileName=" + playListModel.fileName;
@@ -677,11 +677,11 @@ namespace M3UPlayer.ViewModels
                 dbMsg += ",extention=" + playListModel.extentionStr;
 
                 MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-			return playListModel;
-		}
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+            return playListModel;
+        }
 
         /// <summary>
         /// ファイル名配列からプレイリストに一連登録
@@ -689,229 +689,229 @@ namespace M3UPlayer.ViewModels
         /// <param name="files">追加するファイル配列</param>
         /// <param name="InsertTo">挿入位置</param>
         /// ShowFolderDlogの時は
-        public void FilesAdd(string[] files , int InsertTo) {
-			string TAG = "FilesAdd";
-			string dbMsg = "";
-			try {
-				dbMsg += ",files=" + files.Length + "件";
-				dbMsg += ">PLList>" + PLList.Count + "件";
-				foreach (string url in files) {
-					dbMsg += "\r\n" + url;
-					if (File.Exists(url)) {
-						PlayListModel playListModel = MakeOneItem(url);
-						if (playListModel.UrlStr != null) {
-							if (InsertTo == -1) {
-								PLList.Add(playListModel);
-							} else {
-								PLList.Insert(InsertTo, playListModel);
-							}
-						}
-					} else if (Directory.Exists(url)) {
-						//フォルダなら中身の全ファイルで再起する
-						string[] rfiles = System.IO.Directory.GetFiles(url , "*", SearchOption.AllDirectories);
-						FilesAdd(files, InsertTo);
-					}
-				}
-				RaisePropertyChanged("PLList");
-				ListItemCount = PLList.Count();
-				RaisePropertyChanged("ListItemCount");
-				dbMsg += "\r\n" + ListItemCount + "件";
+        public void FilesAdd(string[] files, int InsertTo) {
+            string TAG = "FilesAdd";
+            string dbMsg = "";
+            try {
+                dbMsg += ",files=" + files.Length + "件";
+                dbMsg += ">PLList>" + PLList.Count + "件";
+                foreach (string url in files) {
+                    dbMsg += "\r\n" + url;
+                    if (File.Exists(url)) {
+                        PlayListModel playListModel = MakeOneItem(url);
+                        if (playListModel.UrlStr != null) {
+                            if (InsertTo == -1) {
+                                PLList.Add(playListModel);
+                            } else {
+                                PLList.Insert(InsertTo, playListModel);
+                            }
+                        }
+                    } else if (Directory.Exists(url)) {
+                        //フォルダなら中身の全ファイルで再起する
+                        string[] rfiles = System.IO.Directory.GetFiles(url, "*", SearchOption.AllDirectories);
+                        FilesAdd(files, InsertTo);
+                    }
+                }
+                RaisePropertyChanged("PLList");
+                ListItemCount = PLList.Count();
+                RaisePropertyChanged("ListItemCount");
+                dbMsg += "\r\n" + ListItemCount + "件";
                 //変更されたプレイリストを変更させる
                 IsDoSavePlayList(true);
                 MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
-		/// <summary>
-		/// プレイリストに1ファイルづつ追加する。
-		/// 0で先頭、-1で最後に追加
-		/// </summary>
-		/// <param name="FilsName"></param>
-		/// <param name="InsertTo"></param>
-		public bool AddToPlayList(string url, int InsertTo) {
-			string TAG = "AddToPlayList";
-			string dbMsg = "";
-			bool retBool = false;
-			try {
+        /// <summary>
+        /// プレイリストに1ファイルづつ追加する。
+        /// 0で先頭、-1で最後に追加
+        /// </summary>
+        /// <param name="FilsName"></param>
+        /// <param name="InsertTo"></param>
+        public bool AddToPlayList(string url, int InsertTo) {
+            string TAG = "AddToPlayList";
+            string dbMsg = "";
+            bool retBool = false;
+            try {
 
-				string extention = System.IO.Path.GetExtension(NowSelectedFile);
-				if (-1 < Array.IndexOf(videoFiles, extention)) {
-					//if (InsertTo == -1) {
-					//	InsertTo = ListItemCount;
-					//}
-					dbMsg += "[" + InsertTo + "/" + ListItemCount + "番目]" + url;
-					PlayListModel playListModel = MakeOneItem(url);
-					if (InsertTo == -1) {
-						PLList.Add(playListModel);
-					} else {
-						PLList.Insert(InsertTo, playListModel);
-					}
+                string extention = System.IO.Path.GetExtension(NowSelectedFile);
+                if (-1 < Array.IndexOf(videoFiles, extention)) {
+                    //if (InsertTo == -1) {
+                    //	InsertTo = ListItemCount;
+                    //}
+                    dbMsg += "[" + InsertTo + "/" + ListItemCount + "番目]" + url;
+                    PlayListModel playListModel = MakeOneItem(url);
+                    if (InsertTo == -1) {
+                        PLList.Add(playListModel);
+                    } else {
+                        PLList.Insert(InsertTo, playListModel);
+                    }
 
-					//if (playListModel.UrlStr != null) {
-					//	PLList.Insert(InsertTo, playListModel);
-					//}
-					RaisePropertyChanged("PLList");
-					ListItemCount = PLList.Count();
-					RaisePropertyChanged("ListItemCount");
-					dbMsg += "\r\n" + ListItemCount + "件";
-					retBool = true;
+                    //if (playListModel.UrlStr != null) {
+                    //	PLList.Insert(InsertTo, playListModel);
+                    //}
+                    RaisePropertyChanged("PLList");
+                    ListItemCount = PLList.Count();
+                    RaisePropertyChanged("ListItemCount");
+                    dbMsg += "\r\n" + ListItemCount + "件";
+                    retBool = true;
                     IsDoSavePlayList(false);
                 } else {
-					dbMsg += ">>映像ではない";
-				}
+                    dbMsg += ">>映像ではない";
+                }
 
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-			return retBool;
-		}
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+            return retBool;
+        }
 
 
-		//        /// <summary>
-		//        /// 指定フォルダ内の指定TypeファイルをPlayListにリストアップ
-		//        /// </summary>
-		//        /// <param name="carrentDir"></param>
-		//        /// <param name="type"></param>
-		//        /// <returns></returns>
-		//        /// 呼出し元	SetPlayListItems
-		//        private List<PlayListItems> ListUpFiles(string carrentDir, string type)
-		//        {
-		//            string TAG = "[ListUpFiles]";
-		//            string dbMsg = TAG;
-		//            try
-		//            {
-		//                dbMsg += "carrentDir=" + carrentDir + ",type=" + type;
-		//                string sarchDir = carrentDir;
-		//                DirectoryInfo di = new DirectoryInfo(sarchDir);
-		//                if (carrentDir == di.Root.ToString())
-		//                {
-		//                    string MessageStr = "ドライブルートです。\n時間が掛かるかもしれませんが構いませんか？";
-		//                    DialogResult result = MessageBox.Show(MessageStr,
-		//                        sarchDir + "から" + type + "の抽出",
-		//                        MessageBoxButtons.OKCancel,
-		//                        MessageBoxIcon.Exclamation,
-		//                        MessageBoxDefaultButton.Button1);                   //メッセージボックスを表示する
-		//                    if (result == DialogResult.Cancel)
-		//                    {                   //何が選択されたか調べる
-		//                        dbMsg += "「Cancel」が選択されました";
-		//                        return null;
-		//                    }
-		//                }
-		//                string[] files = Directory.GetFiles(sarchDir);
-		//                int listCount = -1;
-		//                int tCount = 0;
-		//                int nowCount = PlayListBoxItem.Count;
-		//                dbMsg += "/PlayListBoxItem; " + PlayListBoxItem.Count + "件";
-		//                string wrTitol = "";
-		//                int nowToTal = CurrentItemCount(sarchDir);      // サブディレクトリ内のファイルもカウントする場合	, SearchOption.AllDirectories
-		//                dbMsg += ",このデレクトリには" + nowToTal + "件";
-		//                int barMax = progressBar1.Maximum;
-		//                dbMsg += ",progressMax=" + barMax + "件";
-		//                if (barMax < nowToTal)
-		//                {
-		//                    progressBar1.Maximum = nowToTal;
-		//                    ProgressMaxLabel.Text = progressBar1.Maximum.ToString();        //Max
-		//                    ProgressMaxLabel.Update();
-		//                }
-		//                if (files != null)
-		//                {
-		//                    dbMsg += "ファイル=" + files.Length + "件";
-		//                    foreach (string plFileName in files)
-		//                    {
-		//                        listCount++;
-		//                        dbMsg += "\n(" + listCount + ")" + plFileName;
-		//                        string[] pathStrs = plFileName.Split(Path.DirectorySeparatorChar);
-		//                        System.IO.FileAttributes attr = System.IO.File.GetAttributes(plFileName);
-		//                        dbMsg += ",attr=" + attr;
-		//                        if ((attr & System.IO.FileAttributes.Hidden) == System.IO.FileAttributes.Hidden)
-		//                        {
-		//                            dbMsg += ">>Hidden";
-		//                        }
-		//                        else if ((attr & System.IO.FileAttributes.System) == System.IO.FileAttributes.System)
-		//                        {
-		//                            dbMsg += ">>System";
-		//                        }
-		//                        else
-		//                        {
-		//                            string[] extStrs = plFileName.Split('.');
-		//                            string extentionStr = "." + extStrs[extStrs.Length - 1].ToLower();
-		//                            dbMsg += "拡張子=" + extentionStr;
-		//                            if (type == "video" && 0 < Array.IndexOf(videoFiles, extentionStr) ||
-		//                                type == "audio" && 0 < Array.IndexOf(audioFiles, extentionStr)
-		//                                )
-		//                            {
-		//                                string wrPathStr = plFileName.Replace((":" + Path.DirectorySeparatorChar), ":" + Path.DirectorySeparatorChar + Path.DirectorySeparatorChar);
-		//                                wrPathStr = checKLocalFile(wrPathStr);
-		//                                dbMsg += "Path=" + wrPathStr;
-		//                                wrTitol = Path2titol(wrPathStr);
-		//                                dbMsg += ",Titol=" + wrTitol;
-		//                                PlayListItems pli = new PlayListItems(wrTitol, wrPathStr);
-		//                                PlayListBoxItem.Add(pli);
-		//                                tCount = Int32.Parse(targetCountLabel.Text) + 1;
-		//                                targetCountLabel.Text = tCount.ToString();                    //確認
-		//                                targetCountLabel.Update();
-		//                                prgMessageLabel.Text = pathStrs[pathStrs.Length - 1];
-		//                                prgMessageLabel.Update();
-		//                            }
-		//                        }
+        //        /// <summary>
+        //        /// 指定フォルダ内の指定TypeファイルをPlayListにリストアップ
+        //        /// </summary>
+        //        /// <param name="carrentDir"></param>
+        //        /// <param name="type"></param>
+        //        /// <returns></returns>
+        //        /// 呼出し元	SetPlayListItems
+        //        private List<PlayListItems> ListUpFiles(string carrentDir, string type)
+        //        {
+        //            string TAG = "[ListUpFiles]";
+        //            string dbMsg = TAG;
+        //            try
+        //            {
+        //                dbMsg += "carrentDir=" + carrentDir + ",type=" + type;
+        //                string sarchDir = carrentDir;
+        //                DirectoryInfo di = new DirectoryInfo(sarchDir);
+        //                if (carrentDir == di.Root.ToString())
+        //                {
+        //                    string MessageStr = "ドライブルートです。\n時間が掛かるかもしれませんが構いませんか？";
+        //                    DialogResult result = MessageBox.Show(MessageStr,
+        //                        sarchDir + "から" + type + "の抽出",
+        //                        MessageBoxButtons.OKCancel,
+        //                        MessageBoxIcon.Exclamation,
+        //                        MessageBoxDefaultButton.Button1);                   //メッセージボックスを表示する
+        //                    if (result == DialogResult.Cancel)
+        //                    {                   //何が選択されたか調べる
+        //                        dbMsg += "「Cancel」が選択されました";
+        //                        return null;
+        //                    }
+        //                }
+        //                string[] files = Directory.GetFiles(sarchDir);
+        //                int listCount = -1;
+        //                int tCount = 0;
+        //                int nowCount = PlayListBoxItem.Count;
+        //                dbMsg += "/PlayListBoxItem; " + PlayListBoxItem.Count + "件";
+        //                string wrTitol = "";
+        //                int nowToTal = CurrentItemCount(sarchDir);      // サブディレクトリ内のファイルもカウントする場合	, SearchOption.AllDirectories
+        //                dbMsg += ",このデレクトリには" + nowToTal + "件";
+        //                int barMax = progressBar1.Maximum;
+        //                dbMsg += ",progressMax=" + barMax + "件";
+        //                if (barMax < nowToTal)
+        //                {
+        //                    progressBar1.Maximum = nowToTal;
+        //                    ProgressMaxLabel.Text = progressBar1.Maximum.ToString();        //Max
+        //                    ProgressMaxLabel.Update();
+        //                }
+        //                if (files != null)
+        //                {
+        //                    dbMsg += "ファイル=" + files.Length + "件";
+        //                    foreach (string plFileName in files)
+        //                    {
+        //                        listCount++;
+        //                        dbMsg += "\n(" + listCount + ")" + plFileName;
+        //                        string[] pathStrs = plFileName.Split(Path.DirectorySeparatorChar);
+        //                        System.IO.FileAttributes attr = System.IO.File.GetAttributes(plFileName);
+        //                        dbMsg += ",attr=" + attr;
+        //                        if ((attr & System.IO.FileAttributes.Hidden) == System.IO.FileAttributes.Hidden)
+        //                        {
+        //                            dbMsg += ">>Hidden";
+        //                        }
+        //                        else if ((attr & System.IO.FileAttributes.System) == System.IO.FileAttributes.System)
+        //                        {
+        //                            dbMsg += ">>System";
+        //                        }
+        //                        else
+        //                        {
+        //                            string[] extStrs = plFileName.Split('.');
+        //                            string extentionStr = "." + extStrs[extStrs.Length - 1].ToLower();
+        //                            dbMsg += "拡張子=" + extentionStr;
+        //                            if (type == "video" && 0 < Array.IndexOf(videoFiles, extentionStr) ||
+        //                                type == "audio" && 0 < Array.IndexOf(audioFiles, extentionStr)
+        //                                )
+        //                            {
+        //                                string wrPathStr = plFileName.Replace((":" + Path.DirectorySeparatorChar), ":" + Path.DirectorySeparatorChar + Path.DirectorySeparatorChar);
+        //                                wrPathStr = checKLocalFile(wrPathStr);
+        //                                dbMsg += "Path=" + wrPathStr;
+        //                                wrTitol = Path2titol(wrPathStr);
+        //                                dbMsg += ",Titol=" + wrTitol;
+        //                                PlayListItems pli = new PlayListItems(wrTitol, wrPathStr);
+        //                                PlayListBoxItem.Add(pli);
+        //                                tCount = Int32.Parse(targetCountLabel.Text) + 1;
+        //                                targetCountLabel.Text = tCount.ToString();                    //確認
+        //                                targetCountLabel.Update();
+        //                                prgMessageLabel.Text = pathStrs[pathStrs.Length - 1];
+        //                                prgMessageLabel.Update();
+        //                            }
+        //                        }
 
-		//                        int checkCount = Int32.Parse(progCountLabel.Text) + 1;                          //pDialog.GetProgValue() + 1;
-		//                        progCountLabel.Text = checkCount.ToString();                   //確認
-		//                        progCountLabel.Update();
-		//                        dbMsg += ",vCount=" + checkCount;
-		//                        if (progressBar1.Maximum < checkCount)
-		//                        {
-		//                            progressBar1.Maximum = checkCount + 10;
-		//                            ProgressMaxLabel.Text = progressBar1.Maximum.ToString();        //Max
-		//                            ProgressMaxLabel.Update();
-		//                        }
-		//                        progressBar1.Value = checkCount;
-		//                        progresPanel.Update();
-		//                        PlayListLabelWrigt(tCount.ToString(), plFileName);
-		//                        //	pDialog.RedrowPDialog(checkCount.ToString(),  maxvaluestr, nowCount.ToString(), wrTitol);   保留；プログレスダイアログ更新
-		//                    }
-		//                }
-		//                string[] folderes = Directory.GetDirectories(sarchDir);//
-		//                if (folderes != null)
-		//                {
-		//                    foreach (string directoryName in folderes)
-		//                    {
-		//                        System.IO.FileAttributes attr = System.IO.File.GetAttributes(sarchDir);
-		//                        dbMsg += ",attr=" + attr;
-		//                        if (-1 < directoryName.IndexOf("RECYCLE", StringComparison.OrdinalIgnoreCase) ||
-		//                            -1 < directoryName.IndexOf("System Vol", StringComparison.OrdinalIgnoreCase) ||
-		//                            (attr & System.IO.FileAttributes.System) == System.IO.FileAttributes.System ||
-		//                            (attr & System.IO.FileAttributes.Hidden) == System.IO.FileAttributes.Hidden
-		//                            )
-		//                        {
-		//                        }
-		//                        else
-		//                        {
-		//                            string rdirectoryName = directoryName.Replace(sarchDir, "");// + 
-		//                            rdirectoryName = rdirectoryName.Replace(Path.DirectorySeparatorChar + "", "");
-		//                            dbMsg += ",foler=" + rdirectoryName;
-		//                            ListUpFiles(directoryName, type);        //再帰
-		//                        }
-		//                    }           //ListBox1に結果を表示する
-		//                }
-		//                //			MyLog(TAG, dbMsg);
-		//            }
-		//            catch (Exception er)
-		//            {
-		//                dbMsg += "<<以降でエラー発生>>" + er.Message;
-		//                MyLog(TAG, dbMsg);
-		//            }
-		//            return PlayListBoxItem;
-		//        }
+        //                        int checkCount = Int32.Parse(progCountLabel.Text) + 1;                          //pDialog.GetProgValue() + 1;
+        //                        progCountLabel.Text = checkCount.ToString();                   //確認
+        //                        progCountLabel.Update();
+        //                        dbMsg += ",vCount=" + checkCount;
+        //                        if (progressBar1.Maximum < checkCount)
+        //                        {
+        //                            progressBar1.Maximum = checkCount + 10;
+        //                            ProgressMaxLabel.Text = progressBar1.Maximum.ToString();        //Max
+        //                            ProgressMaxLabel.Update();
+        //                        }
+        //                        progressBar1.Value = checkCount;
+        //                        progresPanel.Update();
+        //                        PlayListLabelWrigt(tCount.ToString(), plFileName);
+        //                        //	pDialog.RedrowPDialog(checkCount.ToString(),  maxvaluestr, nowCount.ToString(), wrTitol);   保留；プログレスダイアログ更新
+        //                    }
+        //                }
+        //                string[] folderes = Directory.GetDirectories(sarchDir);//
+        //                if (folderes != null)
+        //                {
+        //                    foreach (string directoryName in folderes)
+        //                    {
+        //                        System.IO.FileAttributes attr = System.IO.File.GetAttributes(sarchDir);
+        //                        dbMsg += ",attr=" + attr;
+        //                        if (-1 < directoryName.IndexOf("RECYCLE", StringComparison.OrdinalIgnoreCase) ||
+        //                            -1 < directoryName.IndexOf("System Vol", StringComparison.OrdinalIgnoreCase) ||
+        //                            (attr & System.IO.FileAttributes.System) == System.IO.FileAttributes.System ||
+        //                            (attr & System.IO.FileAttributes.Hidden) == System.IO.FileAttributes.Hidden
+        //                            )
+        //                        {
+        //                        }
+        //                        else
+        //                        {
+        //                            string rdirectoryName = directoryName.Replace(sarchDir, "");// + 
+        //                            rdirectoryName = rdirectoryName.Replace(Path.DirectorySeparatorChar + "", "");
+        //                            dbMsg += ",foler=" + rdirectoryName;
+        //                            ListUpFiles(directoryName, type);        //再帰
+        //                        }
+        //                    }           //ListBox1に結果を表示する
+        //                }
+        //                //			MyLog(TAG, dbMsg);
+        //            }
+        //            catch (Exception er)
+        //            {
+        //                dbMsg += "<<以降でエラー発生>>" + er.Message;
+        //                MyLog(TAG, dbMsg);
+        //            }
+        //            return PlayListBoxItem;
+        //        }
 
-		#region プレイリスト選択コンボボックス
-		/// <summary>
-		/// プレイリスト選択コンボボックス
-		/// </summary>
-		public Dictionary<string, string> PLComboSource { get; set; }           //protectedにするとアウトブレークモードになる
+        #region プレイリスト選択コンボボックス
+        /// <summary>
+        /// プレイリスト選択コンボボックス
+        /// </summary>
+        public Dictionary<string, string> PLComboSource { get; set; }           //protectedにするとアウトブレークモードになる
         public IList<string> _pLComboSelectedItem;
         /// <summary>
         /// 選択されているプレイリストのアイテム
@@ -922,19 +922,19 @@ namespace M3UPlayer.ViewModels
                 string TAG = "PLComboSelectedItem(set)";
                 string dbMsg = "";
                 dbMsg += "[" + value + "]";
-                if (_pLComboSelectedItem == value || value== null)
+                if (_pLComboSelectedItem == value || value == null)
                     return;
                 _pLComboSelectedItem = value;
                 RaisePropertyChanged("PLComboSelectedItem");
-				CurrentPlayListFileName = value[0];
-				dbMsg += CurrentPlayListFileName;
-				Properties.Settings.Default.Save();
-				if (CurrentPlayListFileName.Equals(ComboLastItemKey)) {
-					MakeNewPlayListFile();
-				} else {
-					ListUpFiles(CurrentPlayListFileName);
-				}
-				MyLog(TAG, dbMsg);
+                CurrentPlayListFileName = value[0];
+                dbMsg += CurrentPlayListFileName;
+                Properties.Settings.Default.Save();
+                if (CurrentPlayListFileName.Equals(ComboLastItemKey)) {
+                    MakeNewPlayListFile();
+                } else {
+                    ListUpFiles(CurrentPlayListFileName);
+                }
+                MyLog(TAG, dbMsg);
             }
         }
         private int _plcomboselectedindex;
@@ -942,27 +942,26 @@ namespace M3UPlayer.ViewModels
         /// 選択されているプレイリストのインデックス
         /// ここで選択中のプレイリスト名も更新され、Settingsに登録される
         /// </summary>
-        public int PLComboSelectedIndex
-        {
+        public int PLComboSelectedIndex {
             get => _plcomboselectedindex;
             set {
                 string TAG = "PLComboSelectedIndex(set)";
                 string dbMsg = "";
                 dbMsg += "[" + value + "]";
                 if (_plcomboselectedindex == value || value < 0)
-					return;
-				_plcomboselectedindex = value;
-				RaisePropertyChanged("PLComboSelectedIndex");
-				KeyValuePair<string, string>[] items = PLComboSource.ToArray();
-				CurrentPlayListFileName = items[value].Key;
-				dbMsg += CurrentPlayListFileName;
-				Properties.Settings.Default.Save();
-				if (CurrentPlayListFileName.Equals(ComboLastItemKey)) {
-					MakeNewPlayListFile();
-				} else {
-					ListUpFiles(CurrentPlayListFileName);
-				}
-				MyLog(TAG, dbMsg);
+                    return;
+                _plcomboselectedindex = value;
+                RaisePropertyChanged("PLComboSelectedIndex");
+                KeyValuePair<string, string>[] items = PLComboSource.ToArray();
+                CurrentPlayListFileName = items[value].Key;
+                dbMsg += CurrentPlayListFileName;
+                Properties.Settings.Default.Save();
+                if (CurrentPlayListFileName.Equals(ComboLastItemKey)) {
+                    MakeNewPlayListFile();
+                } else {
+                    ListUpFiles(CurrentPlayListFileName);
+                }
+                MyLog(TAG, dbMsg);
             }
         }
 
@@ -1015,10 +1014,10 @@ namespace M3UPlayer.ViewModels
                 PLComboSource.Add(ComboLastItemKey, ComboLastItemVal);
                 RaisePropertyChanged("PLComboSource");
                 int listIndex = Array.IndexOf(PlayLists, CurrentPlayListFileName);
-				if (listIndex <0) {
-                    dbMsg += "リストに不在" ;
-					PLComboSelectedIndex = 0;       // PLComboSource.Count() - 1;
-				} else {
+                if (listIndex < 0) {
+                    dbMsg += "リストに不在";
+                    PLComboSelectedIndex = 0;       // PLComboSource.Count() - 1;
+                } else {
                     PLComboSelectedIndex = listIndex;
                 }
                 RaisePropertyChanged("PLComboSelectedIndex");
@@ -1040,15 +1039,15 @@ namespace M3UPlayer.ViewModels
             string TAG = "ReplacePlayListComboItem";
             string dbMsg = "";
             try {
-                dbMsg +="["+ tIndex + "/" + PLComboSource.Count() + "を" + AddFlieName + "に置き換える";
+                dbMsg += "[" + tIndex + "/" + PLComboSource.Count() + "を" + AddFlieName + "に置き換える";
                 //登録済みのPlayリストと照合
                 dbMsg += "、登録済み=" + PlayListStr;
                 PlayLists = PlayListStr.Split(',');
                 PlayListStr = "";
                 for (int i = 0; i < PlayLists.Length; ++i) {
-					if (tIndex == i) {
+                    if (tIndex == i) {
                         PlayListStr += AddFlieName;
-					} else {
+                    } else {
                         PlayListStr += PlayLists[i];
                     }
                 }
@@ -1156,12 +1155,10 @@ namespace M3UPlayer.ViewModels
         /// <summary>
         /// コンボボックスにコンテキストメニューを追加する
         /// </summary>
-        public void MakePlayListComboMenu()
-        {
+        public void MakePlayListComboMenu() {
             string TAG = "MakePlayListComboMenu";
             string dbMsg = "";
-            try
-            {
+            try {
                 PlayListComboItemMenu = new ContextMenu();
                 PlayListComboItemDelete = new MenuItem();
                 PlayListComboItemDelete.Header = "削除";
@@ -1171,9 +1168,7 @@ namespace M3UPlayer.ViewModels
                 RaisePropertyChanged("PlayListComboItemMenu");
                 MyLog(TAG, dbMsg);
                 //  Messenger.Raise(new WindowActionMessage(WindowAction.Close, "Close"));
-            }
-            catch (Exception er)
-            {
+            } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
@@ -1183,33 +1178,31 @@ namespace M3UPlayer.ViewModels
         /// </summary>
         /// https://rksoftware.wordpress.com/2015/06/13/combobox-%E3%81%AE-itemssource-%E3%81%A8-selectedvalue-%E3%81%AE%E4%B8%A1%E6%96%B9%E3%81%AB-binding-%E3%82%92%E3%81%99%E3%82%8B/
         /// 
-        private void PlayListComboItemDelete_Click(object sender, RoutedEventArgs e)
-        {
+        private void PlayListComboItemDelete_Click(object sender, RoutedEventArgs e) {
             string TAG = "PlayListComboItemDelete_Click";
             string dbMsg = "";
-            try
-            {
+            try {
                 string titolStr = "プレイリスト・コンボ：アイテムの削除";
                 string msgStr = "削除するプレイリストが選択されていないようです。\r\n削除したいプレイリストファイル名をクリックしてください。";
                 dbMsg += ",PlayListComboSelected= " + PlayListComboSelected;
-				if (PlayListComboSelected == null) {
-					MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.OK, MessageBoxImage.Error);
-					dbMsg += ",result=" + result;
-					return;
-				} else {
+                if (PlayListComboSelected == null) {
+                    MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.OK, MessageBoxImage.Error);
+                    dbMsg += ",result=" + result;
+                    return;
+                } else {
                     msgStr = PlayListComboSelected + "をコンボボックスから外しますか？\r\n（ファイルは削除しません。)";
                     MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.OKCancel, MessageBoxImage.Exclamation);
                     dbMsg += ",result=" + result;
-					if (result.Equals(MessageBoxResult.Cancel)) {
+                    if (result.Equals(MessageBoxResult.Cancel)) {
                         return;
                     }
                 }
                 //削除するアイテムを特定する  
-                dbMsg += ",現在のプレイリストは[ " + PLComboSelectedIndex +"]";
+                dbMsg += ",現在のプレイリストは[ " + PLComboSelectedIndex + "]";
                 CurrentPlayListFileName = PlayLists[PLComboSelectedIndex];
-                dbMsg +=  CurrentPlayListFileName;
-                if (!CurrentPlayListFileName.Equals(ComboLastItemKey)){
-                    if (PLComboSource.ContainsKey(CurrentPlayListFileName)){
+                dbMsg += CurrentPlayListFileName;
+                if (!CurrentPlayListFileName.Equals(ComboLastItemKey)) {
+                    if (PLComboSource.ContainsKey(CurrentPlayListFileName)) {
                         //Binding変更
                         PLComboSource.Remove(CurrentPlayListFileName);
                         RaisePropertyChanged("PLComboSource");
@@ -1217,9 +1210,9 @@ namespace M3UPlayer.ViewModels
                         string rPlayListStr = "";
                         string kVal = "";
 
-                        foreach (KeyValuePair<string, string> item in PLComboSource){
+                        foreach (KeyValuePair<string, string> item in PLComboSource) {
                             kVal = item.Key;
-                            if (!kVal.Equals(ComboLastItemKey)){
+                            if (!kVal.Equals(ComboLastItemKey)) {
                                 rPlayListStr += kVal;
                                 CurrentPlayListFileName = kVal;
                             }
@@ -1231,20 +1224,15 @@ namespace M3UPlayer.ViewModels
                         Properties.Settings.Default.Save();
                         AddPlayListCombo(CurrentPlayListFileName);
                         dbMsg += ",更新後のプレイリスト一覧＝ " + PlayListStr + "[" + PLComboSelectedIndex + "]" + CurrentPlayListFileName;
-                    } else
-                    {
+                    } else {
                         dbMsg += ",該当なし ";
                     }
-                }
-                else
-                {
+                } else {
                     dbMsg += ",固定メニュー";
                 }
 
                 MyLog(TAG, dbMsg);
-            }
-            catch (Exception er)
-            {
+            } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
@@ -1263,7 +1251,7 @@ namespace M3UPlayer.ViewModels
             string dbMsg = "";
             string retStr = "";
             try {
-				decimal sec = Decimal.Parse(secStr);
+                decimal sec = Decimal.Parse(secStr);
                 dbMsg += "、sec=" + sec;
                 var retH = Math.Floor(sec / 3600);
                 if (0 < retH) {
@@ -1292,7 +1280,7 @@ namespace M3UPlayer.ViewModels
                     retStr = retStr + "00";
                 }
                 dbMsg += "、retStr=" + retStr;
-      //          MyLog(TAG, dbMsg);
+                //MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
@@ -1310,10 +1298,12 @@ namespace M3UPlayer.ViewModels
                 //string rStr = await MyView.webView.ExecuteScriptAsync($"document.getElementById(" +'"' + "durationSP" + '"' + ").innerHTML;");
                 //dbMsg += "、rStr=" + rStr;
                 //if (0<rStr.Length) {
-                    string Duration = await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;");
-                    DurationStr = GetHMS(Duration);
-                    dbMsg += "、DurationStr=" + DurationStr;
-                    RaisePropertyChanged("DurationStr");
+                string Duration = await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;");
+                DurationStr = GetHMS(Duration);
+                dbMsg += "、DurationStr=" + DurationStr;
+                RaisePropertyChanged("DurationStr");
+                SliderMaximum = double.Parse(Duration);
+                RaisePropertyChanged("SliderMaximum");
                 //}
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
@@ -1357,8 +1347,9 @@ namespace M3UPlayer.ViewModels
                 //JavaScriptのaddEventListenerからpostMessageされた文字列を受け取る
                 var s = e.TryGetWebMessageAsString();
                 dbMsg += ",s=" + s;
-				if (s.Equals("ended")) {
+                if (s.Equals("ended")) {
                     dbMsg += "、再生終了";
+                    ForwardList();
                     MyLog(TAG, dbMsg);
                 } else {
                     //decimalに変換できれば（保留）再生ポジション
@@ -1366,7 +1357,9 @@ namespace M3UPlayer.ViewModels
                     PositionStr = GetHMS(CurrentTime);
                     dbMsg += "、PositionStr=" + PositionStr;
                     RaisePropertyChanged("PositionStr");
-                    //    MyLog(TAG, dbMsg);
+                    SliderValue = double.Parse(CurrentTime);
+                    RaisePropertyChanged("SliderValue");
+                    //          MyLog(TAG, dbMsg);
                 }
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
@@ -1379,38 +1372,38 @@ namespace M3UPlayer.ViewModels
         /// </summary>
         /// <param name="targetItem">PlayListModelでurlを渡す</param>
         /// 
-        public async void PlayListToPlayer( PlayListModel targetItem) {
-			//int oldIndex,
-			string TAG = "PlayListToPlayer";
-			string dbMsg = "";
-			try {
+        public async void PlayListToPlayer(PlayListModel targetItem) {
+            //int oldIndex,
+            string TAG = "PlayListToPlayer";
+            string dbMsg = "";
+            try {
                 //axWmp = null;
-                    //if (0 < MyView.FrameGrid.Children.Count) {
-                    //	dbMsg += ">delete既存=" + MyView.FrameGrid.Children.Count + "件";
-                    //	MyView.FrameGrid.Children.RemoveAt(0);
-                    //}
-                    //if (myview.mainframe.source != null) {
-                    //	myview.mainframe.source = null;
-                    //	//dbmsg += "既存=" + myview.mainframe.children.count + "件";
-                    //	//myview.mainframe.children.removeat(0);
-                    //}
+                //if (0 < MyView.FrameGrid.Children.Count) {
+                //	dbMsg += ">delete既存=" + MyView.FrameGrid.Children.Count + "件";
+                //	MyView.FrameGrid.Children.RemoveAt(0);
+                //}
+                //if (myview.mainframe.source != null) {
+                //	myview.mainframe.source = null;
+                //	//dbmsg += "既存=" + myview.mainframe.children.count + "件";
+                //	//myview.mainframe.children.removeat(0);
+                //}
                 string targetURLStr = targetItem.UrlStr;
                 dbMsg += "、targetURLStr=" + targetURLStr;
                 string extention = System.IO.Path.GetExtension(targetURLStr);
-				dbMsg += "、拡張子=" + extention;
+                dbMsg += "、拡張子=" + extention;
                 bool toWeb = true;  // false;
-					//if (-1 < Array.IndexOf(WebVideo, extention) ||
-					//	targetURLStr.StartsWith("https")) {
-					//	toWeb = true;
-					//}
-					//Frame frame = new Frame();
-					dbMsg += "、Web=" + toWeb;
-				if (toWeb) {
+                                    //if (-1 < Array.IndexOf(WebVideo, extention) ||
+                                    //	targetURLStr.StartsWith("https")) {
+                                    //	toWeb = true;
+                                    //}
+                                    //Frame frame = new Frame();
+                dbMsg += "、Web=" + toWeb;
+                if (toWeb) {
                     if (MyView == null) {
-					} else {
-						//             CallWeb();
-						//WebView2のロード完了時のイベント
-						MyView.webView.NavigationCompleted += WebView_NavigationCompleted; PlayListSaveBTVisble = "Hidden";
+                    } else {
+                        //             CallWeb();
+                        //WebView2のロード完了時のイベント
+                        MyView.webView.NavigationCompleted += WebView_NavigationCompleted; PlayListSaveBTVisble = "Hidden";
                         //JavaScriptからのデータ送信    https://knooto.info/csharp-webview2-snippets/
                         MyView.webView.WebMessageReceived += webView_CurrentTimeeReceived;
 
@@ -1419,333 +1412,333 @@ namespace M3UPlayer.ViewModels
                         string tagStr = MakeVideoSouce(targetURLStr, 1000, 1000);
                         dbMsg += "、tagStr\r\n" + tagStr;
                         // 実行ディレクトリを取得
-						dbMsg += "、\r\n" + Constant.currentDirectory;
+                        dbMsg += "、\r\n" + Constant.currentDirectory;
                         SaveFile(Constant.currentDirectory, tagStr);
                         // ローカルファイルのURIを作成
                         Uri uri = new Uri(Constant.currentDirectory);
-						TargetURI = uri;
-						RaisePropertyChanged("TargetURI");
+                        TargetURI = uri;
+                        RaisePropertyChanged("TargetURI");
                         // WebView2にローカルファイルのURIを設定
                         MyView.webView.CoreWebView2.Navigate(TargetURI.AbsoluteUri);
                         IsPlaying = false;
 
-         //               GetDuration();
+                        //               GetDuration();
                         await Task.Run(() => {
-							MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
-						});
-						ClickPlayBt();
+                            MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
+                        });
+                        ClickPlayBt();
                     }
-                } else if(-1 < Array.IndexOf(FlashVideo, extention)) {
-						//// Create the interop host control.
-						//System.Windows.Forms.Integration.WindowsFormsHost host =
-						//	new System.Windows.Forms.Integration.WindowsFormsHost();
+                } else if (-1 < Array.IndexOf(FlashVideo, extention)) {
+                    //// Create the interop host control.
+                    //System.Windows.Forms.Integration.WindowsFormsHost host =
+                    //	new System.Windows.Forms.Integration.WindowsFormsHost();
 
-						//// Create the ActiveX control.
-						//PlayerWFCL.FlushControl axFLP = new PlayerWFCL.FlushControl(targetURLStr);
-						// Assign the ActiveX control as the host control's child.
-					//	host.Child = axFLP;
+                    //// Create the ActiveX control.
+                    //PlayerWFCL.FlushControl axFLP = new PlayerWFCL.FlushControl(targetURLStr);
+                    // Assign the ActiveX control as the host control's child.
+                    //	host.Child = axFLP;
 
-					//	// Add the interop host control to the Grid
-					//	// control's collection of child controls.
-					//	MyView.FrameGrid.Children.Add(host);
+                    //	// Add the interop host control to the Grid
+                    //	// control's collection of child controls.
+                    //	MyView.FrameGrid.Children.Add(host);
 
-					////	//		axFLP.InitAxShockwaveFlash();
-					////	axFLP.AddURl(targetURLStr);
+                    ////	//		axFLP.InitAxShockwaveFlash();
+                    ////	axFLP.AddURl(targetURLStr);
 
 
-					//	//if (axFLP.SFPlayer != null) {
-					//	//} else {
-					//	//	dbMsg += ">>FlushControl生成できず";
-					//	//}
+                    //	//if (axFLP.SFPlayer != null) {
+                    //	//} else {
+                    //	//	dbMsg += ">>FlushControl生成できず";
+                    //	//}
 
-					} else {
-						//// Create the interop host control.
-						//System.Windows.Forms.Integration.WindowsFormsHost host =
-						//	new System.Windows.Forms.Integration.WindowsFormsHost();
+                } else {
+                    //// Create the interop host control.
+                    //System.Windows.Forms.Integration.WindowsFormsHost host =
+                    //	new System.Windows.Forms.Integration.WindowsFormsHost();
 
-						//// Create the ActiveX control.
-						//axWmp = new PlayerWFCL.WMPControl(targetURLStr);
+                    //// Create the ActiveX control.
+                    //axWmp = new PlayerWFCL.WMPControl(targetURLStr);
 
-						//// Assign the ActiveX control as the host control's child.
-						//host.Child = axWmp;
+                    //// Assign the ActiveX control as the host control's child.
+                    //host.Child = axWmp;
 
-						//// Add the interop host control to the Grid
-						//// control's collection of child controls.
-						//MyView.FrameGrid.Children.Add(host);
-						//axWmp.ReSizeContlor((int)MyView.FrameGrid.Width , (int)MyView.FrameGrid.Height);
-						//// Play a .wav file with the ActiveX control.
-						//axWmp.AddURl(targetURLStr);
-						//double playPosition = axWmp.GetPlayPosition();
-						//DurationStr = "00:00:00";
-						//double playDuration = axWmp.GetDuration();
-						//if (0 < playDuration) {
-						//	TimeSpan span = new TimeSpan(0, 0, (int)playDuration);
-						//	DurationStr = span.ToString("HH:mm:ss");
-						//}
-						//RaisePropertyChanged("DurationStr");
-						//SetupTimer();
-						//// player = axWmp.GetPlayer();
-						////player.currentMedia.
-					}
-				//} else {
-				//	dbMsg += ">>MyView == null";
-				//}
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+                    //// Add the interop host control to the Grid
+                    //// control's collection of child controls.
+                    //MyView.FrameGrid.Children.Add(host);
+                    //axWmp.ReSizeContlor((int)MyView.FrameGrid.Width , (int)MyView.FrameGrid.Height);
+                    //// Play a .wav file with the ActiveX control.
+                    //axWmp.AddURl(targetURLStr);
+                    //double playPosition = axWmp.GetPlayPosition();
+                    //DurationStr = "00:00:00";
+                    //double playDuration = axWmp.GetDuration();
+                    //if (0 < playDuration) {
+                    //	TimeSpan span = new TimeSpan(0, 0, (int)playDuration);
+                    //	DurationStr = span.ToString("HH:mm:ss");
+                    //}
+                    //RaisePropertyChanged("DurationStr");
+                    //SetupTimer();
+                    //// player = axWmp.GetPlayer();
+                    ////player.currentMedia.
+                }
+                //} else {
+                //	dbMsg += ">>MyView == null";
+                //}
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
-		// タイマメソッド
-		private void MyTimerMethod(object sender, EventArgs e) {
-			string TAG = "MyTimerMethod";
-			string dbMsg = "";
-			try {
-				//if (axWmp != null) {
-				//	this.IsPlaying = axWmp.IsPlaying;
-				//	dbMsg += ":IsPlaying=" + IsPlaying;
-				//	double position = axWmp.GetPlayPosition();
-				//	SliderMaximum = axWmp.GetDuration();
-				//	dbMsg += "," + position;
-				//	if (0 < position) {
-				//		TimeSpan span = new TimeSpan(0, 0, (int)position);
-				//		this.PositionStr = span.ToString(@"hh\:mm\:ss");
-				//		if (position < 1) {
-				//			SliderMaximum = axWmp.GetDuration();
-				//			dbMsg +=  " / " + SliderMaximum ;
-				//			span = new TimeSpan(0, 0, (int)SliderMaximum);
-				//			this.DurationStr = span.ToString(@"hh\:mm\:ss");
-				//		}
-				//		SliderValue = position;
-				//	} else {
-				//		this.DurationStr ="00:00:00";
-				//		this.PositionStr = "00:00:00";
-				//	}
-				//	dbMsg += ",>>" + PositionStr + " / " + DurationStr;
-				//	SoundValue = axWmp.GetVolume();
-				//	dbMsg += "," + SoundValue;
-				//	if (SoundValue == 0) {
-				//		IsMute = true;
-				//	} else {
-				//		IsMute = false;
-				//	}
+        // タイマメソッド
+        private void MyTimerMethod(object sender, EventArgs e) {
+            string TAG = "MyTimerMethod";
+            string dbMsg = "";
+            try {
+                //if (axWmp != null) {
+                //	this.IsPlaying = axWmp.IsPlaying;
+                //	dbMsg += ":IsPlaying=" + IsPlaying;
+                //	double position = axWmp.GetPlayPosition();
+                //	SliderMaximum = axWmp.GetDuration();
+                //	dbMsg += "," + position;
+                //	if (0 < position) {
+                //		TimeSpan span = new TimeSpan(0, 0, (int)position);
+                //		this.PositionStr = span.ToString(@"hh\:mm\:ss");
+                //		if (position < 1) {
+                //			SliderMaximum = axWmp.GetDuration();
+                //			dbMsg +=  " / " + SliderMaximum ;
+                //			span = new TimeSpan(0, 0, (int)SliderMaximum);
+                //			this.DurationStr = span.ToString(@"hh\:mm\:ss");
+                //		}
+                //		SliderValue = position;
+                //	} else {
+                //		this.DurationStr ="00:00:00";
+                //		this.PositionStr = "00:00:00";
+                //	}
+                //	dbMsg += ",>>" + PositionStr + " / " + DurationStr;
+                //	SoundValue = axWmp.GetVolume();
+                //	dbMsg += "," + SoundValue;
+                //	if (SoundValue == 0) {
+                //		IsMute = true;
+                //	} else {
+                //		IsMute = false;
+                //	}
 
-				//}
-	//			RaisePropertyChanged();
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+                //}
+                //			RaisePropertyChanged();
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
-		/// <summary>
-		/// タイマのインスタンス
-		/// </summary>
-		private DispatcherTimer _timer;
+        /// <summary>
+        /// タイマのインスタンス
+        /// </summary>
+        private DispatcherTimer _timer;
 
-		/// <summary>
-		/// タイマを設定する
-		/// </summary>
-		private void SetupTimer() {
-			string TAG = "SetupTimer";
-			string dbMsg = "";
-			try {
-				// タイマのインスタンスを生成
-				_timer = new DispatcherTimer(); // 優先度はDispatcherPriority.Background
-												// インターバルを設定
-				_timer.Interval = new TimeSpan(0, 0, 1);
-				// タイマメソッドを設定
-				_timer.Tick += new EventHandler(MyTimerMethod);
-				// タイマを開始
-				_timer.Start();
+        /// <summary>
+        /// タイマを設定する
+        /// </summary>
+        private void SetupTimer() {
+            string TAG = "SetupTimer";
+            string dbMsg = "";
+            try {
+                // タイマのインスタンスを生成
+                _timer = new DispatcherTimer(); // 優先度はDispatcherPriority.Background
+                                                // インターバルを設定
+                _timer.Interval = new TimeSpan(0, 0, 1);
+                // タイマメソッドを設定
+                _timer.Tick += new EventHandler(MyTimerMethod);
+                // タイマを開始
+                _timer.Start();
 
-				// 画面が閉じられるときに、タイマを停止
-				//MyView.Closing += new CancelEventHandler(StopTimer);
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+                // 画面が閉じられるときに、タイマを停止
+                //MyView.Closing += new CancelEventHandler(StopTimer);
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
-		// タイマを停止
-		private void StopTimer(object sender, CancelEventArgs e) {
-			string TAG = "StopTimer";
-			string dbMsg = "";
-			try {
-				_timer.Stop();
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+        // タイマを停止
+        private void StopTimer(object sender, CancelEventArgs e) {
+            string TAG = "StopTimer";
+            string dbMsg = "";
+            try {
+                _timer.Stop();
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
-		public void BackFromPlayer(PlayListModel targetItem) {
-			//int oldIndex,
-			string TAG = "BackFromPlayer";
-			string dbMsg = "";
-			try {
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+        public void BackFromPlayer(PlayListModel targetItem) {
+            //int oldIndex,
+            string TAG = "BackFromPlayer";
+            string dbMsg = "";
+            try {
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
-		//public AxShockwaveFlashObjects.AxShockwaveFlash SFPlayer;
-		private System.ComponentModel.IContainer components = null;
-		//public WindowsMediaPlayer mediaPlayer;
-		//	public AxWMPLib.AxWindowsMediaPlayer mediaPlayer;           //AxWMPLib
-		/*
+        //public AxShockwaveFlashObjects.AxShockwaveFlash SFPlayer;
+        private System.ComponentModel.IContainer components = null;
+        //public WindowsMediaPlayer mediaPlayer;
+        //	public AxWMPLib.AxWindowsMediaPlayer mediaPlayer;           //AxWMPLib
+        /*
 			 FLV・SWFファイルの再生 http://www.geocities.co.jp/NatureLand/2023/reference/Multimedia/movie02.html
 			 Flash 4 で新しくサポートされたスクリプトメソッド       http://kb2.adobe.com/jp/cps/228/228681.html
 			 */
-		/// <summary>
-		/// Flashのmoveプレイヤーで渡されたファイルを再生
-		/// 
-		/// error : video_fileが設定されていません。
-		/// </summary>
-		/// <param name="fileName">再生ファイル名</param>
-		private void MakeFlash(string fileName) {
-			string TAG = "[MakeFlash]" + fileName;
-			string dbMsg = TAG;
-			try {
-		////		this.MediaPlayerPanel.Controls.RemoveAt(0);
-		//		this.SFPlayer = InitializeFLComponent();
-		//		try {
-		//			System.IO.FileInfo fi = new System.IO.FileInfo(fileName);
-		//			if (fi.Extension.Equals(".flv") || fi.Extension.Equals(".f4v")) {
-		//				LoadFLV(fileName, SFPlayer);
-		//	//			LoadFladance(fileName);
-		//			} else if (fi.Extension.Equals(".swf")) {
-		//				this.SFPlayer.LoadMovie(0, fileName); //でthis.SFPlayer.Movieにセットされるが再生はされない
-		//													  //   Movie   "M:\\sample\\EmbedFlash.swf" 
-		//			}
-		//			dbMsg += ",Movie=" + this.SFPlayer.Movie;
-		//			dbMsg += ",MovieData=" + this.SFPlayer.MovieData;
-		//			dbMsg += ",FlashVars=" + this.SFPlayer.FlashVars;
+        /// <summary>
+        /// Flashのmoveプレイヤーで渡されたファイルを再生
+        /// 
+        /// error : video_fileが設定されていません。
+        /// </summary>
+        /// <param name="fileName">再生ファイル名</param>
+        private void MakeFlash(string fileName) {
+            string TAG = "[MakeFlash]" + fileName;
+            string dbMsg = TAG;
+            try {
+                ////		this.MediaPlayerPanel.Controls.RemoveAt(0);
+                //		this.SFPlayer = InitializeFLComponent();
+                //		try {
+                //			System.IO.FileInfo fi = new System.IO.FileInfo(fileName);
+                //			if (fi.Extension.Equals(".flv") || fi.Extension.Equals(".f4v")) {
+                //				LoadFLV(fileName, SFPlayer);
+                //	//			LoadFladance(fileName);
+                //			} else if (fi.Extension.Equals(".swf")) {
+                //				this.SFPlayer.LoadMovie(0, fileName); //でthis.SFPlayer.Movieにセットされるが再生はされない
+                //													  //   Movie   "M:\\sample\\EmbedFlash.swf" 
+                //			}
+                //			dbMsg += ",Movie=" + this.SFPlayer.Movie;
+                //			dbMsg += ",MovieData=" + this.SFPlayer.MovieData;
+                //			dbMsg += ",FlashVars=" + this.SFPlayer.FlashVars;
 
 
-		//			this.SFPlayer.FlashCall += new AxShockwaveFlashObjects._IShockwaveFlashEvents_FlashCallEventHandler(this.SFPlayer_FlashCall);
-		//			//          ((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).EndInit();                   //必須
-		//			this.SFPlayer.Play();
-		//		} catch {
-		//			string titolStr = "Flash";
-		//			string msgStr = "Flashがインストールされていないようです";
-		//			MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-		//			dbMsg += ",result=" + result;
-		//		}
+                //			this.SFPlayer.FlashCall += new AxShockwaveFlashObjects._IShockwaveFlashEvents_FlashCallEventHandler(this.SFPlayer_FlashCall);
+                //			//          ((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).EndInit();                   //必須
+                //			this.SFPlayer.Play();
+                //		} catch {
+                //			string titolStr = "Flash";
+                //			string msgStr = "Flashがインストールされていないようです";
+                //			MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                //			dbMsg += ",result=" + result;
+                //		}
 
 
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
-		/// <summary>
-		/// ShockWaveObjewctを作成してGridに埋め込む
-		/// </summary>
-//		private AxShockwaveFlashObjects.AxShockwaveFlash InitializeFLComponent() {
-//			string TAG = "[InitializeFLComponent]";
-//			string dbMsg = TAG;
-//			//System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));   //?
-//			AxShockwaveFlashObjects.AxShockwaveFlash SFPlayer = new AxShockwaveFlashObjects.AxShockwaveFlash();
-//			try {
-//				((System.ComponentModel.ISupportInitialize)(SFPlayer)).BeginInit();   
-//				//必須;http://bbs.wankuma.com/index.cgi?mode=al2&namber=9784&KLOG=22
-//			//	this.SuspendLayout();           //必要？
-//				SFPlayer.Dock = System.Windows.Forms.DockStyle.Fill;
-//				SFPlayer.Enabled = true;
-//	//0113		SFPlayer.Location = new System.Drawing.Point(0, 0);
-//				SFPlayer.Name = "SFPlayer";
-//				System.Windows.Forms.Panel MediaPlayerPanel = new System.Windows.Forms.Panel();
-//				Frame frame = new Frame();
-//				frame.Navigate(MediaPlayerPanel);
-//				MyView.FrameGrid.Children.Add(frame);
-//				//0115	VWidth = MyView.FrameGrid.ActualWidth;
-//				//VHeight = MyView.FrameGrid.ActualHeight;
-//				dbMsg += "[" + VWidth + "×" + VHeight + "]";
-//			//	SFPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("this.SFPlayer.OcxState")));
-//			// 'C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Windows.Forms\v4.0_4.0.0.0__b77a5c561934e089\System.Windows.Forms.dll' が読み込まれました。PDB ファイルを開けないか、ファイルが見つかりません。
-//// 'C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Windows.Forms.resources\v4.0_4.0.0.0_ja_b77a5c561934e089\System.Windows.Forms.resources.dll' が読み込まれました。モジュールがシンボルなしでビルドされました。
-//				SFPlayer.Width = (int)VWidth;
-//				SFPlayer.Height = (int)VHeight;	
-//				dbMsg += ">SFPlayer[" + this.SFPlayer.Width + "×" + this.SFPlayer.Height + "]";
-//				SFPlayer.TabIndex = 0;
-//				MediaPlayerPanel.Controls.Add(this.SFPlayer);
-//				////this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form1_DragDrop);
-//				////this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
-//				SFPlayer.FSCommand += new AxShockwaveFlashObjects._IShockwaveFlashEvents_FSCommandEventHandler(this.SFPlayer_FSCommand);
-//				SFPlayer.RegionChanged += new System.EventHandler(this.SFPlayer_RegionChanged);
-//				SFPlayer.Move += new System.EventHandler(this.SFPlayer_Move);
-//				((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).EndInit();                   //必須
-//	//	0115	MyView.ResumeLayout(false);
+        /// <summary>
+        /// ShockWaveObjewctを作成してGridに埋め込む
+        /// </summary>
+        //		private AxShockwaveFlashObjects.AxShockwaveFlash InitializeFLComponent() {
+        //			string TAG = "[InitializeFLComponent]";
+        //			string dbMsg = TAG;
+        //			//System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));   //?
+        //			AxShockwaveFlashObjects.AxShockwaveFlash SFPlayer = new AxShockwaveFlashObjects.AxShockwaveFlash();
+        //			try {
+        //				((System.ComponentModel.ISupportInitialize)(SFPlayer)).BeginInit();   
+        //				//必須;http://bbs.wankuma.com/index.cgi?mode=al2&namber=9784&KLOG=22
+        //			//	this.SuspendLayout();           //必要？
+        //				SFPlayer.Dock = System.Windows.Forms.DockStyle.Fill;
+        //				SFPlayer.Enabled = true;
+        //	//0113		SFPlayer.Location = new System.Drawing.Point(0, 0);
+        //				SFPlayer.Name = "SFPlayer";
+        //				System.Windows.Forms.Panel MediaPlayerPanel = new System.Windows.Forms.Panel();
+        //				Frame frame = new Frame();
+        //				frame.Navigate(MediaPlayerPanel);
+        //				MyView.FrameGrid.Children.Add(frame);
+        //				//0115	VWidth = MyView.FrameGrid.ActualWidth;
+        //				//VHeight = MyView.FrameGrid.ActualHeight;
+        //				dbMsg += "[" + VWidth + "×" + VHeight + "]";
+        //			//	SFPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("this.SFPlayer.OcxState")));
+        //			// 'C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Windows.Forms\v4.0_4.0.0.0__b77a5c561934e089\System.Windows.Forms.dll' が読み込まれました。PDB ファイルを開けないか、ファイルが見つかりません。
+        //// 'C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Windows.Forms.resources\v4.0_4.0.0.0_ja_b77a5c561934e089\System.Windows.Forms.resources.dll' が読み込まれました。モジュールがシンボルなしでビルドされました。
+        //				SFPlayer.Width = (int)VWidth;
+        //				SFPlayer.Height = (int)VHeight;	
+        //				dbMsg += ">SFPlayer[" + this.SFPlayer.Width + "×" + this.SFPlayer.Height + "]";
+        //				SFPlayer.TabIndex = 0;
+        //				MediaPlayerPanel.Controls.Add(this.SFPlayer);
+        //				////this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form1_DragDrop);
+        //				////this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
+        //				SFPlayer.FSCommand += new AxShockwaveFlashObjects._IShockwaveFlashEvents_FSCommandEventHandler(this.SFPlayer_FSCommand);
+        //				SFPlayer.RegionChanged += new System.EventHandler(this.SFPlayer_RegionChanged);
+        //				SFPlayer.Move += new System.EventHandler(this.SFPlayer_Move);
+        //				((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).EndInit();                   //必須
+        //	//	0115	MyView.ResumeLayout(false);
 
-//				SFPlayer=InitAxShockwaveFlash(SFPlayer);
-//				MyLog(TAG, dbMsg);
-//			} catch (Exception er) {
-//				dbMsg += "<<以降でエラー発生>>" + er.Message;
-//				MyLog(TAG, dbMsg);
-//			}
-//			return SFPlayer;
+        //				SFPlayer=InitAxShockwaveFlash(SFPlayer);
+        //				MyLog(TAG, dbMsg);
+        //			} catch (Exception er) {
+        //				dbMsg += "<<以降でエラー発生>>" + er.Message;
+        //				MyLog(TAG, dbMsg);
+        //			}
+        //			return SFPlayer;
 
-//		}
+        //		}
 
-		//private void SFPlayer_FSCommand(object sender, AxShockwaveFlashObjects._IShockwaveFlashEvents_FSCommandEvent e) {
-		//	string TAG = "[SFPlayer_FSCommand]";
-		//	string dbMsg = TAG;
-		//	try {
-		//		dbMsg += e.command + ";";
-		//		//switch (e.command)
-		//		//{
-		//		//    case 0:
-		//		//        dbMsg += "1";
-		//		//        //            PlayTitolLabel.Text = ("Undefined;WindowsMediaPlayerの状態が定義されていません");
-		//		//        break;
-		//		//}
-		//		MyLog(TAG, dbMsg);
-		//	} catch (Exception er) {
-		//		dbMsg += "<<以降でエラー発生>>" + er.Message;
-		//		MyLog(TAG, dbMsg);
-		//	}
-		//}
+        //private void SFPlayer_FSCommand(object sender, AxShockwaveFlashObjects._IShockwaveFlashEvents_FSCommandEvent e) {
+        //	string TAG = "[SFPlayer_FSCommand]";
+        //	string dbMsg = TAG;
+        //	try {
+        //		dbMsg += e.command + ";";
+        //		//switch (e.command)
+        //		//{
+        //		//    case 0:
+        //		//        dbMsg += "1";
+        //		//        //            PlayTitolLabel.Text = ("Undefined;WindowsMediaPlayerの状態が定義されていません");
+        //		//        break;
+        //		//}
+        //		MyLog(TAG, dbMsg);
+        //	} catch (Exception er) {
+        //		dbMsg += "<<以降でエラー発生>>" + er.Message;
+        //		MyLog(TAG, dbMsg);
+        //	}
+        //}
 
-		private void SFPlayer_Move(object sender, EventArgs e) {
-			string TAG = "[SFPlayer_Move]";
-			string dbMsg = TAG;
-			try {
-				dbMsg += e.ToString() + ";";
-				//switch (e.command)
-				//{
-				//    case 0:
-				//        dbMsg += "1";
-				//        //            PlayTitolLabel.Text = ("Undefined;WindowsMediaPlayerの状態が定義されていません");
-				//        break;
-				//}
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				dbMsg += "<<以降でエラー発生>>" + er.Message;
-				MyLog(TAG, dbMsg);
-			}
-		}
+        private void SFPlayer_Move(object sender, EventArgs e) {
+            string TAG = "[SFPlayer_Move]";
+            string dbMsg = TAG;
+            try {
+                dbMsg += e.ToString() + ";";
+                //switch (e.command)
+                //{
+                //    case 0:
+                //        dbMsg += "1";
+                //        //            PlayTitolLabel.Text = ("Undefined;WindowsMediaPlayerの状態が定義されていません");
+                //        break;
+                //}
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                dbMsg += "<<以降でエラー発生>>" + er.Message;
+                MyLog(TAG, dbMsg);
+            }
+        }
 
-		private void SFPlayer_RegionChanged(object sender, EventArgs e) {
-			string TAG = "[SFPlayer_RegionChanged]";
-			string dbMsg = TAG;
-			try {
-				dbMsg += e.ToString() + ";";
-				//switch (e.command)
-				//{
-				//    case 0:
-				//        dbMsg += "1";
-				//        //            PlayTitolLabel.Text = ("Undefined;WindowsMediaPlayerの状態が定義されていません");
-				//        break;
-				//}
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				dbMsg += "<<以降でエラー発生>>" + er.Message;
-				MyLog(TAG, dbMsg);
-			}
-		}
+        private void SFPlayer_RegionChanged(object sender, EventArgs e) {
+            string TAG = "[SFPlayer_RegionChanged]";
+            string dbMsg = TAG;
+            try {
+                dbMsg += e.ToString() + ";";
+                //switch (e.command)
+                //{
+                //    case 0:
+                //        dbMsg += "1";
+                //        //            PlayTitolLabel.Text = ("Undefined;WindowsMediaPlayerの状態が定義されていません");
+                //        break;
+                //}
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                dbMsg += "<<以降でエラー発生>>" + er.Message;
+                MyLog(TAG, dbMsg);
+            }
+        }
 
         /// <summary>
         /// AxShockwaveFlashの設定
@@ -1849,7 +1842,7 @@ namespace M3UPlayer.ViewModels
                         dbMsg += "Drag開始＝" + DraggedItem_name;
                         MyView.popup_text.Text = DraggedItem_name;
                         Drag_now = true;
-                        
+
                         PlayListSelectionMode = "Single";
                         RaisePropertyChanged("PlayListSelectionMode");
 
@@ -1877,9 +1870,9 @@ namespace M3UPlayer.ViewModels
                 dbMsg += "Drag_now=" + Drag_now;
                 if (Drag_now) {
                     dbMsg += ">>dropRow=" + dropRow;
-                    PlayListItemMoveTo(dropRow , SelectedPlayListFiles);
+                    PlayListItemMoveTo(dropRow, SelectedPlayListFiles);
                     Drag_now = false;
-              //      RaisePropertyChanged("Drag_now");
+                    //      RaisePropertyChanged("Drag_now");
                     PlayListSelectionMode = "Extended";
                     RaisePropertyChanged("PlayListSelectionMode");
                     MyView.popup_text.Text = "";
@@ -1930,7 +1923,7 @@ namespace M3UPlayer.ViewModels
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void PlayList_DragLeave( ) {
+        public void PlayList_DragLeave() {
             string TAG = "PlayList_DragLeave";// + fileName;
             string dbMsg = "";
             try {
@@ -1999,54 +1992,54 @@ namespace M3UPlayer.ViewModels
         ///// <param name="sender"></param>
         ///// <param name="e"></param>
         private void PLMouseDown() {
-			string TAG = "[PlayList_MouseDown]";// + fileName;
-			string dbMsg = "";
-			try {
-				if (PLListSelectedItem != null) {
-					//DraggedItem = PLListSelectedItem;
-					//dbMsg += ",UrlStr=" + PLListSelectedItem.UrlStr;
-					//int oldIndex = PLList.IndexOf(PLListSelectedItem);
-					//dbMsg += "[" + oldIndex + "]";
-					//_isDragging = true;
-					//				var row = UIHelpers.TryFindFromPoint<DataGridRow>((UIElement)sender, e.GetPosition(shareGrid));
-					//	if (row == null || row.IsEditing) return;
+            string TAG = "[PlayList_MouseDown]";// + fileName;
+            string dbMsg = "";
+            try {
+                if (PLListSelectedItem != null) {
+                    //DraggedItem = PLListSelectedItem;
+                    //dbMsg += ",UrlStr=" + PLListSelectedItem.UrlStr;
+                    //int oldIndex = PLList.IndexOf(PLListSelectedItem);
+                    //dbMsg += "[" + oldIndex + "]";
+                    //_isDragging = true;
+                    //				var row = UIHelpers.TryFindFromPoint<DataGridRow>((UIElement)sender, e.GetPosition(shareGrid));
+                    //	if (row == null || row.IsEditing) return;
 
-					//set flag that indicates we're capturing mouse movements
-					//draglist = (ListBox)sender;
-					//PlayListMouseDownNo = draglist.SelectedIndex;
-					//dbMsg += "(Down;" + PlayListMouseDownNo + ")";
-					//if (e.Button == System.Windows.Forms.MouseButtons.Left) {                   //マウス左ボタン
-					//	dbMsg += ",選択モード切替；ModifierKeys=" + Control.ModifierKeys;
-					//	if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift) {                //シフト
-					//		playListBox.SelectionMode = SelectionMode.MultiExtended;               //3:		インデックスが配列の境界外です。?
-					//	} else if ((Control.ModifierKeys & Keys.Control) == Keys.Control) {     //コントロール
-					//		playListBox.SelectionMode = SelectionMode.MultiSimple;
-					//		2:	MultiSimple / MultiExtended   http://www.atmarkit.co.jp/fdotnet/chushin/introwinform_03/introwinform_03_02.html
+                    //set flag that indicates we're capturing mouse movements
+                    //draglist = (ListBox)sender;
+                    //PlayListMouseDownNo = draglist.SelectedIndex;
+                    //dbMsg += "(Down;" + PlayListMouseDownNo + ")";
+                    //if (e.Button == System.Windows.Forms.MouseButtons.Left) {                   //マウス左ボタン
+                    //	dbMsg += ",選択モード切替；ModifierKeys=" + Control.ModifierKeys;
+                    //	if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift) {                //シフト
+                    //		playListBox.SelectionMode = SelectionMode.MultiExtended;               //3:		インデックスが配列の境界外です。?
+                    //	} else if ((Control.ModifierKeys & Keys.Control) == Keys.Control) {     //コントロール
+                    //		playListBox.SelectionMode = SelectionMode.MultiSimple;
+                    //		2:	MultiSimple / MultiExtended   http://www.atmarkit.co.jp/fdotnet/chushin/introwinform_03/introwinform_03_02.html
 
-					//				} else {                                                                //無しなら
-					//		playListBox.SelectionMode = SelectionMode.One;                         //1:単一選択
-					//	}
-					//	dbMsg += " ,SelectionMode=" + draglist.SelectionMode;
-					//}
-					//if (-1 < PlayListMouseDownNo) {
-					//	PlayListMouseDownValue = draglist.SelectedValue.ToString();
-					//	dbMsg += PlayListMouseDownValue;
-					//	dragFrom = draglist.Name;
-					//	dragSouceIDl = draglist.SelectedIndex;
-					//	mouceDownPoint = Control.MousePosition;
-					//	mouceDownPoint = draglist.PointToClient(mouceDownPoint);//ドラッグ開始時のマウスの位置をクライアント座標に変換
-					//	dbMsg += "(mouceDownPoint;" + mouceDownPoint.X + "," + mouceDownPoint.Y + ")";
-					//	dragSouceIDP = draglist.IndexFromPoint(mouceDownPoint);//マウス下のListBoxのインデックスを得る
-					//	dbMsg += "(Pointから;" + dragSouceIDP + ")";
-					//}
-				} else {
-					dbMsg += "選択値無し";
-				}
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+                    //				} else {                                                                //無しなら
+                    //		playListBox.SelectionMode = SelectionMode.One;                         //1:単一選択
+                    //	}
+                    //	dbMsg += " ,SelectionMode=" + draglist.SelectionMode;
+                    //}
+                    //if (-1 < PlayListMouseDownNo) {
+                    //	PlayListMouseDownValue = draglist.SelectedValue.ToString();
+                    //	dbMsg += PlayListMouseDownValue;
+                    //	dragFrom = draglist.Name;
+                    //	dragSouceIDl = draglist.SelectedIndex;
+                    //	mouceDownPoint = Control.MousePosition;
+                    //	mouceDownPoint = draglist.PointToClient(mouceDownPoint);//ドラッグ開始時のマウスの位置をクライアント座標に変換
+                    //	dbMsg += "(mouceDownPoint;" + mouceDownPoint.X + "," + mouceDownPoint.Y + ")";
+                    //	dragSouceIDP = draglist.IndexFromPoint(mouceDownPoint);//マウス下のListBoxのインデックスを得る
+                    //	dbMsg += "(Pointから;" + dragSouceIDP + ")";
+                    //}
+                } else {
+                    dbMsg += "選択値無し";
+                }
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
         //#endregion
 
         //#region PlayListアイテムでマウスムーブ
@@ -2112,41 +2105,41 @@ namespace M3UPlayer.ViewModels
         //#endregion
 
         //#region PlayListアイテムでマウスアップ
-  //     public ICommand PlayList_MouseUp => new DelegateCommand(PLMouseUp);
-		//private ViewModelCommand _PlayListMouseUp;
-		//public ViewModelCommand PlayListMouseUp {
-		//	get {
-		//		if (_PlayListMouseUp == null) {
-		//			_PlayListMouseUp = new ViewModelCommand(PLMouseUp);
-		//		}
-		//		return _PlayListMouseUp;
-		//	}
-		//}
+        //     public ICommand PlayList_MouseUp => new DelegateCommand(PLMouseUp);
+        //private ViewModelCommand _PlayListMouseUp;
+        //public ViewModelCommand PlayListMouseUp {
+        //	get {
+        //		if (_PlayListMouseUp == null) {
+        //			_PlayListMouseUp = new ViewModelCommand(PLMouseUp);
+        //		}
+        //		return _PlayListMouseUp;
+        //	}
+        //}
 
-		/// <summary>
-		/// プレイリストでのマウスアップ                    Completes a drag/drop operation.
-		/// </summary>
-		public void PLMouseUp() {
-			string TAG = "[PLMouseUp]";
-			string dbMsg = "";
-			try {
+        /// <summary>
+        /// プレイリストでのマウスアップ                    Completes a drag/drop operation.
+        /// </summary>
+        public void PLMouseUp() {
+            string TAG = "[PLMouseUp]";
+            string dbMsg = "";
+            try {
                 PlayListModel targetItem = new PlayListModel();
                 targetItem.UrlStr = "https://www.yahoo.co.jp/";
-				string titolStr = "プレイリストアイテムファイルの操作";
+                string titolStr = "プレイリストアイテムファイルの操作";
                 string errorStr = "マウスアップ";
                 string? doStr = null;
                 if (PlayListOpelate(titolStr, errorStr, doStr)) {
-					//if (DraggedItem != null) {
-					//	//				DraggedItem = PLListSelectedItem;
-					//	dbMsg += ",UrlStr=" + PLListSelectedItem.UrlStr;
-					//	int oldIndex = PLList.IndexOf(PLListSelectedItem);
-					//	dbMsg += "[" + oldIndex + "]";
-					//	if (!_isDragging) {            //|| _isEditing
-					//		return;
-					//	}
+                    //if (DraggedItem != null) {
+                    //	//				DraggedItem = PLListSelectedItem;
+                    //	dbMsg += ",UrlStr=" + PLListSelectedItem.UrlStr;
+                    //	int oldIndex = PLList.IndexOf(PLListSelectedItem);
+                    //	dbMsg += "[" + oldIndex + "]";
+                    //	if (!_isDragging) {            //|| _isEditing
+                    //		return;
+                    //	}
 
-					//	//get the target item
-					//	PlayListModel
+                    //	//get the target item
+                    //	PlayListModel
                     targetItem = SelectedPlayListFiles[0];
 
                     //	if (targetItem == null) {           // || !ReferenceEquals(DraggedItem, targetItem)
@@ -2172,127 +2165,127 @@ namespace M3UPlayer.ViewModels
                     //reset
                     //ResetDragDrop();
                 } else {
-					dbMsg += "選択値無し";
-				}
+                    dbMsg += "選択値無し";
+                }
                 dbMsg += ",UrlStr=" + targetItem.UrlStr;
                 IsPlaying = false;
                 PlayListToPlayer(targetItem);
                 MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
-		//#endregion
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+        //#endregion
 
-		/////////////////////////////////////////////////////////////Drop///
-
-
-		#region inputダイアログのサンプル
-		/// <summary>
-		/// 三択ダイアログのコールバック
-		/// https://days-of-programming.blogspot.com/2018/01/livetwpf.html
-		/// </summary>
-		/// <param name="msg"></param>
-		//public void MessageBoxClosed(ConfirmationMessage msg)
-		//{
-		//    string TAG = "MessageBoxClosed";
-		//    string dbMsg = "";
-		//    try
-		//    {
-		//        dbMsg += ",ConfirmationMessage=" + msg.Response;
-		//        if (msg.Response == null)
-		//        {
-		//            dbMsg += "null>>Cancel";
-		//        } else if (msg.Response.Value){     //true
-		//            dbMsg += ">>Yes";
-		//        }else{                              //false
-		//            dbMsg += ">>No";
-		//        }
-		//        MyLog(TAG, dbMsg);
-		//    }
-		//    catch (Exception er)
-		//    {
-		//        MyErrorLog(TAG, dbMsg, er);
-		//    }
-		//}
-
-		/// <summary>
-		/// ボタン内で表示させたConfirmからのコールバック
-		/// 》OKボタンで現在日時算出
-		/// </summary>
-		/// <param name="message"></param>
-		//public void ConfirmFromView(ConfirmationMessage message)
-		//{
-		//    string TAG = "ConfirmFromView";
-		//    string OutputMessage = $"{DateTime.Now}: ConfirmFromView: {message.Response ?? false}";
-		//    string dbMsg = "OutputMessage=" + OutputMessage;
-		//    MyLog(TAG, dbMsg);
-		//}
+        /////////////////////////////////////////////////////////////Drop///
 
 
+        #region inputダイアログのサンプル
+        /// <summary>
+        /// 三択ダイアログのコールバック
+        /// https://days-of-programming.blogspot.com/2018/01/livetwpf.html
+        /// </summary>
+        /// <param name="msg"></param>
+        //public void MessageBoxClosed(ConfirmationMessage msg)
+        //{
+        //    string TAG = "MessageBoxClosed";
+        //    string dbMsg = "";
+        //    try
+        //    {
+        //        dbMsg += ",ConfirmationMessage=" + msg.Response;
+        //        if (msg.Response == null)
+        //        {
+        //            dbMsg += "null>>Cancel";
+        //        } else if (msg.Response.Value){     //true
+        //            dbMsg += ">>Yes";
+        //        }else{                              //false
+        //            dbMsg += ">>No";
+        //        }
+        //        MyLog(TAG, dbMsg);
+        //    }
+        //    catch (Exception er)
+        //    {
+        //        MyErrorLog(TAG, dbMsg, er);
+        //    }
+        //}
 
-		//private ViewModelCommand _ViewModelConfirmFrom;
-		//public ViewModelCommand ViewModelConfirmFrom
-		//{
-		//    get {
-		//        string TAG = "ViewModelConfirmFrom";
-		//        string dbMsg = "";
-		//        try
-		//        {
-		//            if (_ViewModelConfirmFrom == null)
-		//            {
-		//                dbMsg += ">>起動時";
-		//                _ViewModelConfirmFrom = new ViewModelCommand(ConfirmFromViewModel);
+        /// <summary>
+        /// ボタン内で表示させたConfirmからのコールバック
+        /// 》OKボタンで現在日時算出
+        /// </summary>
+        /// <param name="message"></param>
+        //public void ConfirmFromView(ConfirmationMessage message)
+        //{
+        //    string TAG = "ConfirmFromView";
+        //    string OutputMessage = $"{DateTime.Now}: ConfirmFromView: {message.Response ?? false}";
+        //    string dbMsg = "OutputMessage=" + OutputMessage;
+        //    MyLog(TAG, dbMsg);
+        //}
 
-		//            }
-		//            MyLog(TAG, dbMsg);
-		//        }
-		//        catch (Exception er)
-		//        {
-		//            MyErrorLog(TAG, dbMsg, er);
-		//        }
-		//        return _FileNameInputShow;
-		//    }
-		//}
 
-		//public async void ConfirmFromViewModel()
-		//{
-		//    string TAG = "ConfirmFromView";
-		//    ConfirmationMessage message = new ConfirmationMessage("これはテスト用メッセージです。", "テスト", "MessageKey_Confirm")
-		//    {
-		//        Button = MessageBoxButton.OKCancel,
-		//    };
-		//    await Messenger.RaiseAsync(message);
-		//    string OutputMessage = $"{DateTime.Now}: ConfirmFromViewModel: {message.Response ?? false}";
-		//    string dbMsg = "OutputMessage=" + OutputMessage;
-		//    MyLog(TAG, dbMsg);
-		//}
 
-		#endregion
+        //private ViewModelCommand _ViewModelConfirmFrom;
+        //public ViewModelCommand ViewModelConfirmFrom
+        //{
+        //    get {
+        //        string TAG = "ViewModelConfirmFrom";
+        //        string dbMsg = "";
+        //        try
+        //        {
+        //            if (_ViewModelConfirmFrom == null)
+        //            {
+        //                dbMsg += ">>起動時";
+        //                _ViewModelConfirmFrom = new ViewModelCommand(ConfirmFromViewModel);
 
-		public string DResult { get; private set; }
+        //            }
+        //            MyLog(TAG, dbMsg);
+        //        }
+        //        catch (Exception er)
+        //        {
+        //            MyErrorLog(TAG, dbMsg, er);
+        //        }
+        //        return _FileNameInputShow;
+        //    }
+        //}
 
-		#region playList　/////////////////////////////////////////////////////////////
-		/// <summary>
-		/// 保存ボタンの表示
-		/// </summary>
-		public string PlayListSaveBTVisble { get; set; }
+        //public async void ConfirmFromViewModel()
+        //{
+        //    string TAG = "ConfirmFromView";
+        //    ConfirmationMessage message = new ConfirmationMessage("これはテスト用メッセージです。", "テスト", "MessageKey_Confirm")
+        //    {
+        //        Button = MessageBoxButton.OKCancel,
+        //    };
+        //    await Messenger.RaiseAsync(message);
+        //    string OutputMessage = $"{DateTime.Now}: ConfirmFromViewModel: {message.Response ?? false}";
+        //    string dbMsg = "OutputMessage=" + OutputMessage;
+        //    MyLog(TAG, dbMsg);
+        //}
+
+        #endregion
+
+        public string DResult { get; private set; }
+
+        #region playList　/////////////////////////////////////////////////////////////
+        /// <summary>
+        /// 保存ボタンの表示
+        /// </summary>
+        public string PlayListSaveBTVisble { get; set; }
 
         public ICommand FileNameInputShow => new DelegateCommand(MakeNewPlayListFile);
-		/// <summary>
-		/// 新規プレイリストを作成する
-		/// </summary>
-		/// https://water2litter.net/rye/post/c_io_save_dialog/
-		public void MakeNewPlayListFile() {
-			string TAG = "MakeNewPlayListFile";
-			string dbMsg = "";
-			try {
-				NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
-				SaveFileDialog SFDialog = new SaveFileDialog() {
-					Title = "プレイリストを新規作成",
-					InitialDirectory = NowSelectedPath,
-					FileName = String.Format("{0:yyyyMM_ss}", DateTime.Now),
-					DefaultExt = ".m3u8",
+        /// <summary>
+        /// 新規プレイリストを作成する
+        /// </summary>
+        /// https://water2litter.net/rye/post/c_io_save_dialog/
+        public void MakeNewPlayListFile() {
+            string TAG = "MakeNewPlayListFile";
+            string dbMsg = "";
+            try {
+                NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
+                SaveFileDialog SFDialog = new SaveFileDialog() {
+                    Title = "プレイリストを新規作成",
+                    InitialDirectory = NowSelectedPath,
+                    FileName = String.Format("{0:yyyyMM_ss}", DateTime.Now),
+                    DefaultExt = ".m3u8",
 
                     AddExtension = true,        // ユーザーが拡張子を省略したときに、自動的に拡張子を付けるか。規定値はtrue。
                     CheckFileExists = false,    // ユーザーが存在しないファイルを指定したときに、警告するか。規定値はfalse。
@@ -2305,77 +2298,77 @@ namespace M3UPlayer.ViewModels
                     OverwritePrompt = true,     // 存在するファイルを指定したときに、警告するか。規定値はtrue。
                     ValidateNames = true,       // ファイル名がWin32に適合するか検査するかどうか。規定値はfalse。
                 };
-				if (SFDialog.ShowDialog() == true) {
-					//TransitionMessage message = new TransitionMessage(VM, "FileNameInputShow");
-					//await Messenger.RaiseAsync(message);
-					//dbMsg += ",Response=" + message.Response;
-					//dbMsg += ",Result=" + VM.DialogResult;
-					//if (VM.DialogResult != null) {
-					//    string nSelectedFile = VM.DialogResult;
-					string nSelectedFile = SFDialog.FileName;
-					dbMsg += ">>" + nSelectedFile;
-					if (File.Exists(nSelectedFile)) {
-						string titolStr = "既に存在するファイルです";
-						string msgStr = "再度、ファイル作成ができるダイアログを開きますか";
-						MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
-						dbMsg += ",result=" + result;
-						if (result == MessageBoxResult.Yes) {
-							MakeNewPlayListFile();
-						} else {
-							return;
-						}
-					} else {
-						dbMsg += "新規作成";
-						NowSelectedPath = Path.GetDirectoryName(nSelectedFile);
-						string newFileName = System.IO.Path.GetFileName(nSelectedFile);
-						CurrentPlayListFileName = nSelectedFile;
-						dbMsg += ">>CurrentPlayListFileName=" + CurrentPlayListFileName;
+                if (SFDialog.ShowDialog() == true) {
+                    //TransitionMessage message = new TransitionMessage(VM, "FileNameInputShow");
+                    //await Messenger.RaiseAsync(message);
+                    //dbMsg += ",Response=" + message.Response;
+                    //dbMsg += ",Result=" + VM.DialogResult;
+                    //if (VM.DialogResult != null) {
+                    //    string nSelectedFile = VM.DialogResult;
+                    string nSelectedFile = SFDialog.FileName;
+                    dbMsg += ">>" + nSelectedFile;
+                    if (File.Exists(nSelectedFile)) {
+                        string titolStr = "既に存在するファイルです";
+                        string msgStr = "再度、ファイル作成ができるダイアログを開きますか";
+                        MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
+                        dbMsg += ",result=" + result;
+                        if (result == MessageBoxResult.Yes) {
+                            MakeNewPlayListFile();
+                        } else {
+                            return;
+                        }
+                    } else {
+                        dbMsg += "新規作成";
+                        NowSelectedPath = Path.GetDirectoryName(nSelectedFile);
+                        string newFileName = System.IO.Path.GetFileName(nSelectedFile);
+                        CurrentPlayListFileName = nSelectedFile;
+                        dbMsg += ">>CurrentPlayListFileName=" + CurrentPlayListFileName;
 
-						StreamWriter sw = File.CreateText(CurrentPlayListFileName);
-						sw.Close();
+                        StreamWriter sw = File.CreateText(CurrentPlayListFileName);
+                        sw.Close();
 
-						//設定ファイル更新
-						Properties.Settings.Default.Save();
-						AddPlayListCombo(CurrentPlayListFileName);
-					}
-					//} else {
-					//    dbMsg += "キャンセルされました";
-					//}
+                        //設定ファイル更新
+                        Properties.Settings.Default.Save();
+                        AddPlayListCombo(CurrentPlayListFileName);
+                    }
+                    //} else {
+                    //    dbMsg += "キャンセルされました";
+                    //}
 
-				}
+                }
 
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
-		public ICommand PlayListSave => new DelegateCommand(SavePlayList);
+        public ICommand PlayListSave => new DelegateCommand(SavePlayList);
         /// <summary>
         /// 表示されてるプレイリストを保存する
         /// </summary>
         /// <param name="url"></param>
         private void SavePlayList() {
-			string TAG = "SavePlayList";
-			string dbMsg = "";
-			try {
-				ListItemCount = PLList.Count();
-				dbMsg += "\r\n" + ListItemCount + "件";
-				string text = "";
-				foreach (PlayListModel One in PLList) {
-					text += One.UrlStr + "\r\n";
-				}
-				StreamWriter sw = new StreamWriter(CurrentPlayListFileName, false, Encoding.UTF8);
-				sw.Write(text);
-				sw.Close();
-				PlayListSaveBTVisble = "Hidden";
-				RaisePropertyChanged("PlayListSaveBTVisble");
-				PlayListSaveRoot.IsEnabled = false;
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+            string TAG = "SavePlayList";
+            string dbMsg = "";
+            try {
+                ListItemCount = PLList.Count();
+                dbMsg += "\r\n" + ListItemCount + "件";
+                string text = "";
+                foreach (PlayListModel One in PLList) {
+                    text += One.UrlStr + "\r\n";
+                }
+                StreamWriter sw = new StreamWriter(CurrentPlayListFileName, false, Encoding.UTF8);
+                sw.Write(text);
+                sw.Close();
+                PlayListSaveBTVisble = "Hidden";
+                RaisePropertyChanged("PlayListSaveBTVisble");
+                PlayListSaveRoot.IsEnabled = false;
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
         /// <summary>
         /// プレイリストに変化があった場合、trueを渡せば保存、falseで設問によって保存。
@@ -2394,7 +2387,7 @@ namespace M3UPlayer.ViewModels
                 if (isSave) {
                     SavePlayList();
                     dbMsg += "＞＞保存済み";
-				} else {
+                } else {
                     string titolStr = "プレイリストが変更されています";
                     string msgStr = "保存しますか？";
                     MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
@@ -2426,27 +2419,27 @@ namespace M3UPlayer.ViewModels
                 Boolean isNotselect = false;
 
                 SelectedPlayListFiles = new List<PlayListModel>();      //  (List<PlayListModel>)MyView.PlayList.SelectedItems;
-         //       NowSelectedFile = PLListSelectedItem.UrlStr;
+                                                                        //       NowSelectedFile = PLListSelectedItem.UrlStr;
                 int oldIndex = PLList.IndexOf(PLListSelectedItem);
-         //       dbMsg += "[" + SelectedPlayListIndex + "]" + NowSelectedFile;
+                //       dbMsg += "[" + SelectedPlayListIndex + "]" + NowSelectedFile;
                 dbMsg += "操作するのは[" + oldIndex + "]" + NowSelectedFile;
 
                 if (MyView.PlayList.SelectedItems != null) {
                     dbMsg += "," + MyView.PlayList.SelectedItems.Count + "件";
                     if (0 < MyView.PlayList.SelectedItems.Count) {
                         for (int i = 0; i < MyView.PlayList.SelectedItems.Count; ++i) {
-							PlayListModel oneItem = (PlayListModel)MyView.PlayList.SelectedItems[i];
+                            PlayListModel oneItem = (PlayListModel)MyView.PlayList.SelectedItems[i];
                             SelectedPlayListFiles.Add(oneItem);
                             dbMsg += "\r\n[" + i + "]" + oneItem.UrlStr;
                         }
-					} else {
+                    } else {
                         isNotselect = false;
                     }
                 } else {
                     isNotselect = false;
                 }
 
-                if (isNotselect ) {  //PLListSelectedItem == null || SelectedPlayListIndex < 0
+                if (isNotselect) {  //PLListSelectedItem == null || SelectedPlayListIndex < 0
                     if (errorStr != null) {
                         errorStr = errorStr + "するプレイリストアイテムが選択されていないようです。\r\n" + errorStr + "したいプレイリストアイテムをクリックしてください。";
                         MessageBoxResult result = MessageShowWPF(titolStr, errorStr, MessageBoxButton.OK, MessageBoxImage.Error);
@@ -2455,7 +2448,7 @@ namespace M3UPlayer.ViewModels
                 } else {
                     retBool = true;
                     RaisePropertyChanged("PLListSelectedItem");
-					if (doStr != null) {
+                    if (doStr != null) {
                         doStr = PLListSelectedItem.fileName + doStr;
                         MessageBoxResult result = MessageShowWPF(titolStr, doStr, MessageBoxButton.OKCancel, MessageBoxImage.Exclamation);
                         dbMsg += ",result=" + result;
@@ -2477,7 +2470,7 @@ namespace M3UPlayer.ViewModels
         /// <summary>
         /// プレイリスト上での移動
         /// </summary>
-        public void PlayListItemMoveTo(int dropRow , List<PlayListModel> dropPlayListFiles) {
+        public void PlayListItemMoveTo(int dropRow, List<PlayListModel> dropPlayListFiles) {
             //int oldIndex,
             string TAG = "PlayListItemMoveTo";
             string dbMsg = "";
@@ -2489,21 +2482,21 @@ namespace M3UPlayer.ViewModels
                 }
                 if (cofDialog != null) {
                     dbMsg += "CommonOpenFileDialog";
-                  //  cofDialog.Dispose();ではない
+                    //  cofDialog.Dispose();ではない
                 }
                 dbMsg += "[" + dropRow + "/" + PLList.Count + "]へ" + dropPlayListFiles.Count + "件移動";
                 int insertRow = dropRow;
 
                 foreach (PlayListModel one in dropPlayListFiles) {
                     int removeIndex = PLList.IndexOf(one);
-					if (-1 < removeIndex) {
+                    if (-1 < removeIndex) {
                         dbMsg += "\r\n[" + removeIndex + "/" + PLList.Count + "]";
                         PLList.Remove(one);
                     }
                     dbMsg += ">>[" + insertRow + "/" + PLList.Count + "]" + one.UrlStr;
-					if (insertRow< PLList.Count) {
+                    if (insertRow < PLList.Count) {
                         PLList.Insert(insertRow, one);
-					} else {
+                    } else {
                         PLList.Add(one);
                     }
                     if (insertRow == dropRow) {
@@ -2512,7 +2505,7 @@ namespace M3UPlayer.ViewModels
                     insertRow++;
                 }
                 RaisePropertyChanged("PLList");
-				RaisePropertyChanged("PLListSelectedItem");
+                RaisePropertyChanged("PLListSelectedItem");
                 IsDoSavePlayList(false);
                 dbMsg += ">>[" + insertRow + "/" + PLList.Count + "]";
                 MyLog(TAG, dbMsg);
@@ -2535,7 +2528,7 @@ namespace M3UPlayer.ViewModels
                     return;
                 }
 
-                dbMsg += "開始時=" + SelectedPlayListFiles.Count+" / " +PLList.Count + "件";
+                dbMsg += "開始時=" + SelectedPlayListFiles.Count + " / " + PLList.Count + "件";
                 for (int i = 0; i < SelectedPlayListFiles.Count; ++i) {
                     PlayListModel oneItem = SelectedPlayListFiles[i];
                     dbMsg += "\r\n[" + i + "]" + oneItem.UrlStr;
@@ -2552,66 +2545,66 @@ namespace M3UPlayer.ViewModels
 
         #region プレイリストのコンテキストメニュー
         public ContextMenu PlayListMenu { get; set; }
-		public MenuItem PlayListItemViewExplore;
-		public MenuItem PlayListItemMove;
-		public MenuItem PlayListItemMoveTop;
-		public MenuItem PlayListItemMoveBottom;
-		public MenuItem PlayListDeleteCannotRead;
-		public MenuItem PlayListDeleteDoubling;
-		public MenuItem PlayListDeleteFrontDoubling;
-		public MenuItem PlayListDeleteAfterDoubling;
+        public MenuItem PlayListItemViewExplore;
+        public MenuItem PlayListItemMove;
+        public MenuItem PlayListItemMoveTop;
+        public MenuItem PlayListItemMoveBottom;
+        public MenuItem PlayListDeleteCannotRead;
+        public MenuItem PlayListDeleteDoubling;
+        public MenuItem PlayListDeleteFrontDoubling;
+        public MenuItem PlayListDeleteAfterDoubling;
         public MenuItem PlayListItemRemove;
         public MenuItem PlayListSaveRoot;
-		public MenuItem PlayListSaveMenu;
-		public MenuItem PlayListSaveAsMenu;
-		/// <summary>
-		/// コンボボックスにコンテキストメニューを追加する
-		/// </summary>
-		public void MakePlayListMenu() {
-			string TAG = "MakePlayListoMenu";
-			string dbMsg = "";
-			try {
-				//  dbMsg += ",PLComboSelectedIndex=" + PLComboSelectedIndex;
-				PlayListMenu = new ContextMenu();
+        public MenuItem PlayListSaveMenu;
+        public MenuItem PlayListSaveAsMenu;
+        /// <summary>
+        /// コンボボックスにコンテキストメニューを追加する
+        /// </summary>
+        public void MakePlayListMenu() {
+            string TAG = "MakePlayListoMenu";
+            string dbMsg = "";
+            try {
+                //  dbMsg += ",PLComboSelectedIndex=" + PLComboSelectedIndex;
+                PlayListMenu = new ContextMenu();
 
-				PlayListItemViewExplore = new MenuItem();
-				PlayListItemViewExplore.Header = "エクスプローラーで開く";
-				//コンテキストメニュー表示時に発生するイベントを追加
-				PlayListItemViewExplore.Click += PlayListItemViewExplore_Click;
-				PlayListMenu.Items.Add(PlayListItemViewExplore);
+                PlayListItemViewExplore = new MenuItem();
+                PlayListItemViewExplore.Header = "エクスプローラーで開く";
+                //コンテキストメニュー表示時に発生するイベントを追加
+                PlayListItemViewExplore.Click += PlayListItemViewExplore_Click;
+                PlayListMenu.Items.Add(PlayListItemViewExplore);
 
-				PlayListItemMove = new MenuItem();
-				PlayListItemMove.Header = "移動...";
+                PlayListItemMove = new MenuItem();
+                PlayListItemMove.Header = "移動...";
 
-				PlayListItemMoveTop = new MenuItem();
-				PlayListItemMoveTop.Header = "先頭へ移動";
-				PlayListItemMoveTop.Click += PlayListItemMoveTop_Click;
-				PlayListItemMove.Items.Add(PlayListItemMoveTop);
+                PlayListItemMoveTop = new MenuItem();
+                PlayListItemMoveTop.Header = "先頭へ移動";
+                PlayListItemMoveTop.Click += PlayListItemMoveTop_Click;
+                PlayListItemMove.Items.Add(PlayListItemMoveTop);
 
-				PlayListItemMoveBottom = new MenuItem();
-				PlayListItemMoveBottom.Header = "末尾へ移動";
-				PlayListItemMoveBottom.Click += PlayListItemMoveBottom_Click;
-				PlayListItemMove.Items.Add(PlayListItemMoveBottom);
-				PlayListMenu.Items.Add(PlayListItemMove);
+                PlayListItemMoveBottom = new MenuItem();
+                PlayListItemMoveBottom.Header = "末尾へ移動";
+                PlayListItemMoveBottom.Click += PlayListItemMoveBottom_Click;
+                PlayListItemMove.Items.Add(PlayListItemMoveBottom);
+                PlayListMenu.Items.Add(PlayListItemMove);
 
-				PlayListDeleteCannotRead = new MenuItem();
-				PlayListDeleteCannotRead.Header = "読めないアイテムを削除";
-				PlayListDeleteCannotRead.Click += PlayListDeleteCannotRead_Click;
-				PlayListMenu.Items.Add(PlayListDeleteCannotRead);
+                PlayListDeleteCannotRead = new MenuItem();
+                PlayListDeleteCannotRead.Header = "読めないアイテムを削除";
+                PlayListDeleteCannotRead.Click += PlayListDeleteCannotRead_Click;
+                PlayListMenu.Items.Add(PlayListDeleteCannotRead);
 
-				PlayListDeleteDoubling = new MenuItem();
-				PlayListDeleteDoubling.Header = "重複アイテムを削除...";
+                PlayListDeleteDoubling = new MenuItem();
+                PlayListDeleteDoubling.Header = "重複アイテムを削除...";
 
-				PlayListDeleteFrontDoubling = new MenuItem();
-				PlayListDeleteFrontDoubling.Header = "先頭側";
-				PlayListDeleteFrontDoubling.Click += PlayListDeleteFrontDoubling_Click;
-				PlayListDeleteDoubling.Items.Add(PlayListDeleteFrontDoubling);
+                PlayListDeleteFrontDoubling = new MenuItem();
+                PlayListDeleteFrontDoubling.Header = "先頭側";
+                PlayListDeleteFrontDoubling.Click += PlayListDeleteFrontDoubling_Click;
+                PlayListDeleteDoubling.Items.Add(PlayListDeleteFrontDoubling);
 
-				PlayListDeleteAfterDoubling = new MenuItem();
-				PlayListDeleteAfterDoubling.Header = "末尾側";
-				PlayListDeleteAfterDoubling.Click += PlayListDeleteAfterDoubling_Click;
-				PlayListDeleteDoubling.Items.Add(PlayListDeleteAfterDoubling);
-				PlayListMenu.Items.Add(PlayListDeleteDoubling);
+                PlayListDeleteAfterDoubling = new MenuItem();
+                PlayListDeleteAfterDoubling.Header = "末尾側";
+                PlayListDeleteAfterDoubling.Click += PlayListDeleteAfterDoubling_Click;
+                PlayListDeleteDoubling.Items.Add(PlayListDeleteAfterDoubling);
+                PlayListMenu.Items.Add(PlayListDeleteDoubling);
 
                 PlayListItemRemove = new MenuItem();
                 PlayListItemRemove.Header = "選択しているアイテムを削除";
@@ -2619,26 +2612,26 @@ namespace M3UPlayer.ViewModels
                 PlayListMenu.Items.Add(PlayListItemRemove);
 
                 PlayListSaveRoot = new MenuItem();
-				PlayListSaveRoot.Header = "このプレイリストを保存...";
+                PlayListSaveRoot.Header = "このプレイリストを保存...";
 
-				PlayListSaveMenu = new MenuItem();
-				PlayListSaveMenu.Header = "上書き";
-				PlayListSaveMenu.Click += PlayListSaveMenu_Click;
-				PlayListSaveRoot.Items.Add(PlayListSaveMenu);
+                PlayListSaveMenu = new MenuItem();
+                PlayListSaveMenu.Header = "上書き";
+                PlayListSaveMenu.Click += PlayListSaveMenu_Click;
+                PlayListSaveRoot.Items.Add(PlayListSaveMenu);
 
-				PlayListSaveAsMenu = new MenuItem();
-				PlayListSaveAsMenu.Header = "名前を付けて保存";
-				PlayListSaveAsMenu.Click += PlayListSaveAsMenu_Click;
-				PlayListSaveRoot.Items.Add(PlayListSaveAsMenu);
-				PlayListMenu.Items.Add(PlayListSaveRoot);
+                PlayListSaveAsMenu = new MenuItem();
+                PlayListSaveAsMenu.Header = "名前を付けて保存";
+                PlayListSaveAsMenu.Click += PlayListSaveAsMenu_Click;
+                PlayListSaveRoot.Items.Add(PlayListSaveAsMenu);
+                PlayListMenu.Items.Add(PlayListSaveRoot);
 
-				RaisePropertyChanged("PlayListMenu");
-				MyLog(TAG, dbMsg);
-				//  Messenger.Raise(new WindowActionMessage(WindowAction.Close, "Close"));
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+                RaisePropertyChanged("PlayListMenu");
+                MyLog(TAG, dbMsg);
+                //  Messenger.Raise(new WindowActionMessage(WindowAction.Close, "Close"));
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
         /// <summary>
         /// プレイリストで選択したアイテムをエクスプローラーで開く
@@ -2647,9 +2640,9 @@ namespace M3UPlayer.ViewModels
         /// <param name="e"></param>
         /// https://dobon.net/vb/dotnet/process/openexplore.html
 		private void PlayListItemViewExplore_Click(object sender, RoutedEventArgs e) {
-			string TAG = "PlayListItemViewExplore_Click";
-			string dbMsg = "";
-			try {
+            string TAG = "PlayListItemViewExplore_Click";
+            string dbMsg = "";
+            try {
                 string titolStr = "プレイリストアイテムファイルの操作";
                 string errorStr = "操作";
                 string? doStr = null;
@@ -2658,37 +2651,37 @@ namespace M3UPlayer.ViewModels
                 }
 
                 NowSelectedFile = PLListSelectedItem.UrlStr;
-				dbMsg += "[" + SelectedPlayListIndex + "]" + NowSelectedFile;
+                dbMsg += "[" + SelectedPlayListIndex + "]" + NowSelectedFile;
                 string[] Strs = NowSelectedFile.Split('/');
                 if (NowSelectedFile.Contains('/')) {
-                }else if (NowSelectedFile.Contains(Path.DirectorySeparatorChar)) {
+                } else if (NowSelectedFile.Contains(Path.DirectorySeparatorChar)) {
                     Strs = NowSelectedFile.Split(Path.DirectorySeparatorChar);
                 }
                 dbMsg += "," + Strs.Length + "階層";
-                string fileNameStr =  Strs[Strs.Length-1];
+                string fileNameStr = Strs[Strs.Length - 1];
                 dbMsg += ",fileNameStr=" + fileNameStr;
-                string pathStr =  NowSelectedFile.Remove(NowSelectedFile.Length - fileNameStr.Length-1);
+                string pathStr = NowSelectedFile.Remove(NowSelectedFile.Length - fileNameStr.Length - 1);
                 pathStr = pathStr.Replace("file://", "");
                 pathStr = pathStr.Replace("///", "/");
                 pathStr = pathStr.Replace("//", "/");
                 pathStr = pathStr.Replace('/', Path.DirectorySeparatorChar);
-                dbMsg += ">>" + pathStr+" の "+ fileNameStr;
+                dbMsg += ">>" + pathStr + " の " + fileNameStr;
                 //		System.Diagnostics.Process.Start("EXPLORER.EXE", pathStr);
                 // ダイアログのインスタンスを生成
                 cofDialog = new CommonOpenFileDialog("ファイルの操作") {
-					IsFolderPicker = false,             //フォルダ選択
-					InitialDirectory =  pathStr,
-					DefaultDirectory =  pathStr,         //初期ディレクトリ
-					DefaultFileName = fileNameStr,  //ファイルの完全なパスを含む文字列
-					EnsurePathExists = true,
-					// FileNameは読み取り専用
-				};
-				if (cofDialog.ShowDialog() == CommonFileDialogResult.Ok) {
-					//    MessageBox.Show(dialog.FileName);
-					string NewSelectedPath = cofDialog.FileName;              //fbDialog.SelectedPath;
-					dbMsg += ">>" + NewSelectedPath;
-					if (!NewSelectedPath.Equals(NowSelectedFile)) {
-                        dbMsg += ">>変更有り" ;
+                    IsFolderPicker = false,             //フォルダ選択
+                    InitialDirectory = pathStr,
+                    DefaultDirectory = pathStr,         //初期ディレクトリ
+                    DefaultFileName = fileNameStr,  //ファイルの完全なパスを含む文字列
+                    EnsurePathExists = true,
+                    // FileNameは読み取り専用
+                };
+                if (cofDialog.ShowDialog() == CommonFileDialogResult.Ok) {
+                    //    MessageBox.Show(dialog.FileName);
+                    string NewSelectedPath = cofDialog.FileName;              //fbDialog.SelectedPath;
+                    dbMsg += ">>" + NewSelectedPath;
+                    if (!NewSelectedPath.Equals(NowSelectedFile)) {
+                        dbMsg += ">>変更有り";
                         PlayListModel changeItem = new PlayListModel();
                         changeItem.UrlStr = NewSelectedPath;
                         if (File.Exists(NowSelectedFile)) {
@@ -2708,7 +2701,7 @@ namespace M3UPlayer.ViewModels
                         SavePlayList();
                     }
                 } else {
-					dbMsg += "キャンセルされました";
+                    dbMsg += "キャンセルされました";
                 }
                 if (File.Exists(NowSelectedFile)) {
                 } else {
@@ -2717,10 +2710,10 @@ namespace M3UPlayer.ViewModels
                     SavePlayList();
                 }
                 MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
         /// <summary>
         /// 先頭へ移動
@@ -2728,27 +2721,27 @@ namespace M3UPlayer.ViewModels
         /// <param name="sender"></param>
         /// <param name="e"></param>
 		private void PlayListItemMoveTop_Click(object sender, RoutedEventArgs e) {
-			string TAG = "PlayListItemMoveTop_Click";
-			string dbMsg = "";
-			try {
+            string TAG = "PlayListItemMoveTop_Click";
+            string dbMsg = "";
+            try {
                 string titolStr = "プレイリストのアイテム移動";
                 string errorStr = "移動";
                 string doStr = "をリスト先頭に移動しますか？";
-                if (!PlayListOpelate( titolStr, errorStr, doStr)) {
-                    return ;
+                if (!PlayListOpelate(titolStr, errorStr, doStr)) {
+                    return;
                 }
 
                 NowSelectedFile = PLListSelectedItem.UrlStr;
-				dbMsg += "urlStr=" + NowSelectedFile;
-				int oldIndex = PLList.IndexOf(PLListSelectedItem);
-				dbMsg += ",oldIndex=" + oldIndex;
-				PLList.Move(oldIndex, 0);
-                IsDoSavePlayList( false);
+                dbMsg += "urlStr=" + NowSelectedFile;
+                int oldIndex = PLList.IndexOf(PLListSelectedItem);
+                dbMsg += ",oldIndex=" + oldIndex;
+                PLList.Move(oldIndex, 0);
+                IsDoSavePlayList(false);
                 MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
         /// <summary>
         /// 末尾へ移動
@@ -2756,9 +2749,9 @@ namespace M3UPlayer.ViewModels
         /// <param name="sender"></param>
         /// <param name="e"></param>
 		private void PlayListItemMoveBottom_Click(object sender, RoutedEventArgs e) {
-			string TAG = "PlayListItemMoveBottom_Click";
-			string dbMsg = "";
-			try {
+            string TAG = "PlayListItemMoveBottom_Click";
+            string dbMsg = "";
+            try {
                 string titolStr = "プレイリストのアイテム移動";
                 string errorStr = "移動";
                 string doStr = "をリスト末尾に移動しますか？";
@@ -2766,16 +2759,16 @@ namespace M3UPlayer.ViewModels
                     return;
                 }
                 NowSelectedFile = PLListSelectedItem.UrlStr;
-				dbMsg += "urlStr=" + NowSelectedFile;
-				int oldIndex = PLList.IndexOf(PLListSelectedItem);
-				dbMsg += ",oldIndex=" + oldIndex;
-				PLList.Move(oldIndex, PLList.Count - 1);
+                dbMsg += "urlStr=" + NowSelectedFile;
+                int oldIndex = PLList.IndexOf(PLListSelectedItem);
+                dbMsg += ",oldIndex=" + oldIndex;
+                PLList.Move(oldIndex, PLList.Count - 1);
                 IsDoSavePlayList(false);
                 MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
         /// <summary>
         /// 読めないファイルを削除
@@ -2783,34 +2776,34 @@ namespace M3UPlayer.ViewModels
         /// <param name="sender"></param>
         /// <param name="e"></param>
 		private void PlayListDeleteCannotRead_Click(object sender, RoutedEventArgs e) {
-			string TAG = "PlayListDeleteCannotRead_Click";
-			string dbMsg = "";
-			try {
-				dbMsg += "ListItemCount=" + ListItemCount + "件";
-				ObservableCollection<PlayListModel> DeleteList = new ObservableCollection<PlayListModel>();
-				foreach (PlayListModel item in PLList) {
-					if (File.Exists(item.UrlStr)) {
-					} else {
-						dbMsg += "不在=" + item.UrlStr;
-						DeleteList.Add(item);
-					}
-				}
-				dbMsg += ">削除待ち>" + DeleteList.Count + "件";
-				if (0<DeleteList.Count) {
-					foreach (PlayListModel item in DeleteList) {
-						PLList.Remove(item);
-					}
-					RaisePropertyChanged("PLList");
-					ListItemCount = PLList.Count();
-					RaisePropertyChanged("ListItemCount");
-					dbMsg += ">>" + ListItemCount + "件";
-				}
+            string TAG = "PlayListDeleteCannotRead_Click";
+            string dbMsg = "";
+            try {
+                dbMsg += "ListItemCount=" + ListItemCount + "件";
+                ObservableCollection<PlayListModel> DeleteList = new ObservableCollection<PlayListModel>();
+                foreach (PlayListModel item in PLList) {
+                    if (File.Exists(item.UrlStr)) {
+                    } else {
+                        dbMsg += "不在=" + item.UrlStr;
+                        DeleteList.Add(item);
+                    }
+                }
+                dbMsg += ">削除待ち>" + DeleteList.Count + "件";
+                if (0 < DeleteList.Count) {
+                    foreach (PlayListModel item in DeleteList) {
+                        PLList.Remove(item);
+                    }
+                    RaisePropertyChanged("PLList");
+                    ListItemCount = PLList.Count();
+                    RaisePropertyChanged("ListItemCount");
+                    dbMsg += ">>" + ListItemCount + "件";
+                }
                 IsDoSavePlayList(true);
                 MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
         /// <summary>
         /// 先頭側の重複アイテムを削除
@@ -2818,40 +2811,40 @@ namespace M3UPlayer.ViewModels
         /// <param name="sender"></param>
         /// <param name="e"></param>
 		private void PlayListDeleteFrontDoubling_Click(object sender, RoutedEventArgs e) {
-			string TAG = "DeletePlayListComboItem";
-			string dbMsg = "";
-			try {
-				dbMsg += "ListItemCount=" + ListItemCount + "件";
-				ObservableCollection<PlayListModel> DeleteList = new ObservableCollection<PlayListModel>();
-				foreach (PlayListModel checkItem in PLList) {
-					int checkIndex = PLList.IndexOf(checkItem);
-					foreach (PlayListModel tItem in PLList) {
-						int tIndex = PLList.IndexOf(tItem);
-						if (checkIndex < tIndex) {
-							if (tItem.UrlStr.Equals(checkItem.UrlStr)) {
-								dbMsg += ">重複>=" + tItem.UrlStr;
-								checkItem.ActionFlag = true;
-								DeleteList.Add(checkItem);
-							}
-						}
-					}
-				}
-				dbMsg += ">削除待ち>" + DeleteList.Count + "件";
-				if (0 < DeleteList.Count) {
-					foreach (PlayListModel item in DeleteList) {
-						PLList.Remove(item);
-					}
-					RaisePropertyChanged("PLList");
-					ListItemCount = PLList.Count();
-					RaisePropertyChanged("ListItemCount");
-					dbMsg += ">>" + ListItemCount + "件";
-				}
+            string TAG = "DeletePlayListComboItem";
+            string dbMsg = "";
+            try {
+                dbMsg += "ListItemCount=" + ListItemCount + "件";
+                ObservableCollection<PlayListModel> DeleteList = new ObservableCollection<PlayListModel>();
+                foreach (PlayListModel checkItem in PLList) {
+                    int checkIndex = PLList.IndexOf(checkItem);
+                    foreach (PlayListModel tItem in PLList) {
+                        int tIndex = PLList.IndexOf(tItem);
+                        if (checkIndex < tIndex) {
+                            if (tItem.UrlStr.Equals(checkItem.UrlStr)) {
+                                dbMsg += ">重複>=" + tItem.UrlStr;
+                                checkItem.ActionFlag = true;
+                                DeleteList.Add(checkItem);
+                            }
+                        }
+                    }
+                }
+                dbMsg += ">削除待ち>" + DeleteList.Count + "件";
+                if (0 < DeleteList.Count) {
+                    foreach (PlayListModel item in DeleteList) {
+                        PLList.Remove(item);
+                    }
+                    RaisePropertyChanged("PLList");
+                    ListItemCount = PLList.Count();
+                    RaisePropertyChanged("ListItemCount");
+                    dbMsg += ">>" + ListItemCount + "件";
+                }
                 IsDoSavePlayList(false);
                 MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
         /// <summary>
         /// 末尾側の重複アイテムを削除
@@ -2859,41 +2852,41 @@ namespace M3UPlayer.ViewModels
         /// <param name="sender"></param>
         /// <param name="e"></param>
 		private void PlayListDeleteAfterDoubling_Click(object sender, RoutedEventArgs e) {
-			string TAG = "PlayListDeleteAfterDoubling_Click";
-			string dbMsg = "";
-			try {
-				dbMsg += "ListItemCount=" + ListItemCount + "件";
-				ObservableCollection<PlayListModel> DeleteList = new ObservableCollection<PlayListModel>();
-				foreach (PlayListModel checkItem in PLList) {
-					int checkIndex = PLList.IndexOf(checkItem);
-					foreach (PlayListModel tItem in PLList) {
-						int tIndex = PLList.IndexOf(tItem);
-						if (checkIndex < tIndex) {
-							if (tItem.UrlStr.Equals(checkItem.UrlStr)) {
-								dbMsg += ">重複>=" + tItem.UrlStr;
-								tItem.ActionFlag=true;
-								DeleteList.Add(tItem);
-							}
-						}
-					}
-				}
-				dbMsg += ">削除待ち>" + DeleteList.Count + "件";
-				if (0 < DeleteList.Count) {
-					while (0<DeleteList.Count) {
-						PLList.Remove(DeleteList[0]);
-						DeleteList.Remove(DeleteList[0]);
-					}
-					RaisePropertyChanged("PLList");
-					ListItemCount = PLList.Count();
-					RaisePropertyChanged("ListItemCount");
-					dbMsg += ">>" + ListItemCount + "件";
-				}
+            string TAG = "PlayListDeleteAfterDoubling_Click";
+            string dbMsg = "";
+            try {
+                dbMsg += "ListItemCount=" + ListItemCount + "件";
+                ObservableCollection<PlayListModel> DeleteList = new ObservableCollection<PlayListModel>();
+                foreach (PlayListModel checkItem in PLList) {
+                    int checkIndex = PLList.IndexOf(checkItem);
+                    foreach (PlayListModel tItem in PLList) {
+                        int tIndex = PLList.IndexOf(tItem);
+                        if (checkIndex < tIndex) {
+                            if (tItem.UrlStr.Equals(checkItem.UrlStr)) {
+                                dbMsg += ">重複>=" + tItem.UrlStr;
+                                tItem.ActionFlag = true;
+                                DeleteList.Add(tItem);
+                            }
+                        }
+                    }
+                }
+                dbMsg += ">削除待ち>" + DeleteList.Count + "件";
+                if (0 < DeleteList.Count) {
+                    while (0 < DeleteList.Count) {
+                        PLList.Remove(DeleteList[0]);
+                        DeleteList.Remove(DeleteList[0]);
+                    }
+                    RaisePropertyChanged("PLList");
+                    ListItemCount = PLList.Count();
+                    RaisePropertyChanged("ListItemCount");
+                    dbMsg += ">>" + ListItemCount + "件";
+                }
                 IsDoSavePlayList(false);
                 MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
         /// <summary>
         /// 選択しているアイテムを削除
@@ -2917,15 +2910,15 @@ namespace M3UPlayer.ViewModels
         /// <param name="sender"></param>
         /// <param name="e"></param>
 		private void PlayListSaveMenu_Click(object sender, RoutedEventArgs e) {
-			string TAG = "PlayListSaveMwnu_Click";
-			string dbMsg = "";
-			try {
-				SavePlayList();
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+            string TAG = "PlayListSaveMwnu_Click";
+            string dbMsg = "";
+            try {
+                SavePlayList();
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
         /// <summary>
         /// 名前を付けてこのプレイリストを保存
@@ -2933,16 +2926,16 @@ namespace M3UPlayer.ViewModels
         /// <param name="sender"></param>
         /// <param name="e"></param>
 		private void PlayListSaveAsMenu_Click(object sender, RoutedEventArgs e) {
-			string TAG = "PlayListSaveAsMenu_Click";
-			string dbMsg = "";
-			try {
+            string TAG = "PlayListSaveAsMenu_Click";
+            string dbMsg = "";
+            try {
                 string oldPlayListFileName = CurrentPlayListFileName;
                 dbMsg += "[" + PLComboSelectedIndex + " / " + PLComboSource.Count() + "]" + oldPlayListFileName;
                 dbMsg += "\r\n" + ListItemCount + "件";
-				string text = "";           //プレイリスト内の要素
-				foreach (PlayListModel One in PLList) {
-					text += One.UrlStr + "\r\n";                    //プレイリストはurlのみ
-				}
+                string text = "";           //プレイリスト内の要素
+                foreach (PlayListModel One in PLList) {
+                    text += One.UrlStr + "\r\n";                    //プレイリストはurlのみ
+                }
 
                 SaveFileDialog dialog = new SaveFileDialog() {
                     Title = "プレイリストの複製",
@@ -2964,11 +2957,11 @@ namespace M3UPlayer.ViewModels
 
 
                 if (true == dialog.ShowDialog()) {
-					string newFileFullName = dialog.FileName;
-					dbMsg += ">>" + newFileFullName;
+                    string newFileFullName = dialog.FileName;
+                    dbMsg += ">>" + newFileFullName;
                     string fName = dialog.SafeFileName;              //System.IO.Path.GetFileName(CurrentPlayListFileName);
                     dbMsg += "と" + fName;
-					File.WriteAllText(newFileFullName, text, Encoding.UTF8);
+                    File.WriteAllText(newFileFullName, text, Encoding.UTF8);
 
                     //using (Stream fileStream = dialog.OpenFile())
                     //using (StreamWriter sr = new StreamWriter(fileStream)) {
@@ -2983,14 +2976,14 @@ namespace M3UPlayer.ViewModels
                     NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
                     RaisePropertyChanged("NowSelectedPath");
                     dbMsg += ">>NowSelectedPath=" + NowSelectedPath;
-					//設定ファイル更新
-					Properties.Settings.Default.Save();
-				}
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+                    //設定ファイル更新
+                    Properties.Settings.Default.Save();
+                }
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
         #endregion
 
@@ -3007,67 +3000,63 @@ namespace M3UPlayer.ViewModels
         /// 単一ファイルの選択ダイアログから選択されたファイルをPLリストもしくは現在のプレイリストに追加する
         /// </summary>
         /// https://johobase.com/wpf-file-folder-common-dialog/
-        public void ShowFileDlog()
-        {
+        public void ShowFileDlog() {
             string TAG = "File_bt_Click";
             string dbMsg = "";
-            try
-            {
+            try {
 
                 //         string SelectFileName = "";
                 //①
                 // ダイアログのインスタンスを生成
                 ofDialog = new OpenFileDialog();
-				// ファイルの種類を設定
-				ofDialog.Filter = "プレイリスト (*.m3u*)|*.m3u*|ムービー (*.mp4)|*.mp4|全てのファイル (*.*)|*.*";
+                // ファイルの種類を設定
+                ofDialog.Filter = "プレイリスト (*.m3u*)|*.m3u*|ムービー (*.mp4)|*.mp4|全てのファイル (*.*)|*.*";
 
 
-				//	System.Windows.Forms.OpenFileDialog ofDialog = new System.Windows.Forms.OpenFileDialog();
-				//② デフォルトのフォルダを指定する
-				if (CurrentPlayListFileName.Equals(""))
-				{
-					CurrentPlayListFileName = "C;";
-				}
-				if (NowSelectedPath == null || NowSelectedPath.Equals(""))
-				{
-					NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
-				}
-				dbMsg += ",NowSelectedPath=" + NowSelectedPath;
-				ofDialog.InitialDirectory = @NowSelectedPath;
-				//③ダイアログのタイトルを指定する
-				ofDialog.Title = "ファイル選択";
-				//ダイアログを表示する
-				if (ofDialog.ShowDialog() == true) {
-					NowSelectedFile = ofDialog.FileName;
-					dbMsg += ">>" + NowSelectedFile;
-					NowSelectedPath = System.IO.Path.GetDirectoryName(NowSelectedFile);
-					dbMsg += ">>NowSelectedPath=" + NowSelectedPath;
-					RaisePropertyChanged("NowSelectedPath");
-					//設定ファイル更新
-					Properties.Settings.Default.Save();
-					string extention = System.IO.Path.GetExtension(NowSelectedFile);
-					if (extention.Contains("m3u")){
-						dbMsg += "PLListに追加";
-						AddPlayListCombo(NowSelectedFile);
-					}else{
-						dbMsg += "現在のプレイリストの先頭に追加";
-						if (AddToPlayList(NowSelectedFile, 0)){
-							//				SavePlayList();
-						}
-					}
-				}else{
-					dbMsg += "キャンセルされました";
-				}
-				// オブジェクトを破棄する
-		//		ofDialog.Dispose();
+                //	System.Windows.Forms.OpenFileDialog ofDialog = new System.Windows.Forms.OpenFileDialog();
+                //② デフォルトのフォルダを指定する
+                if (CurrentPlayListFileName.Equals("")) {
+                    CurrentPlayListFileName = "C;";
+                }
+                if (NowSelectedPath == null || NowSelectedPath.Equals("")) {
+                    NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
+                }
+                dbMsg += ",NowSelectedPath=" + NowSelectedPath;
+                ofDialog.InitialDirectory = @NowSelectedPath;
+                //③ダイアログのタイトルを指定する
+                ofDialog.Title = "ファイル選択";
+                //ダイアログを表示する
+                if (ofDialog.ShowDialog() == true) {
+                    NowSelectedFile = ofDialog.FileName;
+                    dbMsg += ">>" + NowSelectedFile;
+                    NowSelectedPath = System.IO.Path.GetDirectoryName(NowSelectedFile);
+                    dbMsg += ">>NowSelectedPath=" + NowSelectedPath;
+                    RaisePropertyChanged("NowSelectedPath");
+                    //設定ファイル更新
+                    Properties.Settings.Default.Save();
+                    string extention = System.IO.Path.GetExtension(NowSelectedFile);
+                    if (extention.Contains("m3u")) {
+                        dbMsg += "PLListに追加";
+                        AddPlayListCombo(NowSelectedFile);
+                    } else {
+                        dbMsg += "現在のプレイリストの先頭に追加";
+                        if (AddToPlayList(NowSelectedFile, 0)) {
+                            //				SavePlayList();
+                        }
+                    }
+                } else {
+                    dbMsg += "キャンセルされました";
+                }
+                // オブジェクトを破棄する
+                //		ofDialog.Dispose();
 
-				if (!NowSelectedFile.Equals("")){
-					string[] files = { NowSelectedFile };
-					//         FilesFromLocal(files);
-				}
+                if (!NowSelectedFile.Equals("")) {
+                    string[] files = { NowSelectedFile };
+                    //         FilesFromLocal(files);
+                }
                 ofDialog = null;
                 MyLog(TAG, dbMsg);
-            }catch (Exception er){
+            } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
@@ -3079,12 +3068,10 @@ namespace M3UPlayer.ViewModels
         /// フォルダ選択ダイアログから選択されたフォルダのファイルリストをファイルをアイコン化処理に渡す
         /// https://johobase.com/file-folder-common-dialog/
         /// </summary>
-        private void ShowFolderDlog()
-        {
+        private void ShowFolderDlog() {
             string TAG = "Folder_bt_Click";
             string dbMsg = "";
-            try
-            {
+            try {
                 // ダイアログのインスタンスを生成
                 cofDialog = new CommonOpenFileDialog("フォルダーの選択");
 
@@ -3093,23 +3080,23 @@ namespace M3UPlayer.ViewModels
 
                 // ダイアログを表示
                 if (cofDialog.ShowDialog() == CommonFileDialogResult.Ok) {
-                //    MessageBox.Show(dialog.FileName);
+                    //    MessageBox.Show(dialog.FileName);
                     NowSelectedPath = cofDialog.FileName;              //fbDialog.SelectedPath;
-					dbMsg += ">>" + NowSelectedPath;
-					string[] files = System.IO.Directory.GetFiles(@NowSelectedPath, "*", System.IO.SearchOption.AllDirectories);
-					dbMsg += ">>" + files.Length + "件";
-					//設定ファイル更新
-					Properties.Settings.Default.Save();
-					FilesAdd(files, 0);
+                    dbMsg += ">>" + NowSelectedPath;
+                    string[] files = System.IO.Directory.GetFiles(@NowSelectedPath, "*", System.IO.SearchOption.AllDirectories);
+                    dbMsg += ">>" + files.Length + "件";
+                    //設定ファイル更新
+                    Properties.Settings.Default.Save();
+                    FilesAdd(files, 0);
                     IsDoSavePlayList(false);
                 } else {
-					dbMsg += "キャンセルされました";
-				}
+                    dbMsg += "キャンセルされました";
+                }
                 // オブジェクトを破棄する
                 //        dialog.Dispose();
                 cofDialog = null;
                 MyLog(TAG, dbMsg);
-            }catch (Exception er){
+            } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
@@ -3132,19 +3119,15 @@ namespace M3UPlayer.ViewModels
         /// <summary>
         /// エクスプローラで作業対象フォルダを表示する
         /// </summary>
-        private void ShowExplore()
-        {
+        private void ShowExplore() {
             string TAG = "ShowExplore";
             string dbMsg = "";
-            try
-            {
+            try {
                 //最近表示した場所	をシェルなら
                 //	explorer.exe shell:::{ 22877A6D - 37A1 - 461A - 91B0 - DBDA5AAEBC99}
                 pEXPLORER = System.Diagnostics.Process.Start("EXPLORER.EXE", @"{ 22877A6D - 37A1 - 461A - 91B0 - DBDA5AAEBC99}");
                 MyLog(TAG, dbMsg);
-            }
-            catch (Exception er)
-            {
+            } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
@@ -3158,7 +3141,7 @@ namespace M3UPlayer.ViewModels
         /// <summary>
         /// Playボタンのクリック
         /// </summary>
-        private async void ClickPlayBt() {
+        public void ClickPlayBt() {
             string TAG = "ClickPlayBt";
             string dbMsg = "";
             try {
@@ -3170,6 +3153,98 @@ namespace M3UPlayer.ViewModels
                 }
                 RaisePropertyChanged("IsPlaying");
                 dbMsg += ">>IsPlaying=" + IsPlaying;
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+        /// <summary>
+        /// pauseにするだけ(Thumb.DragStarted)
+        /// </summary>
+        public async void PauseVideo() {
+            string TAG = "PauseVideo";
+            string dbMsg = "";
+            try {
+                dbMsg += ",SliderValue=" + SliderValue;
+                dbMsg += ",IsPlaying=" + IsPlaying;
+                if (IsPlaying) {
+                    IsPlaying = false;
+                    RaisePropertyChanged("IsPlaying");
+                }
+                dbMsg += ">>=" + IsPlaying;
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+
+        //		public ICommand PositionSliderValueChanged => new DelegateCommand(PositionSliderValueChang);
+
+        /// <summary>
+        /// 再生ポジションスライダーの Thumb 位置変更
+        /// </summary>
+        public async void PositionSliderValueChang(double newPosition) {
+            string TAG = "PositionSliderValueChang";
+            string dbMsg = "";
+            try {
+                dbMsg += ",SliderValue=" + SliderValue;
+                dbMsg += ",newPosition=" + newPosition;
+                SliderValue = newPosition;
+                RaisePropertyChanged("SliderValue");
+                //await Task.Run(() => {の中では設定できなかった
+                await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
+                IsPlaying = true;
+                RaisePropertyChanged("IsPlaying");
+
+                //       await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+        public ICommand ListForwarding => new DelegateCommand(ForwardList);
+        /// <summary>
+        /// プレイリストの次アイテムへ
+        /// </summary>
+        public async void ForwardList() {
+            string TAG = "ForwardList";
+            string dbMsg = "";
+            try {
+                PauseVideo();
+                dbMsg += "SelectedPlayListIndex=" + SelectedPlayListIndex;
+                if ((PLList.Count - 2) < SelectedPlayListIndex) {
+                    SelectedPlayListIndex = 0;
+                } else {
+                    SelectedPlayListIndex++;
+                }
+                RaisePropertyChanged("SelectedPlayListIndex");
+                dbMsg += ">>=" + SelectedPlayListIndex;
+                dbMsg += "/" + PLList.Count;
+                PLMouseUp();
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+        public ICommand ListRewind => new DelegateCommand(RewindList);
+        public async void RewindList() {
+            string TAG = "RewindList";
+            string dbMsg = "";
+            try {
+                dbMsg += "SelectedPlayListIndex=" + SelectedPlayListIndex;
+                if (SelectedPlayListIndex < 1) {
+                    SelectedPlayListIndex = PLList.Count - 1;
+                } else {
+                    SelectedPlayListIndex--;
+                }
+                RaisePropertyChanged("SelectedPlayListIndex");
+                dbMsg += ">>=" + SelectedPlayListIndex;
+                dbMsg += "/" + PLList.Count;
+                PLMouseUp();
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
@@ -3188,8 +3263,7 @@ namespace M3UPlayer.ViewModels
 
         ///システムメニューのカスタマイズ /////////////////////////////////////////////////////////////////////////////////////////////
         [StructLayout(LayoutKind.Sequential)]
-        struct MENUITEMINFO
-        {
+        struct MENUITEMINFO {
             public uint cbSize;
             public uint fMask;
             public uint fType;
@@ -3204,8 +3278,7 @@ namespace M3UPlayer.ViewModels
             public IntPtr hbmpItem;
 
             // return the size of the structure
-            public static uint SizeOf
-            {
+            public static uint SizeOf {
                 get { return (uint)Marshal.SizeOf(typeof(MENUITEMINFO)); }
             }
         }
@@ -3240,7 +3313,7 @@ namespace M3UPlayer.ViewModels
 
         bool IsWriteSysMenu = false;    //システムメニューを追記した
                                         /////////////////////////////////////////////////////////////////////////////////////////////システムメニューのカスタマイズ///
- //       Settings appSettings = new Settings();
+                                        //       Settings appSettings = new Settings();
         public System.ComponentModel.ComponentResourceManager resources;
         //	public SplitContainer MediaPlayerSplitter;
         //public System.Windows.Forms.WebBrowser playerWebBrowser;
@@ -3276,7 +3349,7 @@ namespace M3UPlayer.ViewModels
         string plaingItem = "";             //再生中アイテムのフルパス;連続再生スタート時、自動送り、プレイリストからのアイテムクリックで更新
         string listUpDir = "";             //プレイリストにリストアップするデレクトリ
         string wiPlayerID = Constant.PlayerName;       //webに埋め込むプレイヤーのID
- //       List<PlayListItems> PlayListBoxItem = new List<PlayListItems>();
+                                                       //       List<PlayListItems> PlayListBoxItem = new List<PlayListItems>();
         List<int> treeSelectList = new List<int>();
         string nowLPlayList = "";               //現在使っているプレイリスト
         int plIndex;             //プレイリスト上のアイテムのインデックスを取得
@@ -3289,10 +3362,10 @@ namespace M3UPlayer.ViewModels
         string plRightClickItemUrl = "";       //PlayListクリックアイテムのFullPath
         string dragFrom = "";
         ListBox draglist;
-		System.Drawing.Point mouceDownPoint;
+        System.Drawing.Point mouceDownPoint;
         int PlayListMouseDownNo;
         string PlayListMouseDownValue = "";
-  //      DragDropEffects DDEfect;
+        //      DragDropEffects DDEfect;
         TreeNode ftSelectNode;
         TreeNode dragNode;
         TreeNode fileTreeDropNode; //ドロップ先のTreeNodeを取得する
@@ -3304,13 +3377,13 @@ namespace M3UPlayer.ViewModels
         //アイコン
         //Properties
         //private Cursor noneCursor = new Cursor("none.cur");
-		//private Cursor moveCursor = new Cursor("move.cur");
-		//private Cursor copyCursor = new Cursor("copy.cur");
-		//private Cursor linkCursor = new Cursor("link.cur");
+        //private Cursor moveCursor = new Cursor("move.cur");
+        //private Cursor copyCursor = new Cursor("copy.cur");
+        //private Cursor linkCursor = new Cursor("link.cur");
 
-//	int playListWidth = 234;            //プレイリストの幅
-//	ProgressDialog pDialog;
-List<String> PlayListFileNames = new List<String>();
+        //	int playListWidth = 234;            //プレイリストの幅
+        //	ProgressDialog pDialog;
+        List<String> PlayListFileNames = new List<String>();
         bool isPlay = true;
 
         //public Form1()
@@ -3342,8 +3415,8 @@ List<String> PlayListFileNames = new List<String>();
         //        ReWriteSysMenu();   //システムメニューカスタマイズ
         //                            //イベントハンドラの追加
         //                            /*		fileTree.BeforeLabelEdit += new NodeLabelEditEventHandler( FileTree_BeforeLabelEdit );
-								//			fileTree.AfterLabelEdit += new NodeLabelEditEventHandler( FileTree1_AfterLabelEdit );
-								//			fileTree.KeyUp += new KeyEventHandler( FileTree_KeyUp );*/
+        //			fileTree.AfterLabelEdit += new NodeLabelEditEventHandler( FileTree1_AfterLabelEdit );
+        //			fileTree.KeyUp += new KeyEventHandler( FileTree_KeyUp );*/
 
         //        元に戻す.Visible = false;
         //        ペーストToolStripMenuItem.Visible = false;
@@ -3401,16 +3474,16 @@ List<String> PlayListFileNames = new List<String>();
         //        FilelistView.View = View.Details;                                                       //詳細表示にする
         //        FilelistView.ColumnClick += new ColumnClickEventHandler(FilelistView_ColumnClick);        //ColumnClickイベントハンドラの追加☆Form1.csと重複させない
         //                                                                                                  /*
-								//																					  listViewItemSorter = new ListViewItemComparer();                //ListViewItemComparerの作成と設定
+        //																					  listViewItemSorter = new ListViewItemComparer();                //ListViewItemComparerの作成と設定
 
-								//																																					   listViewItemSorter.ColumnModes = new ListViewItemComparer.ComparerMode[]
-								//																																						  {
-								//																																										  ListViewItemComparer.ComparerMode.String,
-								//																																										  ListViewItemComparer.ComparerMode.Integer,
-								//																																										  ListViewItemComparer.ComparerMode.DateTime
-								//																																						  };
-								//																																						  FilelistView.ListViewItemSorter = listViewItemSorter;               //ListViewItemSorterを指定する
-								//																																						  */
+        //																																					   listViewItemSorter.ColumnModes = new ListViewItemComparer.ComparerMode[]
+        //																																						  {
+        //																																										  ListViewItemComparer.ComparerMode.String,
+        //																																										  ListViewItemComparer.ComparerMode.Integer,
+        //																																										  ListViewItemComparer.ComparerMode.DateTime
+        //																																						  };
+        //																																						  FilelistView.ListViewItemSorter = listViewItemSorter;               //ListViewItemSorterを指定する
+        //																																						  */
         //        playListBox.AllowDrop = true;
         //        playListBox.DragEnter += new DragEventHandler(PlayListBox_DragEnter);
         //        playListBox.DragDrop += new DragEventHandler(PlayListBox_DragDrop);
@@ -3451,12 +3524,10 @@ List<String> PlayListFileNames = new List<String>();
         /// プレイリストファイルを選択した場合の読込み
         /// </summary>
         /// <param name="fullName"></param>
-        public void PlayFromFileBrousert(string fullName)
-        {
+        public void PlayFromFileBrousert(string fullName) {
             string TAG = "[PlayFromFileList]";
             string dbMsg = TAG;
-            try
-            {
+            try {
                 dbMsg += fullName;
                 string[] extStrs = fullName.Split('.');
                 string extentionStr = "." + extStrs[extStrs.Length - 1].ToLower();
@@ -3474,12 +3545,10 @@ List<String> PlayListFileNames = new List<String>();
                 playerUrl = fullName; //リストで選択されたアイテムのフルパス
                 plaingItem = fullName;             //再生中アイテムのフルパス
                 lsFullPathName = fullName;
-            //    ToView(fullName);
+                //    ToView(fullName);
                 //	}
                 MyLog(TAG, dbMsg);
-            }
-            catch (Exception er)
-            {
+            } catch (Exception er) {
                 dbMsg += "<<以降でエラー発生>>" + er.Message;
                 MyLog(TAG, dbMsg);
             }
@@ -3494,8 +3563,7 @@ List<String> PlayListFileNames = new List<String>();
         {
             string TAG = "[PlayStateChangeEvent]";
             string dbMsg = TAG;
-            try
-            {
+            try {
                 /*	switch (e.newState) {
 						case 0:    // Undefined
 						dbMsg+= "Undefined";
@@ -3554,15 +3622,11 @@ List<String> PlayListFileNames = new List<String>();
 						break;
 					}*/
                 MyLog(TAG, dbMsg);
-            }
-            catch (NotImplementedException er)
-            {
+            } catch (NotImplementedException er) {
                 dbMsg += "<<以降でエラー発生>>" + er.Message;
                 MyLog(TAG, dbMsg);
                 throw new NotImplementedException();
-            }
-            catch (Exception er)
-            {
+            } catch (Exception er) {
                 dbMsg += "<<以降でエラー発生>>" + er.Message;
                 MyLog(TAG, dbMsg);
             }
@@ -3580,18 +3644,12 @@ List<String> PlayListFileNames = new List<String>();
 
         private void MakeFolderList(string sarchDir)//, string sarchTyp
         {
-            try
-            {
+            try {
                 string[] files = Directory.GetFiles(sarchDir);
-                if (files != null)
-                {
-                    foreach (string fileName in files)
-                    {
-                        if (-1 < fileName.IndexOf("RECYCLE.BIN", StringComparison.OrdinalIgnoreCase))
-                        {
-                        }
-                        else
-                        {
+                if (files != null) {
+                    foreach (string fileName in files) {
+                        if (-1 < fileName.IndexOf("RECYCLE.BIN", StringComparison.OrdinalIgnoreCase)) {
+                        } else {
 
                             string rfileName = fileName.Replace(sarchDir, "");
                             //					listBox1.Items.Add( rfileName );      //ListBox1に結果を表示する
@@ -3599,38 +3657,28 @@ List<String> PlayListFileNames = new List<String>();
                     }
                 }
                 string[] folderes = Directory.GetDirectories(sarchDir);//
-                if (folderes != null)
-                {
-                    foreach (string directoryName in folderes)
-                    {
+                if (folderes != null) {
+                    foreach (string directoryName in folderes) {
                         if (-1 < directoryName.IndexOf("RECYCLE", StringComparison.OrdinalIgnoreCase) ||
                             -1 < directoryName.IndexOf("System Vol", StringComparison.OrdinalIgnoreCase)
-                            ) { }
-                        else
-                        {
+                            ) { } else {
                             //	listBox1.Items.Add( directoryName );
                             //        MakeFolderList(directoryName);
                         }
                     }           //ListBox1に結果を表示する
 
                 }
-            }
-            catch (UnauthorizedAccessException UAEx)
-            {
+            } catch (UnauthorizedAccessException UAEx) {
                 Console.WriteLine(UAEx.Message);
-            }
-            catch (PathTooLongException PathEx)
-            {
+            } catch (PathTooLongException PathEx) {
                 Console.WriteLine(PathEx.Message);
             }
 
         }       //ファイルリストアップ
 
-        private void MakeFileList(string sarchDir, string sarchType)
-        {
+        private void MakeFileList(string sarchDir, string sarchType) {
             string[] files = Directory.GetFiles("c:\\");
-            foreach (string fileName in files)
-            {
+            foreach (string fileName in files) {
                 //			listBox1.Items.Add( fileName );
             }           //ListBox1に結果を表示する
 
@@ -3646,18 +3694,16 @@ List<String> PlayListFileNames = new List<String>();
             //         listBox1.Items.AddRange(files);           //ListBox1に結果を表示する
         }       //ファイルリストアップ
 
-        private void MakeDriveList()
-        {
+        private void MakeDriveList() {
             TreeNode tn;
             foreach (DriveInfo drive in DriveInfo.GetDrives())//http://www.atmarkit.co.jp/fdotnet/dotnettips/557driveinfo/driveinfo.html
             {
                 string driveNames = drive.Name; // ドライブ名
-                if (drive.IsReady)
-                { // ドライブの準備はOK？
-              //      tn = new TreeNode(driveNames, 0, 0);
-              ////      fileTree.Nodes.Add(tn);//親ノードにドライブを設定
-              //  //    FolderItemListUp(driveNames, tn);
-              //      tn.ImageIndex = 0;          //hd_icon.png
+                if (drive.IsReady) { // ドライブの準備はOK？
+                                     //      tn = new TreeNode(driveNames, 0, 0);
+                                     ////      fileTree.Nodes.Add(tn);//親ノードにドライブを設定
+                                     //  //    FolderItemListUp(driveNames, tn);
+                                     //      tn.ImageIndex = 0;          //hd_icon.png
                 }
             }
         }//使用可能なドライブリスト取得
@@ -3668,372 +3714,230 @@ List<String> PlayListFileNames = new List<String>();
         /// </summary>
         /// <param name="checkFileName"></param>
         /// <returns></returns>
-        public string GetFileTypeStr(string checkFileName)
-        {
+        public string GetFileTypeStr(string checkFileName) {
             string TAG = "[GetFileTypeStr]";
             string dbMsg = "";
             string retMIME = "";
             try {
-				string retType = "";
+                string retType = "";
                 string[] extStrs = checkFileName.Split('.');
                 string extentionStr = "." + extStrs[extStrs.Length - 1].ToLower();
                 dbMsg += ",拡張子=" + extentionStr;
                 if (-1 < extentionStr.IndexOf(".mov", StringComparison.OrdinalIgnoreCase) ||
-                    -1 < extentionStr.IndexOf(".qt", StringComparison.OrdinalIgnoreCase))
-                {
+                    -1 < extentionStr.IndexOf(".qt", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
                     retMIME = "video/quicktime";
-                }
-                else if (-1 < extentionStr.IndexOf(".mpg", StringComparison.OrdinalIgnoreCase) ||
-                  -1 < extentionStr.IndexOf(".mpeg", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".mpg", StringComparison.OrdinalIgnoreCase) ||
+                    -1 < extentionStr.IndexOf(".mpeg", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
                     retMIME = "video/mpeg";
-                }
-                else if (-1 < extentionStr.IndexOf(".mp4", StringComparison.OrdinalIgnoreCase))
-                {          //動画コーデック：H.264/音声コーデック：MP3、AAC
+                } else if (-1 < extentionStr.IndexOf(".mp4", StringComparison.OrdinalIgnoreCase)) {          //動画コーデック：H.264/音声コーデック：MP3、AAC
                     retType = "video";
                     retMIME = "video/mp4";        //ver12:MP4 ビデオ ファイル <source src="movie.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
-                }
-                else if (-1 < extentionStr.IndexOf(".webm", StringComparison.OrdinalIgnoreCase))
-                {          //動画コーデック：VP8 / Vorbis
+                } else if (-1 < extentionStr.IndexOf(".webm", StringComparison.OrdinalIgnoreCase)) {          //動画コーデック：VP8 / Vorbis
                     retType = "video";
                     retMIME = "video/webm";//  <source src="movie.webm" type='video/webm; codecs="vp8, vorbis"' />
-                }
-                else if (-1 < extentionStr.IndexOf(".ogv", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".ogv", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
                     retMIME = "video/ogv";
-                }
-                else if (-1 < extentionStr.IndexOf(".avi", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".avi", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
                     retMIME = "video/x-msvideo";
-                }
-                else if (-1 < extentionStr.IndexOf(".3gp", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".3gp", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
                     retMIME = "video/3gpp";     //audio/3gpp
-                }
-                else if (-1 < extentionStr.IndexOf(".3g2", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".3g2", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
                     retMIME = "video/3gpp2";            //audio/3gpp2
-                }
-                else if (-1 < extentionStr.IndexOf(".asf", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".asf", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
                     retMIME = "video/x-ms-asf";
-                }
-                else if (-1 < extentionStr.IndexOf(".asx", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".asx", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
                     retMIME = "video/x-ms-asf";   //ver9:Windows Media メタファイル 
-                }
-                else if (-1 < extentionStr.IndexOf(".wax", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".wax", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";   //ver9:Windows Media メタファイル 
-                }
-                else if (-1 < extentionStr.IndexOf(".wmv", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".wmv", StringComparison.OrdinalIgnoreCase)) {
                     retMIME = "video/x-ms-wmv";      //ver9:Windows Media 形式
                     retType = "video";
-                }
-                else if (-1 < extentionStr.IndexOf(".wvx", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".wvx", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
                     retMIME = "video/x-ms-wvx";       //ver9:Windows Media メタファイル 
-                }
-                else if (-1 < extentionStr.IndexOf(".wmx", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".wmx", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
                     retMIME = "video/x-ms-wmx";       //ver9:Windows Media メタファイル 
-                }
-                else if (-1 < extentionStr.IndexOf(".wmz", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".wmz", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
                     retMIME = "application/x-ms-wmz";
-                }
-                else if (-1 < extentionStr.IndexOf(".wmd", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".wmd", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
                     retMIME = "application/x-ms-wmd";
-                }
-                else if (-1 < extentionStr.IndexOf(".swf", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".swf", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
                     retMIME = "application/x-shockwave-flash";
-                }
-                else if (-1 < extentionStr.IndexOf(".flv", StringComparison.OrdinalIgnoreCase))
-                {          //動画コーデック：Sorenson Spark / On2VP6/音声コーデック：MP3
+                } else if (-1 < extentionStr.IndexOf(".flv", StringComparison.OrdinalIgnoreCase)) {          //動画コーデック：Sorenson Spark / On2VP6/音声コーデック：MP3
                     retType = "video";
                     retMIME = "application/x-shockwave-flash";
                     //	retMIME = "video/x-flv";
-                }
-                else if (-1 < extentionStr.IndexOf(".f4v", StringComparison.OrdinalIgnoreCase))
-                {          //動画コーデック：H.264/音声コーデック：MP3、AAC、HE - AAC
+                } else if (-1 < extentionStr.IndexOf(".f4v", StringComparison.OrdinalIgnoreCase)) {          //動画コーデック：H.264/音声コーデック：MP3、AAC、HE - AAC
                     retType = "video";
                     retMIME = "video/mp4";
-                }
-                else if (-1 < extentionStr.IndexOf(".rm", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".rm", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
                     retMIME = "application/vnd.rn-realmedia";
-                }
-                else if (-1 < extentionStr.IndexOf(".ivf", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".ivf", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";     //ver10:Indeo Video Technology
-                }
-                else if (-1 < extentionStr.IndexOf(".dvr-ms", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".dvr-ms", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";            //ver12:Microsoft デジタル ビデオ録画
-                }
-                else if (-1 < extentionStr.IndexOf(".m2ts", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".m2ts", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";           //m2tsと同じ
-                                                 /*
-											      .htaccess や Apache のMIME Type設定
-											      AddType application/x-mpegURL .m3u8
-    AddType video/MP2T .ts
-										      */
-                }
-                else if (-1 < extentionStr.IndexOf(".ts", StringComparison.OrdinalIgnoreCase))
-                {
+                    /*
+                     .htaccess や Apache のMIME Type設定
+                     AddType application/x-mpegURL .m3u8
+AddType video/MP2T .ts
+                 */
+                } else if (-1 < extentionStr.IndexOf(".ts", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";           //ver12:MPEG-2 TS ビデオ ファイル 
-                }
-                else if (-1 < extentionStr.IndexOf(".m1v", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".m1v", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
-                }
-                else if (-1 < extentionStr.IndexOf(".mp2", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".mp2", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
-                }
-                else if (-1 < extentionStr.IndexOf(".mpa", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".mpa", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
-                }
-                else if (-1 < extentionStr.IndexOf(".mpe", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".mpe", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
-                }
-                else if (-1 < extentionStr.IndexOf(".m4v", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".m4v", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
-                }
-                else if (-1 < extentionStr.IndexOf(".mp4v", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".mp4v", StringComparison.OrdinalIgnoreCase)) {
                     retType = "video";
                     //image/////////////////////////////////////////////////////////////////////////
-                }
-                else if (-1 < extentionStr.IndexOf(".jpg", StringComparison.OrdinalIgnoreCase) ||
-                       -1 < extentionStr.IndexOf(".jpeg", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".jpg", StringComparison.OrdinalIgnoreCase) ||
+                         -1 < extentionStr.IndexOf(".jpeg", StringComparison.OrdinalIgnoreCase)) {
                     retType = "image";
                     retMIME = "image/jpeg";
-                }
-                else if (-1 < extentionStr.IndexOf(".gif", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".gif", StringComparison.OrdinalIgnoreCase)) {
                     retType = "image";
                     retMIME = "image/gif";
-                }
-                else if (-1 < extentionStr.IndexOf(".png", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".png", StringComparison.OrdinalIgnoreCase)) {
                     retType = "image";
                     retMIME = "image/png";
-                }
-                else if (-1 < extentionStr.IndexOf(".ico", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".ico", StringComparison.OrdinalIgnoreCase)) {
                     retType = "image";
                     retMIME = "image/vnd.microsoft.icon";
-                }
-                else if (-1 < extentionStr.IndexOf(".bmp", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".bmp", StringComparison.OrdinalIgnoreCase)) {
                     retType = "image";
                     retMIME = "image/x-ms-bmp";
                     //audio/////////////////////////////////////////////////////////////////////////
-                }
-                else if (-1 < extentionStr.IndexOf(".mp3", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".mp3", StringComparison.OrdinalIgnoreCase)) {
                     retType = "audio";
                     retMIME = "audio/mpeg";
-                }
-                else if (-1 < extentionStr.IndexOf(".m4a", StringComparison.OrdinalIgnoreCase) ||
-                  -1 < extentionStr.IndexOf(".aac", StringComparison.OrdinalIgnoreCase)
-                  )
-                {
+                } else if (-1 < extentionStr.IndexOf(".m4a", StringComparison.OrdinalIgnoreCase) ||
+                    -1 < extentionStr.IndexOf(".aac", StringComparison.OrdinalIgnoreCase)
+                    ) {
                     retType = "audio";
                     retMIME = "audio/aac";         //var12;MP4 オーディオ ファイル
-                }
-                else if (-1 < extentionStr.IndexOf(".ogg", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".ogg", StringComparison.OrdinalIgnoreCase)) {
                     retType = "audio";
                     retMIME = "audio/ogg";
-                }
-                else if (-1 < extentionStr.IndexOf(".midi", StringComparison.OrdinalIgnoreCase) ||
-                  -1 < extentionStr.IndexOf(".mid", StringComparison.OrdinalIgnoreCase) ||
-                  -1 < extentionStr.IndexOf(".rmi", StringComparison.OrdinalIgnoreCase)
-                  )
-                {
+                } else if (-1 < extentionStr.IndexOf(".midi", StringComparison.OrdinalIgnoreCase) ||
+                    -1 < extentionStr.IndexOf(".mid", StringComparison.OrdinalIgnoreCase) ||
+                    -1 < extentionStr.IndexOf(".rmi", StringComparison.OrdinalIgnoreCase)
+                    ) {
                     retType = "audio";
                     retMIME = "audio/midi";          //var9;MIDI 
-                }
-                else if (-1 < extentionStr.IndexOf(".ra", StringComparison.OrdinalIgnoreCase) ||
-                  -1 < extentionStr.IndexOf(".ram", StringComparison.OrdinalIgnoreCase)
-                  )
-                {
+                } else if (-1 < extentionStr.IndexOf(".ra", StringComparison.OrdinalIgnoreCase) ||
+                    -1 < extentionStr.IndexOf(".ram", StringComparison.OrdinalIgnoreCase)
+                    ) {
                     retType = "audio";
                     retMIME = "audio/vnd.rn-realaudio";
-                }
-                else if (-1 < extentionStr.IndexOf(".flac", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".flac", StringComparison.OrdinalIgnoreCase)) {
                     retType = "audio";
                     retMIME = "audio/flac";
-                }
-                else if (-1 < extentionStr.IndexOf(".wma", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".wma", StringComparison.OrdinalIgnoreCase)) {
                     retType = "audio";
                     retMIME = "audio/x-ms-wma";
-                }
-                else if (-1 < extentionStr.IndexOf(".wav", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".wav", StringComparison.OrdinalIgnoreCase)) {
                     retType = "audio";
                     retMIME = "audio/wav";           //var9;Windows 用オーディオ   
-                }
-                else if (-1 < extentionStr.IndexOf(".aif", StringComparison.OrdinalIgnoreCase) ||
-                  -1 < extentionStr.IndexOf(".aifc", StringComparison.OrdinalIgnoreCase) ||
-                  -1 < extentionStr.IndexOf(".aiff", StringComparison.OrdinalIgnoreCase)
-                  )
-                {
+                } else if (-1 < extentionStr.IndexOf(".aif", StringComparison.OrdinalIgnoreCase) ||
+                    -1 < extentionStr.IndexOf(".aifc", StringComparison.OrdinalIgnoreCase) ||
+                    -1 < extentionStr.IndexOf(".aiff", StringComparison.OrdinalIgnoreCase)
+                    ) {
                     retType = "audio";           //var9;Audio Interchange File FormatI 
-                }
-                else if (-1 < extentionStr.IndexOf(".au", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".au", StringComparison.OrdinalIgnoreCase)) {
                     retType = "audio";          //var9;Sun Microsystems  
-                }
-                else if (-1 < extentionStr.IndexOf(".snd", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".snd", StringComparison.OrdinalIgnoreCase)) {
                     retType = "audio";          //var9; NeXT  
-                }
-                else if (-1 < extentionStr.IndexOf(".cda", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".cda", StringComparison.OrdinalIgnoreCase)) {
                     retType = "audio";          //var9;CD オーディオ トラック 
-                }
-                else if (-1 < extentionStr.IndexOf(".adt", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".adt", StringComparison.OrdinalIgnoreCase)) {
                     retType = "audio";          //var12;Windows オーディオ ファイル 
-                }
-                else if (-1 < extentionStr.IndexOf(".adts", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".adts", StringComparison.OrdinalIgnoreCase)) {
                     retType = "audio";           //var12;Windows オーディオ ファイル 
-                }
-                else if (-1 < extentionStr.IndexOf(".asx", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".asx", StringComparison.OrdinalIgnoreCase)) {
                     retType = "audio";
                     //text/////////////////////////////////////////////////////////////////////////
-                }
-                else if (-1 < extentionStr.IndexOf(".txt", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".txt", StringComparison.OrdinalIgnoreCase)) {
                     retType = "text";
                     retMIME = "text/plain";
-                }
-                else if (-1 < extentionStr.IndexOf(".html", StringComparison.OrdinalIgnoreCase) ||
-                  -1 < extentionStr.IndexOf(".htm", StringComparison.OrdinalIgnoreCase)
-                  )
-                {
+                } else if (-1 < extentionStr.IndexOf(".html", StringComparison.OrdinalIgnoreCase) ||
+                    -1 < extentionStr.IndexOf(".htm", StringComparison.OrdinalIgnoreCase)
+                    ) {
                     retType = "text";
                     retMIME = "text/html";
-                }
-                else if (-1 < extentionStr.IndexOf(".xhtml", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".xhtml", StringComparison.OrdinalIgnoreCase)) {
                     retMIME = "application/xhtml+xml";
-                }
-                else if (-1 < extentionStr.IndexOf(".xml", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".xml", StringComparison.OrdinalIgnoreCase)) {
                     retType = "text";
                     retMIME = "text/xml";
-                }
-                else if (-1 < extentionStr.IndexOf(".rss", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".rss", StringComparison.OrdinalIgnoreCase)) {
                     retType = "text";
                     retMIME = "application/rss+xml";
-                }
-                else if (-1 < extentionStr.IndexOf(".xml", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".xml", StringComparison.OrdinalIgnoreCase)) {
                     retType = "text";
                     retMIME = "application/xml";            //、text/xml
-                }
-                else if (-1 < extentionStr.IndexOf(".css", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".css", StringComparison.OrdinalIgnoreCase)) {
                     retType = "text";
                     retMIME = "text/css";
-                }
-                else if (-1 < extentionStr.IndexOf(".js", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".js", StringComparison.OrdinalIgnoreCase)) {
                     retType = "text";
                     retMIME = "text/javascript";
-                }
-                else if (-1 < extentionStr.IndexOf(".vbs", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".vbs", StringComparison.OrdinalIgnoreCase)) {
                     retType = "text";
                     retMIME = "text/vbscript";
-                }
-                else if (-1 < extentionStr.IndexOf(".cgi", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".cgi", StringComparison.OrdinalIgnoreCase)) {
                     retType = "text";
                     retMIME = "application/x-httpd-cgi";
-                }
-                else if (-1 < extentionStr.IndexOf(".php", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".php", StringComparison.OrdinalIgnoreCase)) {
                     retType = "text";
                     retMIME = "application/x-httpd-php";
                     //application/////////////////////////////////////////////////////////////////////////
-                }
-                else if (-1 < extentionStr.IndexOf(".zip", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".zip", StringComparison.OrdinalIgnoreCase)) {
                     retType = "application";
                     retMIME = "application/zip";
-                }
-                else if (-1 < extentionStr.IndexOf(".pdf", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".pdf", StringComparison.OrdinalIgnoreCase)) {
                     retType = "application";
                     retMIME = "application/pdf";
-                }
-                else if (-1 < extentionStr.IndexOf(".doc", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".doc", StringComparison.OrdinalIgnoreCase)) {
                     retType = "application";
                     retMIME = "application/msword";
-                }
-                else if (-1 < extentionStr.IndexOf(".xls", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".xls", StringComparison.OrdinalIgnoreCase)) {
                     retType = "application";
                     retMIME = "application/msexcel";
-                }
-                else if (-1 < extentionStr.IndexOf(".wmx", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".wmx", StringComparison.OrdinalIgnoreCase)) {
                     retType = "application";        //ver9:Windows Media Player スキン 
-                }
-                else if (-1 < extentionStr.IndexOf(".wms", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".wms", StringComparison.OrdinalIgnoreCase)) {
                     retType = "application";       //ver9:Windows Media Player スキン  
-                }
-                else if (-1 < extentionStr.IndexOf(".wmz", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".wmz", StringComparison.OrdinalIgnoreCase)) {
                     retType = "application";       //ver9:Windows Media Player スキン  
-                }
-                else if (-1 < extentionStr.IndexOf(".wpl", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".wpl", StringComparison.OrdinalIgnoreCase)) {
                     retType = "application";       //ver9:Windows Media Player スキン  
-                }
-                else if (-1 < extentionStr.IndexOf(".wmd", StringComparison.OrdinalIgnoreCase))
-                {
+                } else if (-1 < extentionStr.IndexOf(".wmd", StringComparison.OrdinalIgnoreCase)) {
                     retType = "application";       //ver9:Windows Media Download パッケージ   
-                                                   /*		} else if (-1 < extentionStr.IndexOf(".m3u", StringComparison.OrdinalIgnoreCase)) {
-														       retType = "video";*/
+                    /*		} else if (-1 < extentionStr.IndexOf(".m3u", StringComparison.OrdinalIgnoreCase)) {
+                                retType = "video";*/
 
-                }
-                else if (-1 < extentionStr.IndexOf(".wm", StringComparison.OrdinalIgnoreCase))
-                {        //以降wmで始まる拡張子が誤動作
+                } else if (-1 < extentionStr.IndexOf(".wm", StringComparison.OrdinalIgnoreCase)) {        //以降wmで始まる拡張子が誤動作
                     retType = "video";
                     retMIME = "video/x-ms-wm";
                 }
@@ -4056,13 +3960,11 @@ List<String> PlayListFileNames = new List<String>();
         /// <param name="initialDirectory"></param>
         /// <returns>選択したファイルのフルパス</returns>
         /// 「ファイルを開く」ダイアログボックスを表示	https://dobon.net/vb/dotnet/form/openfiledialog.html
-        private string SelrctFile(string dlogTitol, string filterStr, string initialDirectory)
-        {            // "プレイリストを選択してください"
+        private string SelrctFile(string dlogTitol, string filterStr, string initialDirectory) {            // "プレイリストを選択してください"
             string TAG = "[SelrctFile]" + dlogTitol;
             string dbMsg = TAG;
             string rPlayList = "";
-            try
-            {
+            try {
                 //OpenFileDialog ofd = new OpenFileDialog();             //OpenFileDialogクラスのインスタンスを作成☆
                 //ofd.Title = dlogTitol;              //タイトルを設定する
                 //                                    //	ofd.FileName = "default.m3u";                          //はじめのファイル名を指定する
@@ -4078,9 +3980,7 @@ List<String> PlayListFileNames = new List<String>();
                 //}
                 dbMsg += ",選択されたファイル名=" + rPlayList;
                 MyLog(TAG, dbMsg);
-            }
-            catch (Exception er)
-            {
+            } catch (Exception er) {
                 dbMsg += "<<以降でエラー発生>>" + er.Message;
                 MyLog(TAG, dbMsg);
             }
@@ -4093,29 +3993,21 @@ List<String> PlayListFileNames = new List<String>();
         /// </summary>
         /// <param name="passNameStr"></param>
         /// <returns></returns>
-        private int CurrentItemCount(string passNameStr)
-        {
+        private int CurrentItemCount(string passNameStr) {
             string TAG = "[CurrentItemCount]";
             string dbMsg = TAG;
             int retIntr = 0;
-            try
-            {
+            try {
                 dbMsg += ",対象階層=" + passNameStr;
                 System.IO.DirectoryInfo dirInfo = new System.IO.DirectoryInfo(passNameStr);
                 //		dbMsg += "；Dir;;Attributes=" + dirInfo.Attributes;
-                if (dirInfo.Parent != null)
-                {
+                if (dirInfo.Parent != null) {
                     //	System.IO.FileAttributes attr = System.IO.Path.GetAttributes(passNameStr);
-                    if ((dirInfo.Attributes & System.IO.FileAttributes.Hidden) == System.IO.FileAttributes.Hidden)
-                    {
+                    if ((dirInfo.Attributes & System.IO.FileAttributes.Hidden) == System.IO.FileAttributes.Hidden) {
                         dbMsg += ">>Hidden";
-                    }
-                    else if ((dirInfo.Attributes & System.IO.FileAttributes.System) == System.IO.FileAttributes.System)
-                    {
+                    } else if ((dirInfo.Attributes & System.IO.FileAttributes.System) == System.IO.FileAttributes.System) {
                         dbMsg += ">>System";
-                    }
-                    else
-                    {
+                    } else {
 
                         dbMsg += ",Parent=" + dirInfo.Parent;//☆ドライブルートはこれで落ちる
                         dbMsg += "フォルダ内";
@@ -4124,40 +4016,27 @@ List<String> PlayListFileNames = new List<String>();
                                                      //			System.IO.DirectoryInfo[] dirs = dirInfo.GetDirectories( "*", System.IO.SearchOption.AllDirectories );
                                                      //			retIntr += dirs.Length;
                     }
-                }
-                else
-                {
+                } else {
                     dbMsg += "ドライブ確認";
                     System.IO.DriveInfo driveInfo = new System.IO.DriveInfo(passNameStr);     //.Substring( 0, 1 )
-                    if (driveInfo.IsReady)
-                    {
+                    if (driveInfo.IsReady) {
                         dbMsg += ">>ドライブ直下" + driveInfo.RootDirectory.ToString();
                         var rootItems = Directory.EnumerateFiles(passNameStr);//.Where( x => !x.Contains( ( passNameStr + "System Volume Infomation") ) );
                                                                               //	dbMsg += ",rootItems=" + rootItems.All.ToString();
-                        foreach (var rootItem in rootItems)
-                        {
+                        foreach (var rootItem in rootItems) {
                             dbMsg += "(" + retIntr + ")" + rootItem;
                             //System Volume Infomation(復元ポイントが保存されている隠しフォルダ)にアクセスが発生して落ちる
                             dirInfo = new System.IO.DirectoryInfo(rootItem);
-                            if ((dirInfo.Attributes & System.IO.FileAttributes.Hidden) == System.IO.FileAttributes.Hidden)
-                            {
+                            if ((dirInfo.Attributes & System.IO.FileAttributes.Hidden) == System.IO.FileAttributes.Hidden) {
                                 dbMsg += ">>Hidden";
-                            }
-                            else if ((dirInfo.Attributes & System.IO.FileAttributes.System) == System.IO.FileAttributes.System)
-                            {
+                            } else if ((dirInfo.Attributes & System.IO.FileAttributes.System) == System.IO.FileAttributes.System) {
                                 dbMsg += ">>System";
-                            }
-                            else
-                            {
+                            } else {
 
                                 if (-1 < rootItem.IndexOf("RECYCLE", StringComparison.OrdinalIgnoreCase) ||
-                                -1 < rootItem.IndexOf("System Vol", StringComparison.OrdinalIgnoreCase))
-                                {
-                                }
-                                else
-                                {
-                                    try
-                                    {
+                                -1 < rootItem.IndexOf("System Vol", StringComparison.OrdinalIgnoreCase)) {
+                                } else {
+                                    try {
                                         /*	string[] folderes = Directory.GetDirectories( rootItem );
 											if (folderes != null) {
 												dbMsg += "\nfolderes=" + folderes.Length + "件";
@@ -4187,26 +4066,21 @@ List<String> PlayListFileNames = new List<String>();
                                         //		dirInfo = new System.IO.DirectoryInfo(rootItem);
                                         string dirAttributes = dirInfo.Attributes.ToString();
                                         dbMsg += ";dirInfo=" + dirAttributes;
-                                        if (dirAttributes == "Directory")
-                                        {
+                                        if (dirAttributes == "Directory") {
                                             System.IO.DirectoryInfo[] rootDirs = dirInfo.GetDirectories("*", System.IO.SearchOption.AllDirectories);
                                             dbMsg += ",rootDirs=" + rootDirs.Length;
                                             retIntr += rootDirs.Length;
                                             System.IO.FileInfo[] rootFiles = dirInfo.GetFiles("*", System.IO.SearchOption.AllDirectories);
                                             dbMsg += ",rootFiles=" + rootFiles.Length;
                                             retIntr += rootFiles.Length;      // サブディレクトリ内のファイルもカウントする場合	, SearchOption.AllDirectories
-                                        }
-                                        else
-                                        {
+                                        } else {
                                             retIntr++;
                                         }
                                         /*=I:\an\workspace2015\参考資料\Android SDK逆引きハンドブック\sample\Chap-15\244\assets；Dir;;Attributes=Directory,Parent=244フォルダ内,
 										 * このデレクトリには0件 マネージ デバッグ アシスタント 'ContextSwitchDeadlock' 
 	CLR は、COM コンテキスト 0x6aa35230 から COM コンテキスト 0x6aa35108 へ 60 秒で移行できませんでした。ターゲット コンテキストおよびアパートメントを所有するスレッドが、ポンプしない待機を行っているか、Windows のメッセージを表示しないで非常に長い実行操作を処理しているかのどちらかです。この状態は通常、パフォーマンスを低下させたり、アプリケーションが応答していない状態および増え続けるメモリ使用を導く可能性があります。この問題を回避するには、すべての Single Thread Apartment (STA) のスレッドが、CoWaitForMultipleHandles のようなポンプする待機プリミティブを使用するか、長い実行操作中に定期的にメッセージをポンプしなければなりません。*/
                                         //									}
-                                    }
-                                    catch (Exception e)
-                                    {
+                                    } catch (Exception e) {
                                         dbMsg += "<<以降でエラー発生>>" + e.Message;
                                         MyLog(TAG, dbMsg);
                                         return retIntr;
@@ -4219,9 +4093,7 @@ List<String> PlayListFileNames = new List<String>();
                 }
                 dbMsg += ",このデレクトリには" + retIntr + "件";
                 MyLog(TAG, dbMsg);
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 dbMsg += "<<以降でエラー発生>>" + e.Message;
                 MyLog(TAG, dbMsg);
             }
@@ -4234,17 +4106,14 @@ List<String> PlayListFileNames = new List<String>();
         /// </summary>
         /// <param name="sarchDir"></param>
         /// <returns></returns>
-        private List<string> GetFolderFiles(string sarchDir)
-        {
+        private List<string> GetFolderFiles(string sarchDir) {
             string TAG = "[GetFolderFiles]";
             string dbMsg = TAG;
             List<string> retItems = new List<string>();
-            try
-            {
+            try {
                 dbMsg += "sarchDir=" + sarchDir;
                 IEnumerable<string> files = Directory.EnumerateFiles(sarchDir, "*"); // サブ・ディレクトも含める	, System.IO.SearchOption.AllDirectories
-                foreach (string fileName in files)
-                {
+                foreach (string fileName in files) {
                     dbMsg += "(" + retItems.Count + ")" + fileName;
                     string[] extStrs = fileName.Split('.');
                     string extentionStr = "." + extStrs[extStrs.Length - 1].ToLower();
@@ -4252,11 +4121,8 @@ List<String> PlayListFileNames = new List<String>();
                         0 < fileName.IndexOf("BOOTNXT", StringComparison.OrdinalIgnoreCase) ||
                         0 < fileName.IndexOf("-ms", StringComparison.OrdinalIgnoreCase) ||
                         0 < fileName.IndexOf("RECYCLE", StringComparison.OrdinalIgnoreCase)
-                        )
-                    {
-                    }
-                    else
-                    {
+                        ) {
+                    } else {
                         retItems.Add(fileName);
                     }
                 }
@@ -4296,9 +4162,7 @@ List<String> PlayListFileNames = new List<String>();
 						}*/
                 dbMsg += ",結果" + retItems.Count + "件";
                 MyLog(TAG, dbMsg);
-            }
-            catch (Exception er)
-            {
+            } catch (Exception er) {
                 dbMsg += "<<以降でエラー発生>>" + er.Message;
                 MyLog(TAG, dbMsg);
                 throw;
@@ -4311,47 +4175,35 @@ List<String> PlayListFileNames = new List<String>();
         /// </summary>
         /// <param name="sarchDir"></param>
         /// <returns></returns>
-        private List<string> GetFolderItems(string sarchDir, List<string> retItems)
-        {
+        private List<string> GetFolderItems(string sarchDir, List<string> retItems) {
             string TAG = "[GetFolderItems]";
             string dbMsg = TAG;
-            try
-            {
+            try {
                 dbMsg += "sarchDir=" + sarchDir;
                 string[] files = Directory.GetFiles(sarchDir);
                 dbMsg += "," + files.Length + "件";
-                if (files != null)
-                {
-                    foreach (string fileName in files)
-                    {
+                if (files != null) {
+                    foreach (string fileName in files) {
                         string[] extStrs = fileName.Split('.');
                         string extentionStr = "." + extStrs[extStrs.Length - 1].ToLower();
                         if (-1 < Array.IndexOf(systemFiles, extentionStr) ||
                             0 < fileName.IndexOf("BOOTNXT", StringComparison.OrdinalIgnoreCase) ||
                             0 < fileName.IndexOf("-ms", StringComparison.OrdinalIgnoreCase) ||
                             0 < fileName.IndexOf("RECYCLE", StringComparison.OrdinalIgnoreCase)
-                            )
-                        {
-                        }
-                        else
-                        {
+                            ) {
+                        } else {
                             dbMsg += "(" + retItems.Count + ")" + fileName;
                             retItems.Add(fileName);
                         }
                     }
                 }
                 string[] folderes = Directory.GetDirectories(sarchDir);
-                if (folderes != null)
-                {
+                if (folderes != null) {
                     dbMsg += "\nfolderes=" + folderes.Length + "件";
-                    foreach (string directoryName in folderes)
-                    {
+                    foreach (string directoryName in folderes) {
                         if (-1 < directoryName.IndexOf("RECYCLE", StringComparison.OrdinalIgnoreCase) ||
-                            -1 < directoryName.IndexOf("System Vol", StringComparison.OrdinalIgnoreCase))
-                        {
-                        }
-                        else
-                        {
+                            -1 < directoryName.IndexOf("System Vol", StringComparison.OrdinalIgnoreCase)) {
+                        } else {
                             /*	List<string> retItems2 = GetFolderFiles( directoryName, retItems );
 								dbMsg += ",retItems2=" + retItems2.Count + "件";
 								for (int i = 0; i < retItems2.Count; ++i) {
@@ -4362,21 +4214,15 @@ List<String> PlayListFileNames = new List<String>();
                     }           //ListBox1に結果を表示する
                 }
                 MyLog(TAG, dbMsg);
-            }
-            catch (UnauthorizedAccessException UAEx)
-            {
+            } catch (UnauthorizedAccessException UAEx) {
                 dbMsg += "<<以降でエラー発生>>" + UAEx.Message;
                 //	MyLog( dbMsg );
                 throw;
-            }
-            catch (PathTooLongException PathEx)
-            {
+            } catch (PathTooLongException PathEx) {
                 dbMsg += "<<以降でエラー発生>>" + PathEx.Message;
                 //	MyLog( dbMsg );
                 throw;
-            }
-            catch (Exception er)
-            {
+            } catch (Exception er) {
                 dbMsg += "<<以降でエラー発生>>" + er.Message;
                 //	MyLog( dbMsg );
                 throw;
@@ -4389,21 +4235,17 @@ List<String> PlayListFileNames = new List<String>();
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        private string checKLocalFile(string fileName)
-        {
+        private string checKLocalFile(string fileName) {
             string TAG = "[checKLocalFile]";
             string dbMsg = TAG;
             string retStr = "";
-            try
-            {
+            try {
                 dbMsg += ",fileName=" + fileName;
                 FileInfo fi = new FileInfo(fileName);
                 retStr = fi.DirectoryName + Path.DirectorySeparatorChar + fi.Name;
                 dbMsg += ",retStr=" + retStr;
                 MyLog(TAG, dbMsg);
-            }
-            catch (Exception er)
-            {
+            } catch (Exception er) {
                 dbMsg += "<<以降でエラー発生>>" + er.Message;
                 MyLog(TAG, dbMsg);
             }
@@ -4468,8 +4310,7 @@ List<String> PlayListFileNames = new List<String>();
         /// <param name="webWidth"></param>
         /// <param name="webHeight"></param>
         /// <returns></returns>
-        private string MakeVideoSouce(string fileName, int webWidth, int webHeight)
-        {
+        private string MakeVideoSouce(string fileName, int webWidth, int webHeight) {
             string TAG = "[MakeVideoSouce]";
             string dbMsg = "";
             string contlolPart = "";
@@ -4516,73 +4357,73 @@ List<String> PlayListFileNames = new List<String>();
                 } else if (extentionStr == ".webm" ||
                     extentionStr == ".ogv"
                     ) {
-                        //contlolPart += "\t\t\t<meta http - equiv = " + '"' + "X-UA-Compatible" + '"' + " content=" + '"' + "chrome=1" + '"' + " >\n";
-                        ////<meta http-equiv="X-UA-Compatible" content="chrome=1">			http://mrs.suzu841.com/mini_memo/numero_23.html
-                        //contlolPart += "\t\t</head>\n";
-                        //contlolPart += "\t\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n";
-                        //	contlolPart += "\t\t<div class=" + '"' + "video-container" + '"' + ">\n";
-                        contlolPart += "\t\t\t<video id=" + '"' + wiPlayerID + '"' + " controls autoplay style = " + '"' + "width:100%;height: auto;" + '"' + ">\n";
-                        contlolPart += "\t\t\t\t<source src=" + '"' + "file://" + fileName + '"' + " type=" + "'" + mineTypeStr;
-                        if (extentionStr == ".webm") {
-                            contlolPart += "; codecs=" + '"' + "vp8, vorbis" + '"' + "'" + ">\n";
-                        } else if (extentionStr == ".ogv") {
-                            contlolPart += "; codecs=" + '"' + "theora, vorbis" + '"' + "'" + ">\n";
-                        }
-                        // "file://" +		//  <source src="movie.webm" type='video/webm; codecs="vp8, vorbis"' />
-                        /*		contlolPart += "\t\t\t<video id=" + '"' + wiPlayerID + '"' + " src=" + '"' + "file://" + fileName + '"' +
-                                                            " controls autoplay style = " + '"' + "width:100%;height: auto;" + '"' +
-                                                                "></video>\n\t\t</div>";          */
-                        contlolPart += "\t\t\t</video>\n";
-                        //		contlolPart += "\t\t</div>"; 
-                        comentStr = "読み込めないファイルは対策検討中です。。";
+                    //contlolPart += "\t\t\t<meta http - equiv = " + '"' + "X-UA-Compatible" + '"' + " content=" + '"' + "chrome=1" + '"' + " >\n";
+                    ////<meta http-equiv="X-UA-Compatible" content="chrome=1">			http://mrs.suzu841.com/mini_memo/numero_23.html
+                    //contlolPart += "\t\t</head>\n";
+                    //contlolPart += "\t\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n";
+                    //	contlolPart += "\t\t<div class=" + '"' + "video-container" + '"' + ">\n";
+                    contlolPart += "\t\t\t<video id=" + '"' + wiPlayerID + '"' + " controls autoplay style = " + '"' + "width:100%;height: auto;" + '"' + ">\n";
+                    contlolPart += "\t\t\t\t<source src=" + '"' + "file://" + fileName + '"' + " type=" + "'" + mineTypeStr;
+                    if (extentionStr == ".webm") {
+                        contlolPart += "; codecs=" + '"' + "vp8, vorbis" + '"' + "'" + ">\n";
+                    } else if (extentionStr == ".ogv") {
+                        contlolPart += "; codecs=" + '"' + "theora, vorbis" + '"' + "'" + ">\n";
+                    }
+                    // "file://" +		//  <source src="movie.webm" type='video/webm; codecs="vp8, vorbis"' />
+                    /*		contlolPart += "\t\t\t<video id=" + '"' + wiPlayerID + '"' + " src=" + '"' + "file://" + fileName + '"' +
+                                                        " controls autoplay style = " + '"' + "width:100%;height: auto;" + '"' +
+                                                            "></video>\n\t\t</div>";          */
+                    contlolPart += "\t\t\t</video>\n";
+                    //		contlolPart += "\t\t</div>"; 
+                    comentStr = "読み込めないファイルは対策検討中です。。";
                 } else if (extentionStr == ".flv" ||
                    extentionStr == ".f4v" ||
                    extentionStr == ".swf"
                    ) {
-                        Uri urlObj = new Uri(fileName);
-                        if (urlObj.IsFile) {             //Uriオブジェクトがファイルを表していることを確認する
-                            fileName = urlObj.AbsoluteUri;                 //Windows形式のパス表現に変換する
-                            dbMsg += "Path=" + fileName;
-                        }
-                        dbMsg += ",assemblyPath=" + assemblyPath + ",assemblyName=" + assemblyName;
-                        dbMsg += ",playerUrl=" + playerUrl;//,playerUrl=C:\Users\博臣\source\repos\file_tree_clock_web1\file_tree_clock_web1\bin\Debug\fladance.swf 
-                        clsId = "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000";       //ブラウザーの ActiveX コントロール
-                        codeBase = "http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0";
-                        string pluginspage = "http://www.macromedia.com/go/getflashplayer";
-                        dbMsg += "[" + webWidth + "×" + webHeight + "]";        //4/3=1.3		1478/957=1.53  801/392=2.04
-                        /*		if (4 / 3 < webWidth / webHeight) {
-                                    webWidth = webHeight/3*4;		.
-                                } else {
-                                    webWidth = webHeight / 3 * 4;
-                                }
-                                dbMsg += ">>[" + webWidth + "×" + webHeight + "]";*/
-                        playerUrl = assemblyPath.Replace(assemblyName, "fladance.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
-                                                                                              //		string nextMove = assemblyPath.Replace( assemblyName, "tonext.htm" );
-                        string flashVvars = "fms_app=&video_file=" + fileName + "&" +       // & amp;
-                                                                                            //								"link_url ="+ nextMove + "&" +
-                                                 "image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10" + '"';
-                        contlolPart += "\t</head>\n";
-                        contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n\t\t";
-                        contlolPart += "<object id=" + '"' + wiPlayerID + '"' +
-                                            " classid=" + '"' + clsId + '"' +
-                                        " codebase=" + '"' + codeBase + '"' +
-                                        " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
-                                         ">\n";
-                        contlolPart += "\t\t\t<param name=" + '"' + "FlashVars" + '"' + " value=" + '"' + flashVvars + '"' + "/>\n";                        //常にバーを表示する
-                        contlolPart += "\t\t\t<param name= " + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>\n";
-                        contlolPart += "\t\t\t<param name =" + '"' + "movie" + '"' + " value=" + '"' + playerUrl + '"' + "/>\n";
-                        contlolPart += "\t\t\t\t<embed name=" + '"' + wiPlayerID + '"' +
-                                                    " src=" + '"' + playerUrl + '"' +            // "file://" + fileName
-                                                                                                 //		"left=-10 width=100% height= auto" +            // '"' + webWidth + '"'
-                                                    " width=" + '"' + webWidth + '"' + " height= " + '"' + webHeight + '"' +            // '"' + webWidth + '"'
-                                                    " type=" + '"' + mineTypeStr + '"' +
-                                                    " allowfullscreen=" + '"' + " true= " + '"' +
-                                                    " flashvars=" + '"' + flashVvars + '"' +
-                                                    " type=" + '"' + "application/x-shockwave-flash" + '"' +
-                                                    " pluginspage=" + '"' + pluginspage + '"' +
-                                           "/>\n";
+                    Uri urlObj = new Uri(fileName);
+                    if (urlObj.IsFile) {             //Uriオブジェクトがファイルを表していることを確認する
+                        fileName = urlObj.AbsoluteUri;                 //Windows形式のパス表現に変換する
+                        dbMsg += "Path=" + fileName;
+                    }
+                    dbMsg += ",assemblyPath=" + assemblyPath + ",assemblyName=" + assemblyName;
+                    dbMsg += ",playerUrl=" + playerUrl;//,playerUrl=C:\Users\博臣\source\repos\file_tree_clock_web1\file_tree_clock_web1\bin\Debug\fladance.swf 
+                    clsId = "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000";       //ブラウザーの ActiveX コントロール
+                    codeBase = "http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0";
+                    string pluginspage = "http://www.macromedia.com/go/getflashplayer";
+                    dbMsg += "[" + webWidth + "×" + webHeight + "]";        //4/3=1.3		1478/957=1.53  801/392=2.04
+                    /*		if (4 / 3 < webWidth / webHeight) {
+                                webWidth = webHeight/3*4;		.
+                            } else {
+                                webWidth = webHeight / 3 * 4;
+                            }
+                            dbMsg += ">>[" + webWidth + "×" + webHeight + "]";*/
+                    playerUrl = assemblyPath.Replace(assemblyName, "fladance.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
+                                                                                          //		string nextMove = assemblyPath.Replace( assemblyName, "tonext.htm" );
+                    string flashVvars = "fms_app=&video_file=" + fileName + "&" +       // & amp;
+                                                                                        //								"link_url ="+ nextMove + "&" +
+                                             "image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10" + '"';
+                    contlolPart += "\t</head>\n";
+                    contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n\t\t";
+                    contlolPart += "<object id=" + '"' + wiPlayerID + '"' +
+                                        " classid=" + '"' + clsId + '"' +
+                                    " codebase=" + '"' + codeBase + '"' +
+                                    " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
+                                     ">\n";
+                    contlolPart += "\t\t\t<param name=" + '"' + "FlashVars" + '"' + " value=" + '"' + flashVvars + '"' + "/>\n";                        //常にバーを表示する
+                    contlolPart += "\t\t\t<param name= " + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>\n";
+                    contlolPart += "\t\t\t<param name =" + '"' + "movie" + '"' + " value=" + '"' + playerUrl + '"' + "/>\n";
+                    contlolPart += "\t\t\t\t<embed name=" + '"' + wiPlayerID + '"' +
+                                                " src=" + '"' + playerUrl + '"' +            // "file://" + fileName
+                                                                                             //		"left=-10 width=100% height= auto" +            // '"' + webWidth + '"'
+                                                " width=" + '"' + webWidth + '"' + " height= " + '"' + webHeight + '"' +            // '"' + webWidth + '"'
+                                                " type=" + '"' + mineTypeStr + '"' +
+                                                " allowfullscreen=" + '"' + " true= " + '"' +
+                                                " flashvars=" + '"' + flashVvars + '"' +
+                                                " type=" + '"' + "application/x-shockwave-flash" + '"' +
+                                                " pluginspage=" + '"' + pluginspage + '"' +
+                                       "/>\n";
 
-                        comentStr = souceName + " ; プレイヤーには「ふらだんす」http://www.streaming.jp/fladance/　を使っています。" + dbWorning;
+                    comentStr = souceName + " ; プレイヤーには「ふらだんす」http://www.streaming.jp/fladance/　を使っています。" + dbWorning;
 
                     /*				playerUrl = assemblyPath.Replace(assemblyName, "flvplayer-305.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
                                                                                                                //	string flashVvars = "fms_app=&video_file=" + fileName + "&" +       // & amp;
@@ -4695,16 +4536,16 @@ List<String> PlayListFileNames = new List<String>();
                     //		contlolPart += "\n\t\t< param name = " + '"' + "FlashVars" + '"' + "value = " + '"' + "flv= + '"' +fileName + '"' +"&autoplay=1&margin=0" + '"' + "/>\n\t\t\t";
                     contlolPart += "\t\t</object>\n";
                 } else if (extentionStr == ".rm") {
-                        contlolPart += "\t</head>\n";
-                        contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n";
-                        clsId = "clsid:CFCDAA03-8BE4-11CF-B84B-0020AFBBCCFA";       //ブラウザーの ActiveX コントロール
-                        contlolPart += "\t\t<object  id=" + '"' + wiPlayerID + '"' +
-                                            "  classid=" + '"' + clsId + '"' +
-                                            " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
-                                         ">\n";
-                        contlolPart += "\t\t\t<param name =" + '"' + "src" + '"' + " value=" + '"' + fileName + '"' + "/>\n";
-                        contlolPart += "\t\t\t<param name =" + '"' + "AUTOSTART" + '"' + " value=" + '"' + "TRUEF" + '"' + "/>\n";
-                        contlolPart += "\t\t\t<param name =" + '"' + "CONTROLS" + '"' + " value=" + '"' + "All" + '"' + "/>\n"; //http://www.tohoho-web.com/wwwmmd3.htm
+                    contlolPart += "\t</head>\n";
+                    contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n";
+                    clsId = "clsid:CFCDAA03-8BE4-11CF-B84B-0020AFBBCCFA";       //ブラウザーの ActiveX コントロール
+                    contlolPart += "\t\t<object  id=" + '"' + wiPlayerID + '"' +
+                                        "  classid=" + '"' + clsId + '"' +
+                                        " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
+                                     ">\n";
+                    contlolPart += "\t\t\t<param name =" + '"' + "src" + '"' + " value=" + '"' + fileName + '"' + "/>\n";
+                    contlolPart += "\t\t\t<param name =" + '"' + "AUTOSTART" + '"' + " value=" + '"' + "TRUEF" + '"' + "/>\n";
+                    contlolPart += "\t\t\t<param name =" + '"' + "CONTROLS" + '"' + " value=" + '"' + "All" + '"' + "/>\n"; //http://www.tohoho-web.com/wwwmmd3.htm
                     contlolPart += "\t\t</object>\n";
                 } else if (extentionStr == ".wmv" ||        //ver9:Windows Media 形式
                     extentionStr == ".asf" ||
@@ -4778,10 +4619,8 @@ List<String> PlayListFileNames = new List<String>();
                     comentStr = "この形式は対応確認中です。";
                 }
                 contlolPart += "\t\t</div>\n";
-                //        contlolPart += "\t\t\t<div id =" + '"' + "statediv" + '"' + ">" + souceName + "</div>\n";     //span	 '"' + 
-                // videoタグからDOMを取得させる仕掛け
                 if (contlolPart.Contains("<video")) {
-					contlolPart += "\t\t<div style=" + '"' + "background-color:#333333; color:#ffffff;" + '"' + ">\n";
+                    contlolPart += "\t\t<div style=" + '"' + "background-color:#333333; color:#ffffff;" + '"' + ">\n";
                     contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "再生" + '"' + " onClick=" + '"' + "playVideo()" + '"' + ">\n";
                     contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "一時停止" + '"' + " onClick=" + '"' + "pauseVideo()" + '"' + ">\n";
                     contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "↑" + '"' + " onClick=" + '"' + "upVolume()" + '"' + ">\n";
@@ -4792,7 +4631,6 @@ List<String> PlayListFileNames = new List<String>();
                     contlolPart += "\t\t</div>\n";
                     contlolPart += "\t\t<script type=" + '"' + "text/javascript" + '"' + ">\n";
                     contlolPart += "\t\t\tvar v = document.getElementById(" + '"' + wiPlayerID + '"' + ");\n";
-                    //contlolPart += "\t\t\tvar isEnded = true;\n\n";
                     //contlolPart += "\t\t\tfunction getHMS(sec) {\n";
                     //contlolPart += "\t\t\t\tvar retStr = " + '"' + '"' + ";\n";
                     //contlolPart += "\t\t\t\tvar retH = Math.floor(sec/3600);\n";
@@ -4827,15 +4665,14 @@ List<String> PlayListFileNames = new List<String>();
                     //contlolPart += "\t\t\t\tvar myDuration = v.duration;\n";
                     //contlolPart += "\t\t\t\treturn myDuration;\n";
                     //contlolPart += "\t\t\t}\n\n";
-                    //contlolPart += "\t\t\tfunction getCurrentTime() {\n";                //現在の再生位置（秒）を表示
-                    //contlolPart += "\t\t\t\tvar myCurrentTime = v.currentTime;\n";
-                    //contlolPart += "\t\t\t\treturn myCurrentTime;\n";
-                    //contlolPart += "\t\t\t}\n\n";
+                    contlolPart += "\t\t\tfunction getCurrentTime() {\n";                //現在の再生位置（秒）を表示
+                    contlolPart += "\t\t\t\tvar myCurrentTime = v.currentTime;\n";
+                    contlolPart += "\t\t\t\treturn myCurrentTime;\n";
+                    contlolPart += "\t\t\t}\n\n";
                     contlolPart += "\t\t\tfunction playVideo() {\n";                //再生完了の表示をクリア
-                    //contlolPart += "\t\t\t\tdocument.getElementById(" + '"' + "kanryou" + '"' + ").innerHTML = " + '"' + '"' + ";\n"; 
                     //動画を再生
                     contlolPart += "\t\t\t\tv.play();\n";
-                    //contlolPart += "\t\t\t\tisEnded=false;\n"; 
+                    contlolPart += "\t\t\t\tisEnded=false;\n";
                     contlolPart += "\t\t\t}\n\n";
                     contlolPart += "\t\t\tfunction pauseVideo() {\n";            //動画を一時停止
                     contlolPart += "\t\t\t\tv.pause();\n";
@@ -4847,16 +4684,14 @@ List<String> PlayListFileNames = new List<String>();
                     contlolPart += "\t\t\t\tv.volume = v.volume - 0.25;\n";
                     contlolPart += "\t\t\t}\n\n";
                     contlolPart += "\t\t\tfunction myOnLoad() {\n";
-                    //contlolPart += "\t\t\t\tdocument.getElementById(" + '"' + "durationSP" + '"' + ").innerHTML = getHMS(getDuration());\n";
                     //現在の再生位置が変更された時
                     contlolPart += "\t\t\t\tv.addEventListener(" + '"' + "timeupdate" + '"' + ", function(){\n";
-                    //contlolPart += "\t\t\t\t\tdocument.getElementById(" + '"' + "currentTimeSP" + '"' + ").innerHTML = getHMS(getCurrentTime());\n";
-                    contlolPart += "\t\t\t\t\twindow.chrome.webview.postMessage(getCurrentTime()+" + '"' + '"' +");\n";
-                    contlolPart += "\t\t\t\t}, false);\n"; 
+                    contlolPart += "\t\t\t\t\twindow.chrome.webview.postMessage(getCurrentTime()+" + '"' + '"' + ");\n";
+                    contlolPart += "\t\t\t\t}, false);\n";            //メディアリソースの末尾に達して、再生が停止した時
+                    contlolPart += "\t\t\t\tv.addEventListener(" + '"' + "ended" + '"' + ", function(){\n";
+                    contlolPart += "\t\t\t\t}, false);\n";
                     //メディアリソースの末尾に達して、再生が停止した時
                     contlolPart += "\t\t\t\tv.addEventListener(" + '"' + "ended" + '"' + ", function(){\n";
-                    //contlolPart += "\t\t\t\t\tdocument.getElementById(" + '"' + "kanryou" + '"' + ").innerHTML = " + '"' + "動画の再生が完了しました。" + '"' + ";\n";
-                    //contlolPart += "\t\t\t\t\tisEnded=true;\n";
                     contlolPart += "\t\t\t\t\twindow.chrome.webview.postMessage(" + '"' + "ended" + '"' + ");\n";
                     contlolPart += "\t\t\t\t}, false);\n";
                     //            v.addEventListener("loadeddata", function(){
@@ -4874,8 +4709,7 @@ List<String> PlayListFileNames = new List<String>();
             return contlolPart;
         }           //Video用のタグを作成
 
-        private string MakeImageSouce(string fileName, int webWidth, int webHeight)
-        {
+        private string MakeImageSouce(string fileName, int webWidth, int webHeight) {
             string TAG = "[MakeImageSouce]";
             string dbMsg = TAG;
             string contlolPart = "";
@@ -4888,11 +4722,8 @@ List<String> PlayListFileNames = new List<String>();
                 extentionStr == ".jpeg" ||
                 extentionStr == ".png" ||
                 extentionStr == ".gif"
-                )
-            {
-            }
-            else
-            {
+                ) {
+            } else {
                 /*	 ".tif", ".ico", ".bmp" };*/
                 comentStr = "静止画はimgタグで読めるもののみ対応しています。";
             }
@@ -4903,8 +4734,7 @@ List<String> PlayListFileNames = new List<String>();
             return contlolPart;
         }  //静止画用のタグを作成
 
-        private string MakeAudioSouce(string fileName, int webWidth, int webHeight)
-        {
+        private string MakeAudioSouce(string fileName, int webWidth, int webHeight) {
             string TAG = "[MakeAudioSouce]";
             string dbMsg = TAG;
             string contlolPart = "";
@@ -4918,14 +4748,11 @@ List<String> PlayListFileNames = new List<String>();
 
             if (
                 extentionStr == ".ogg"
-                )
-            {
+                ) {
                 //		contlolPart += "<div class=" + '"' + "video-container" + '"' + ">\n";
                 contlolPart += "\t\t\t<audio src=" + '"' + "file://" + fileName + '"' + " controls autoplay style = " + '"' + "width:100%" + '"' + " />\n";
                 comentStr = "audioタグで読み込めないファイルは対策検討中です。。";
-            }
-            else if (extentionStr == ".ra")
-            {
+            } else if (extentionStr == ".ra") {
                 string clsId = "clsid:CFCDAA03-8BE4-11CF-B84B-0020AFBBCCFA";       //ブラウザーの ActiveX コントロール
                 contlolPart += "<objec id=" + '"' + wiPlayerID + '"' +
                                     "  classid=" + '"' + clsId + '"' +
@@ -4934,29 +4761,27 @@ List<String> PlayListFileNames = new List<String>();
                 contlolPart += "\t\t\t<param name =" + '"' + "src" + '"' + " value=" + '"' + fileName + '"' + "/>\n";
                 contlolPart += "\t\t\t<param name =" + '"' + "AUTOSTART" + '"' + " value=" + '"' + "TRUEF" + '"' + "/>\n";
                 //	contlolPart += "\t\t\t<param name =" + '"' + "CONTROLS" + '"' + " value=" + '"' + "All" + '"' + "/>\n"; //http://www.tohoho-web.com/wwwmmd3.htm
-            }
-            else if (extentionStr == ".wma" ||
-              extentionStr == ".wvx" ||
-              extentionStr == ".wax" ||
-              extentionStr == ".wav" ||
-              extentionStr == ".m4a" ||           //var12;MP4 オーディオ ファイル
-              extentionStr == ".mp3" ||
-              extentionStr == ".aac" ||
-              extentionStr == ".m4a" ||           //iTurne				extentionStr == ".midi" ||           //var9;MIDI 
-              extentionStr == ".mid" ||           //var9;MIDI 
-              extentionStr == ".rmi" ||           //var9;MIDI 
-              extentionStr == ".aif" ||           //var9;Audio Interchange File FormatI 
-              extentionStr == ".aifc" ||           //var9;Audio Interchange File FormatI 
-              extentionStr == ".aiff" ||           //var9;Audio Interchange File FormatI 
-              extentionStr == ".au" ||           //var9;Sun Microsystems および NeXT  
-              extentionStr == ".snd" ||           //var9;Sun Microsystems および NeXT  
-              extentionStr == ".wav" ||           //var9;Windows 用オーディオ   
-              extentionStr == ".cda" ||           //var9;CD オーディオ トラック 
-              extentionStr == ".adt" ||           //var12;Windows オーディオ ファイル 
-              extentionStr == ".adts" ||           //var12;Windows オーディオ ファイル 
-              extentionStr == ".asx"
-              )
-            {
+            } else if (extentionStr == ".wma" ||
+                extentionStr == ".wvx" ||
+                extentionStr == ".wax" ||
+                extentionStr == ".wav" ||
+                extentionStr == ".m4a" ||           //var12;MP4 オーディオ ファイル
+                extentionStr == ".mp3" ||
+                extentionStr == ".aac" ||
+                extentionStr == ".m4a" ||           //iTurne				extentionStr == ".midi" ||           //var9;MIDI 
+                extentionStr == ".mid" ||           //var9;MIDI 
+                extentionStr == ".rmi" ||           //var9;MIDI 
+                extentionStr == ".aif" ||           //var9;Audio Interchange File FormatI 
+                extentionStr == ".aifc" ||           //var9;Audio Interchange File FormatI 
+                extentionStr == ".aiff" ||           //var9;Audio Interchange File FormatI 
+                extentionStr == ".au" ||           //var9;Sun Microsystems および NeXT  
+                extentionStr == ".snd" ||           //var9;Sun Microsystems および NeXT  
+                extentionStr == ".wav" ||           //var9;Windows 用オーディオ   
+                extentionStr == ".cda" ||           //var9;CD オーディオ トラック 
+                extentionStr == ".adt" ||           //var12;Windows オーディオ ファイル 
+                extentionStr == ".adts" ||           //var12;Windows オーディオ ファイル 
+                extentionStr == ".asx"
+                ) {
                 string clsId = "CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6";   //Windows Media Player9
                 contlolPart += "\n\t\t<div><object id=" + '"' + wiPlayerID + '"' +
                                     "  classid =" + '"' + clsId + '"' + " style = " + '"' + "width:100%;higth :90%" + '"' + " >\n";
@@ -4971,9 +4796,7 @@ List<String> PlayListFileNames = new List<String>();
 						contlolPart += "\t\t\t</ENTRY >\n";
 						contlolPart += "\t\t\t</ASX >\n";
 						  comentStr = "ASXタグで確認中です。(Windows Media Player　がサポートしている形式)";*/
-            }
-            else
-            {
+            } else {
                 /* ".ra", ".flac",  }; */
                 comentStr = "このファイルの再生方法は確認中です。";
             }
@@ -4982,8 +4805,7 @@ List<String> PlayListFileNames = new List<String>();
             return contlolPart;
         }  //静止画用のタグを作成selectNode
 
-        private string MakeTextSouce(string fileName, int webWidth, int webHeight)
-        {
+        private string MakeTextSouce(string fileName, int webWidth, int webHeight) {
             string TAG = "[MakeTextSouce]";
             string dbMsg = TAG;
             string contlolPart = "";
@@ -5007,18 +4829,13 @@ List<String> PlayListFileNames = new List<String>();
                 extentionStr == ".vbs" ||
                 extentionStr == ".cgi" ||
                 extentionStr == ".php"
-                )
-            {
+                ) {
                 rText = rText.Replace("<", "&lt;");
                 rText = rText.Replace(">", "&gt;");
                 contlolPart += rText;
-            }
-            else if (extentionStr == ".txt")
-            {
+            } else if (extentionStr == ".txt") {
                 contlolPart += "\t\t\t" + rText + "\n";
-            }
-            else
-            {
+            } else {
                 comentStr = "このファイルの表示方法は確認中です。";
             }
             contlolPart += "\t\t</pre>\n";
@@ -5027,8 +4844,7 @@ List<String> PlayListFileNames = new List<String>();
             return contlolPart;
         }  //Text用のタグを作成		
 
-        private string MakeApplicationeSouce(string fileName, int webWidth, int webHeight)
-        {
+        private string MakeApplicationeSouce(string fileName, int webWidth, int webHeight) {
             string TAG = "[MakeApplicationeSouce]";
             string dbMsg = TAG;
             string contlolPart = "";
@@ -5041,17 +4857,14 @@ List<String> PlayListFileNames = new List<String>();
                 extentionStr == ".wms" ||     //ver9:Windows Media Player スキン  
                 extentionStr == ".m3u" ||   //MPEGだがrealPlayyerのプレイリスト
                 extentionStr == ".wmd"     //ver9:Windows Media Download パッケージ   
-                )
-            {
+                ) {
                 string clsId = "CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6";   //Windows Media Player9
                 contlolPart += "\n\t\t<object classid =" + '"' + clsId + '"' + " style = " + '"' + "width:100%" + '"' + " >\n";
                 contlolPart += "\t\t\t<param name =" + '"' + "url" + '"' + "value = " + '"' + "file://" + fileName + '"' + "/>\n";
                 contlolPart += "\t\t\t<param name =" + '"' + "stretchToFit" + '"' + " value = true />\n";//右クリックして縮小/拡大で200％
                 contlolPart += "\t\t\t<param name =" + '"' + "autoStart" + '"' + " value = " + true + "/>\n";
                 comentStr = "Windows Media Player9読み込めないファイルは対策検討中です。";
-            }
-            else
-            {
+            } else {
                 comentStr = "このファイルの再生方法は確認中です。";
             }
             contlolPart += "\t\t<div>\n\t\t\t" + comentStr + "\n\t\t</div>\n";
@@ -11114,14 +10927,13 @@ List<String> PlayListFileNames = new List<String>();
         /// </summary>
 
         //public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = ""){
-            if (PropertyChanged != null){
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "") {
+            if (PropertyChanged != null) {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
 
-        void RequeryCommands()
-        {
+        void RequeryCommands() {
             // Seems like there should be a way to bind CanExecute directly to a bool property
             // so that the binding can take care keeping CanExecute up-to-date when the property's
             // value changes, but apparently there isn't.  Instead we listen for the WebView events
@@ -11151,7 +10963,7 @@ List<String> PlayListFileNames = new List<String>();
         /// ；ヘルパなしでRaisePropertyChangedの代りにNotifyPropertyChangedを使う
         /// </summary>
 
-    //    public event PropertyChangedEventHandler PropertyChanged;
+        //    public event PropertyChangedEventHandler PropertyChanged;
         //private void NotifyPropertyChanged([CallerMemberName] String propertyName = "") {
         //    if (PropertyChanged != null) {
         //        PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
@@ -11162,26 +10974,23 @@ List<String> PlayListFileNames = new List<String>();
         //デバッグツール///////////////////////////////////////////////////////////その他//
         Boolean debug_now = true;
 
-        public static void MyLog(string TAG, string dbMsg)
-        {
+        public static void MyLog(string TAG, string dbMsg) {
             dbMsg = "[MainViewModel]" + dbMsg;
             //dbMsg = "[" + MethodBase.GetCurrentMethod().Name + "]" + dbMsg;
             CS_Util Util = new CS_Util();
             Util.MyLog(TAG, dbMsg);
         }
 
-        public static void MyErrorLog(string TAG, string dbMsg, Exception err)
-        {
-			dbMsg = "[MainViewModel]" + dbMsg;
-			CS_Util Util = new CS_Util();
+        public static void MyErrorLog(string TAG, string dbMsg, Exception err) {
+            dbMsg = "[MainViewModel]" + dbMsg;
+            CS_Util Util = new CS_Util();
             Util.MyErrorLog(TAG, dbMsg, err);
         }
 
         public MessageBoxResult MessageShowWPF(String titolStr, String msgStr,
                                                                         MessageBoxButton buttns,
                                                                         MessageBoxImage icon
-                                                                        )
-        {
+                                                                        ) {
             CS_Util Util = new CS_Util();
             return Util.MessageShowWPF(msgStr, titolStr, buttns, icon);
         }

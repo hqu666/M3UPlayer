@@ -327,13 +327,16 @@
                             Orientation="Horizontal" 
                             HorizontalAlignment="Right"
                             >
-                    <Button Width="40" Height="40" MinWidth="30" BorderBrush="Transparent" Foreground="#00000000" RenderTransformOrigin="0.5,0.5"
-                                    >
+                    <Button  Content="↑"
+                             Command="{Binding ListRewind}" 
+                             Width="40" Height="40" MinWidth="30" RenderTransformOrigin="0.5,0.5"
+                             Foreground="White" FontSize="18" FontWeight="Bold" BorderBrush="#00000000" BorderThickness="0,0,0,0" Padding="0,0,0,0" HorizontalContentAlignment="Center"
+                            >
                         <Button.RenderTransform>
                             <TransformGroup>
                                 <ScaleTransform/>
                                 <SkewTransform/>
-                                <RotateTransform Angle="-90"/>
+                                <RotateTransform Angle="90"/>
                                 <TranslateTransform X="0"/>
                             </TransformGroup>
                         </Button.RenderTransform>
@@ -341,7 +344,7 @@
                             <ImageBrush ImageSource="/views/rewbtn.png" Stretch="UniformToFill"/>
                         </Button.Background>
                     </Button>
-                    <Button Width="40" Height="40" MinWidth="30" Margin="20,5,5,5"
+                    <Button  Width="40" Height="40" MinWidth="30" Margin="20,5,5,5"
                                     >
                         <Button.Background>
                             <ImageBrush ImageSource="/views/mute.png" Stretch="Uniform"/>
@@ -352,20 +355,22 @@
                                     Value="{Binding SoundValue, Mode=TwoWay}" Margin="0,0,20,0"
                             />
 
-                    <Button 
-                           Width="40" Height="40" MinWidth="30" RenderTransformOrigin="0.5,0.5" Background="{x:Null}" Content="  ↑" Foreground="White" FontSize="18" FontWeight="Bold" BorderBrush="#00000000" BorderThickness="0,0,0,0" Padding="0,0,0,0" HorizontalContentAlignment="Center"
+                    <Button Content="↓" 
+                            Command="{Binding ListForwarding}" 
+                            Width="40" Height="40" MinWidth="30" RenderTransformOrigin="0.5,0.5"
+                            Foreground="White" FontSize="18" FontWeight="Bold" BorderBrush="#00000000" BorderThickness="0,0,0,0" Padding="0,0,0,0" HorizontalContentAlignment="Center"
                             >
-                        <!--<Button.RenderTransform>
+                        <Button.RenderTransform>
                             <TransformGroup>
                                 <ScaleTransform/>
                                 <SkewTransform/>
-                                <RotateTransform Angle="-90"/>
+                                <RotateTransform Angle="90"/>
                                 <TranslateTransform/>
                             </TransformGroup>
                         </Button.RenderTransform>
                         <Button.Background>
                             <ImageBrush ImageSource="/views/ffbtn.png" Stretch="UniformToFill"/>
-                        </Button.Background>-->
+                        </Button.Background>
                     </Button>
 
                 </StackPanel>
@@ -473,14 +478,24 @@
                                 </Button.Background>
 
                             </Button>
-                            <Slider Grid.Column="1"
+                            <Slider x:Name="PositionSL"
+                                    Grid.Column="1"
                                     VerticalContentAlignment="Stretch"
                                     HorizontalContentAlignment="Stretch" 
                                     Margin="0,6,0,0"
+                                    SmallChange="1" LargeChange="10"
+                                    IsSnapToTickEnabled="True"
+                                    AutoToolTipPlacement="TopLeft"
+                                    Thumb.DragStarted="PositionSL_DragStarted"
+                                    Thumb.DragCompleted="PositionSL_DragCompleted"
                                     Maximum="{Binding SliderMaximum, Mode=OneWay}"
                                     Value="{Binding SliderValue, Mode=TwoWay}"
                                     Style="{DynamicResource MySliderStyle}">
-                                <!--センターライン；TrackBackground　/　ハンドル；Thumb-->
+                                <!--
+                                     ValueChanged="Slider_ValueChanged"
+                                                                   ValueChanged="{Binding PositionSliderValueChanged}"
+
+                                センターライン；TrackBackground　/　ハンドル；Thumb-->
                                 <Slider.Resources>
                                     <SolidColorBrush x:Key="SliderThumb.Static.Foreground" Color="#FFE5E5E5"/>
                                     <SolidColorBrush x:Key="SliderThumb.MouseOver.Background" Color="#FFDCECFC"/>
@@ -600,8 +615,12 @@
                                                         <RepeatButton Command="{x:Static Slider.IncreaseLarge}" Style="{StaticResource RepeatButtonTransparent}"/>
                                                     </Track.IncreaseRepeatButton>
                                                     <Track.Thumb>
-                                                        <Thumb x:Name="Thumb" Focusable="False" Height="36" OverridesDefaultStyle="True" 
-                                                               Template="{StaticResource SliderThumbHorizontalDefault}" VerticalAlignment="Center" Width="11"/>
+                                                        <Thumb x:Name="Thumb" 
+                                                               Focusable="False" 
+                                                               Height="36" 
+                                                               OverridesDefaultStyle="True" 
+                                                               Template="{StaticResource SliderThumbHorizontalDefault}" 
+                                                               VerticalAlignment="Center" Width="11"/>
                                                     </Track.Thumb>
                                                 </Track>
                                             </Grid>

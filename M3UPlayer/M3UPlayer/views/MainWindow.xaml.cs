@@ -17,22 +17,19 @@ using System.Windows.Shapes;
 using M3UPlayer.Models;
 using M3UPlayer.ViewModels;
 
-namespace M3UPlayer.Views
-{
-    /// <summary>
-    /// ベースになる画面
-    /// </summary>
-    public partial class MainWindow : Window
-    {
+namespace M3UPlayer.Views {
+	/// <summary>
+	/// ベースになる画面
+	/// </summary>
+	public partial class MainWindow : Window {
 		MainViewModel VM;
 		/// <summary>
 		/// ドラッグ中
 		/// </summary>
 		public bool IsDragging;
 
-		public MainWindow()
-        {
-            InitializeComponent();
+		public MainWindow() {
+			InitializeComponent();
 			VM = new MainViewModel();
 			VM.MyView = this;
 			this.DataContext = VM;
@@ -51,7 +48,7 @@ namespace M3UPlayer.Views
 			//初期表示
 			PlayListModel targetItem = new PlayListModel();
 			targetItem.UrlStr = "https://www.yahoo.co.jp/";
-		//	targetItem.UrlStr = "https://www.google.co.jp/maps/";
+			//	targetItem.UrlStr = "https://www.google.co.jp/maps/";
 			targetItem.Summary = "StartUp";
 			//	VM.PlayListToPlayer(targetItem);
 			IsDragging = false;
@@ -322,7 +319,7 @@ namespace M3UPlayer.Views
 							PlayListModel plm = new PlayListModel();
 							plm.UrlStr = file;
 							dropPlayListFiles.Add(plm);
-							dbMsg += "\r\n[" +  dropPlayListFiles.Count + "]" + plm.UrlStr;
+							dbMsg += "\r\n[" + dropPlayListFiles.Count + "]" + plm.UrlStr;
 						}
 
 					}
@@ -335,7 +332,7 @@ namespace M3UPlayer.Views
 					// 行オブジェクトから行インデックス(0起算)を取得します。
 					int dropRow = row.GetIndex();
 					dbMsg += ",dropRow=" + dropRow + "" + dropPlayListFiles.Count + "件";
-					VM.PlayListItemMoveTo(dropRow , dropPlayListFiles);
+					VM.PlayListItemMoveTo(dropRow, dropPlayListFiles);
 					IsDragging = false;
 				}
 				MyLog(TAG, dbMsg);
@@ -426,7 +423,7 @@ namespace M3UPlayer.Views
 							ellipse.Fill = newFill;
 						}
 					}
-				}else{
+				} else {
 					dbMsg += ",ellipse = null";
 				}
 				////DataGrid DG = (DataGrid)sender;
@@ -687,14 +684,14 @@ namespace M3UPlayer.Views
 			}
 		}
 
-		private int MoveCount=0;
+		private int MoveCount = 0;
 
 
 		private void PlayList_MouseMove(object sender, MouseEventArgs e) {
 			string TAG = "PlayList_MouseMove";
 			string dbMsg = "";
 			try {
-				dbMsg += "[" + MoveCount  + "]";
+				dbMsg += "[" + MoveCount + "]";
 
 				dbMsg += "左クリック";
 				if (e.LeftButton == MouseButtonState.Released) {
@@ -727,7 +724,7 @@ namespace M3UPlayer.Views
 					if (!IsDragging && 2 < MoveCount) {
 						dbMsg += "、まだドラッグしていない";
 						IsDragging = VM.PlayList_DragEnter();              //Drag_nowが返される
-																			//display the popup if it hasn't been opened yet
+																		   //display the popup if it hasn't been opened yet
 						if (!popup1.IsOpen) {
 							popup1.IsOpen = true;
 							dbMsg += "DataGrid内のpopアップを表示させる";
@@ -747,7 +744,7 @@ namespace M3UPlayer.Views
 											 DragDropEffects.Copy);
 					}
 				}
-			//	MyLog(TAG, dbMsg);
+				//	MyLog(TAG, dbMsg);
 				MoveCount++;
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
@@ -783,21 +780,21 @@ namespace M3UPlayer.Views
 					VM.PLMouseUp();
 				}
 				IsDragging = false;
-				MoveCount = 0;              
+				MoveCount = 0;
 				//DataGrid droplist = (DataGrid)sender;
-											//if (droplist != null) {
-											//	dbMsg += ",AllowDrop=" + droplist.AllowDrop;
-											//	dbMsg += "[" + droplist.SelectedIndex + "]";
-											//	PlayListModel targetItem = (PlayListModel)droplist.SelectedItem;
-											//	//get the target item
-											//	if (DraggedItem != null) {
-											//		dbMsg += "<<Dragged=" + DraggedItem.Summary;
-											//		if (DraggedItem == targetItem) {
-											//			VM.PlayListToPlayer(targetItem);
-											//		} else {
-											//			VM.PlayListItemMoveTo(DraggedItem, targetItem);
-											//		}
-											//	} else {
+				//if (droplist != null) {
+				//	dbMsg += ",AllowDrop=" + droplist.AllowDrop;
+				//	dbMsg += "[" + droplist.SelectedIndex + "]";
+				//	PlayListModel targetItem = (PlayListModel)droplist.SelectedItem;
+				//	//get the target item
+				//	if (DraggedItem != null) {
+				//		dbMsg += "<<Dragged=" + DraggedItem.Summary;
+				//		if (DraggedItem == targetItem) {
+				//			VM.PlayListToPlayer(targetItem);
+				//		} else {
+				//			VM.PlayListItemMoveTo(DraggedItem, targetItem);
+				//		}
+				//	} else {
 
 				//	}
 
@@ -849,7 +846,46 @@ namespace M3UPlayer.Views
 			}
 		}
 
+		/// <summary>
+		/// 再生ポジションスライダーのツマミMouseDown
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void PositionSL_DragStarted(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e) {
+			string TAG = "PositionSL_DragStarted";
+			string dbMsg = TAG;
+			try {
+				Slider slider = (Slider)sender;
+				double newValue = slider.Value;
+				dbMsg += "newValue=" + newValue;
+				VM.PauseVideo();
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(TAG, dbMsg);
+			}
+		}
 
+		/// <summary>
+		/// 再生ポジションスライダーのツマミ Thumb の DragCompleted
+		/// 再生ポジションスライダーが変更された
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void PositionSL_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e) {
+			string TAG = "PositionSL_DragCompleted";
+			string dbMsg = TAG;
+			try {
+				Slider slider = (Slider)sender;
+				double newValue = slider.Value;
+				dbMsg += "newValue=" + newValue;
+				VM.PositionSliderValueChang(newValue);
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(TAG, dbMsg);
+			}
+		}
 
 
 		//        /// <summary>
@@ -893,7 +929,7 @@ namespace M3UPlayer.Views
 		}
 
 
-/// /////////////////////////////////////////////////////////////////////////
+		/// /////////////////////////////////////////////////////////////////////////
 		public static void MyLog(string TAG, string dbMsg) {
 			dbMsg = "[MainWindow]" + dbMsg;
 			//dbMsg = "[" + MethodBase.GetCurrentMethod().Name + "]" + dbMsg;
