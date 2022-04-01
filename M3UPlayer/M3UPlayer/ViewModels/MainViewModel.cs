@@ -1295,18 +1295,41 @@ namespace M3UPlayer.ViewModels {
             string TAG = "GetDuration";
             string dbMsg = "";
             try {
+         //       DurationStr = null;
                 //string rStr = await MyView.webView.ExecuteScriptAsync($"document.getElementById(" +'"' + "durationSP" + '"' + ").innerHTML;");
                 //dbMsg += "、rStr=" + rStr;
                 //if (0<rStr.Length) {
+                string CurrentTime = await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime;");
+                dbMsg += "、CurrentTime=" + CurrentTime;
+                if (CurrentTime == null) {
+				} else {
+                    PositionStr = GetHMS(CurrentTime);
+                    dbMsg += "、PositionStr=" + PositionStr;
+					double Position = double.Parse(CurrentTime);
+                    if (0<Position ) {
+                        MyLog(TAG, dbMsg);
+                        return;
+                    }
+                }
                 string Duration = await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;");
                 dbMsg += "、Duration=" + Duration;
-                if (Duration != null) {
+                if (Duration == null) {
+   //                 return;
+                } else if (Duration.Equals("null")) {
+                    dbMsg += "、Duration=nullという文字";
+                } else if( Duration.Equals("")) {
+                    dbMsg += "、Duration=空白";
+				} else {
                     DurationStr = GetHMS(Duration);
                     dbMsg += "、DurationStr=" + DurationStr;
                     RaisePropertyChanged("DurationStr");
                     SliderMaximum = double.Parse(Duration);
                     RaisePropertyChanged("SliderMaximum");
                 }
+                //if (DurationStr == null) {
+                //	Task.Delay(1000);
+                //                GetDuration();
+                //            }
                 //}
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
@@ -1323,10 +1346,11 @@ namespace M3UPlayer.ViewModels {
             string TAG = "WebView_NavigationCompleted";
             string dbMsg = "";
             try {
+                dbMsg += ",ロード完了時";
                 if (MyView.webView.CoreWebView2 != null) {
                     //JavaScriptからC#のメソッドが実行できる様に仕込む
                     //MyView.webView.CoreWebView2.AddHostObjectToScript("class", CsClass);  //20220331コメントアウト
-                    dbMsg += ",class,CsClass追加";
+                    dbMsg += ",class,CsClass追加済";
                     //ダミーで良ければ　CS_Util　に差し替え
                     GetDuration();
                 } else {
@@ -1352,9 +1376,9 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += ",s=" + s;
                 if (s.Equals("ended")) {
                     dbMsg += "、再生終了";
-      //              await Task.Delay(1000);
-                    ForwardList();
-                    MyLog(TAG, dbMsg);
+					//              await Task.Delay(1000);
+					ForwardList();
+					MyLog(TAG, dbMsg);
                 } else {
                     //decimalに変換できれば（保留）再生ポジション
                     string CurrentTime = await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime;");

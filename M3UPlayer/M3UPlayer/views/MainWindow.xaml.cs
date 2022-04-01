@@ -62,8 +62,8 @@ namespace M3UPlayer.Views {
 		async void InitializeAsync() {
 			//初期化の完了を待たないでwebView2.CoreWebView2にアクセスするとNullReferenceExceptionが発生するので対策
 			await webView.EnsureCoreWebView2Async(null);
-			//イベント割り付け
-			webView.CoreWebView2.NavigationCompleted += WebView_NavigationCompleted;
+			////イベント割り付け
+			//webView.CoreWebView2.NavigationCompleted += WebView_NavigationCompleted;
 
 		}
 
@@ -72,25 +72,25 @@ namespace M3UPlayer.Views {
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void WebView_NavigationCompleted(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e) {
-			string TAG = "WebView_NavigationCompleted";
-			string dbMsg = "";
-			try {
-				//読み込み結果を判定
-				if (e.IsSuccess) {
-					dbMsg = "complete";
-				} else {
-					dbMsg = "WebErrorStatus=" + e.WebErrorStatus;
-				}
+		//private void WebView_NavigationCompleted(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e) {
+		//	string TAG = "WebView_NavigationCompleted";
+		//	string dbMsg = "";
+		//	try {
+		//		//読み込み結果を判定
+		//		if (e.IsSuccess) {
+		//			dbMsg = "complete";
+		//		} else {
+		//			dbMsg = "WebErrorStatus=" + e.WebErrorStatus;
+		//		}
 
-				//シグナル初期化
-				condition.Signal();
-				System.Threading.Thread.Sleep(1);
-				condition.Reset(); MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+		//		//シグナル初期化
+		//		condition.Signal();
+		//		System.Threading.Thread.Sleep(1);
+		//		condition.Reset(); MyLog(TAG, dbMsg);
+		//	} catch (Exception er) {
+		//		MyErrorLog(TAG, dbMsg, er);
+		//	}
+		//}
 		//////////////////////////////////////////////////////////////////////////////////////////webView2////
 
 		private void Window_Closed(object sender, EventArgs e) {
