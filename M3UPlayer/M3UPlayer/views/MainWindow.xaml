@@ -344,15 +344,27 @@
                             <ImageBrush ImageSource="/views/rewbtn.png" Stretch="UniformToFill"/>
                         </Button.Background>
                     </Button>
-                    <Button  Width="40" Height="40" MinWidth="30" Margin="20,5,5,5"
+                    <Button Command="{Binding MuteClick}" 
+                            Width="40" Height="40" MinWidth="30" Margin="20,5,5,5" 
+                            BorderBrush="Transparent" Background="#00DDDDDD"
                                     >
-                        <Button.Background>
-                            <ImageBrush ImageSource="/views/mute.png" Stretch="Uniform"/>
-                        </Button.Background>
+                        <Image x:Name="MuteBtImage" Source="/views/ei-sound.png" >
+                            <!--
+                            
+                             Foreground="#00000000"
+                            <Image.OpacityMask>
+                                <ImageBrush ImageSource="/views/ei-sound.png"/>
+                            </Image.OpacityMask>-->
+                        </Image>
                     </Button>
-                    <Slider HorizontalAlignment="Stretch" Width="200" Height="20"
-                                    Maximum="100"
-                                    Value="{Binding SoundValue, Mode=TwoWay}" Margin="0,0,20,0"
+                    <Slider x:Name="SoundSlider"
+                            HorizontalAlignment="Stretch" 
+                            Width="200" Height="20"
+                            Margin="0,0,20,0"
+                            Maximum="1"
+                            AutoToolTipPlacement="TopLeft"
+                            Value="{Binding SoundValue, Mode=TwoWay}"
+                            Thumb.DragCompleted="SoundSlider_DragCompleted"
                             />
 
                     <Button Content="↓" 

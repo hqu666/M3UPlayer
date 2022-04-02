@@ -887,30 +887,25 @@ namespace M3UPlayer.Views {
 			}
 		}
 
-
-		//        /// <summary>
-		//        /// ドラッグ中にマウスの右ボタンを押すことにより、ドラッグがキャンセル
-		//        /// 
-		//        /// https://dobon.net/vb/dotnet/control/draganddrop.html
-		//        /// </summary>
-		//        /// <param name="sender"></param>
-		//        /// <param name="e"></param>
-		//        /*		private void PlayListBox_QueryContinueDrag(object sender, QueryContinueDragEventArgs e) {
-		//					string TAG = "[PlayListBox_QueryContinueDrag]";
-		//					string dbMsg = TAG;
-		//					try {
-		//						//マウスの右ボタンが押されていればドラッグをキャンセル
-		//						dbMsg += "KeyState=" + e.KeyState;
-		//						if ((e.KeyState & 2) == 2) {                //"2"はマウスの右ボタンを表す
-		//							dbMsg += "マウスの右ボタンでドラッグをキャンセル";
-		//							e.Action = DragAction.Cancel;
-		//						}
-		//						MyLog(TAG, dbMsg);
-		//					} catch (Exception er) {
-		//						dbMsg += "<<以降でエラー発生>>" + er.Message;
-		//						MyLog(TAG, dbMsg);
-		//					}
-		//				}*/
+		/// <summary>
+		/// 音量調整スライダー
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void SoundSlider_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e) {
+			string TAG = "SoundSlider_DragCompleted";
+			string dbMsg = TAG;
+			try {
+				Slider slider = (Slider)sender;
+				double newValue = slider.Value;
+				dbMsg += "newValue=" + newValue;
+				VM.SetMediaVolume();
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(TAG, dbMsg);
+			}
+		}
 		/// ///////////////////////////////////////////////////////////////////////
 		private void MainFrame_Navigated(object sender, System.Windows.Navigation.NavigationEventArgs e) {
 			string TAG = "[MainFrame_Navigated]";

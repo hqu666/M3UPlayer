@@ -15,6 +15,7 @@ namespace M3UPlayer {
         public static string WebStratUrl = "https://www.yahoo.co.jp/?fr=top_ga1_ext1_bookmark";         //webViewのデフォルト表示ページ
 		public static string CurrentFolder = "";                    //現在の対象フォルダ
 		public static string RootFolderURL;
+		public static double SoundValue = 0.5;
 		/// <summary>
 		/// webに書き込むプレイヤー名
 		/// </summary>

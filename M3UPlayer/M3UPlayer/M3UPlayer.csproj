@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="views\ei-sound.png" />
     <None Remove="views\explore_icon.png" />
     <None Remove="views\ffbtn.png" />
     <None Remove="views\file_icon.png" />
@@ -26,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="views\ei-sound.png" />
     <Resource Include="views\explore_icon.png" />
     <Resource Include="views\ffbtn.png" />
     <Resource Include="views\file_icon.png" />

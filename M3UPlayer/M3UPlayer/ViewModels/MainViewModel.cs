@@ -275,23 +275,10 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
-
-        private ImageBrush _PlayBtImageSource;
-        /// <summary>
-        /// 再生ボタンの画像
-        /// </summary>
-        public ImageBrush PlayBtImageSource {
-            get => _PlayBtImageSource;
-            set {
-                if (_PlayBtImageSource == value)
-                    return;
-                _PlayBtImageSource = value;
-                RaisePropertyChanged("PlayBtImageSource");
-            }
-        }
-
-        BitmapImage playImage;
-        BitmapImage pouseImage;
+        public BitmapImage playImage;
+        public BitmapImage pouseImage;
+        public BitmapImage MuteOnImage;
+        public BitmapImage MuteOffImage;
 
         private bool _IsPlaying;
         /// <summary>
@@ -316,7 +303,7 @@ namespace M3UPlayer.ViewModels {
                         MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").pause();");
                         MyView.PlayBtImage.Source = playImage;
                     }
-                    RaisePropertyChanged("PlayBtImageSource");
+                    //RaisePropertyChanged("PlayBtImageSource");
                     //         dbMsg += ">>PlayBtImageSource==" + PlayBtImageSource.ToString();
                     MyLog(TAG, dbMsg);
                 } catch (Exception er) {
@@ -325,23 +312,29 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
-
-
-
-        private int _SoundValue;
+        private double _SoundValue;
         /// <summary>
         /// 音量
         /// </summary>
-        public int SoundValue {
+        public double SoundValue {
             get => _SoundValue;
             set {
-                if (_SoundValue == value)
-                    return;
-                _SoundValue = value;
-                //if (axWmp != null) {
-                //	axWmp.SetVolume(value);
-                //}
-                RaisePropertyChanged("SoundValue");
+                string TAG = "SoundValue(set)";
+                string dbMsg = "";
+                try {
+                    dbMsg += "value=" + value;
+                    if (_SoundValue == value)
+                        return;
+                    _SoundValue = value;
+
+                    //if (axWmp != null) {
+                    //	axWmp.SetVolume(value);
+                    //}
+                    RaisePropertyChanged("SoundValue");
+      //              MyLog(TAG, dbMsg);
+                } catch (Exception er) {
+                    MyErrorLog(TAG, dbMsg, er);
+                }
             }
         }
 
@@ -352,10 +345,29 @@ namespace M3UPlayer.ViewModels {
         public bool IsMute {
             get => _IsMute;
             set {
-                if (_IsMute == value)
-                    return;
-                _IsMute = value;
-                RaisePropertyChanged("IsMute");
+                string TAG = "IsMute(set)";
+                string dbMsg = "";
+                try {
+                    dbMsg += "value=" + value;
+                    if (_IsMute == value)
+                        return;
+                    _IsMute = value;
+                    RaisePropertyChanged("IsMute");
+                    dbMsg += ">>IsMute=" + IsMute;
+                    if (IsMute) {
+                        MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").volume=" + 0 + ";");
+                        MyView.MuteBtImage.Source = MuteOnImage;
+                    } else {
+                        dbMsg += ",SoundValue=" + SoundValue;
+                        //double setVolVal = SoundValue ;
+                        //dbMsg += ">>" + setVolVal;
+                        MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").volume=" + SoundValue + ";");
+                        MyView.MuteBtImage.Source = MuteOffImage;
+                    }
+                    MyLog(TAG, dbMsg);
+                } catch (Exception er) {
+                    MyErrorLog(TAG, dbMsg, er);
+                }
             }
         }
 
@@ -510,6 +522,9 @@ namespace M3UPlayer.ViewModels {
                 PLList = new ObservableCollection<PlayListModel>();
                 pouseImage = new BitmapImage(new Uri("/views/pousebtn.png", UriKind.Relative));
                 playImage = new BitmapImage(new Uri("/views/pl_r_btn.png", UriKind.Relative));
+                MuteOnImage = new BitmapImage(new Uri("/views/ei_silence.png", UriKind.Relative));
+                MuteOffImage = new BitmapImage(new Uri("/views/ei-sound.png", UriKind.Relative));
+
                 //            pouseBrush = new ImageBrush(pouseImage);
                 //playBrush = new ImageBrush(playImage);
                 // ICommandの場合
@@ -538,7 +553,9 @@ namespace M3UPlayer.ViewModels {
                 RaisePropertyChanged("Drag_now");
                 IsPlaying = false;
                 RaisePropertyChanged("IsPlaying");
-
+                SoundValue = Constant.SoundValue;
+                RaisePropertyChanged("SoundValue");
+                IsMute = false;
                 //      WVM = new WsbViewModel();
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
@@ -3187,33 +3204,33 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
-        /// <summary>
-        /// pauseにするだけ(Thumb.DragStarted)
-        /// </summary>
-        public async void PauseVideo() {
-            string TAG = "PauseVideo";
-            string dbMsg = "";
-            try {
-                dbMsg += ",SliderValue=" + SliderValue;
-                dbMsg += ",IsPlaying=" + IsPlaying;
-                if (IsPlaying) {
-                    IsPlaying = false;
-                    RaisePropertyChanged("IsPlaying");
-                }
-                dbMsg += ">>=" + IsPlaying;
-                MyLog(TAG, dbMsg);
-            } catch (Exception er) {
-                MyErrorLog(TAG, dbMsg, er);
-            }
-        }
+		/// <summary>
+		/// pauseにするだけ(Thumb.DragStarted)
+		/// </summary>
+		public void PauseVideo() {
+			string TAG = "PauseVideo";
+			string dbMsg = "";
+			try {
+				dbMsg += ",SliderValue=" + SliderValue;
+				dbMsg += ",IsPlaying=" + IsPlaying;
+				if (IsPlaying) {
+					IsPlaying = false;
+					RaisePropertyChanged("IsPlaying");
+				}
+				dbMsg += ">>=" + IsPlaying;
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				MyErrorLog(TAG, dbMsg, er);
+			}
+		}
 
 
-        //		public ICommand PositionSliderValueChanged => new DelegateCommand(PositionSliderValueChang);
+		//		public ICommand PositionSliderValueChanged => new DelegateCommand(PositionSliderValueChang);
 
-        /// <summary>
-        /// 再生ポジションスライダーの Thumb 位置変更
-        /// </summary>
-        public async void PositionSliderValueChang(double newPosition) {
+		/// <summary>
+		/// 再生ポジションスライダーの Thumb 位置変更
+		/// </summary>
+		public async void PositionSliderValueChang(double newPosition) {
             string TAG = "PositionSliderValueChang";
             string dbMsg = "";
             try {
@@ -3278,6 +3295,44 @@ namespace M3UPlayer.ViewModels {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
+
+
+        public async void SetMediaVolume() {
+            string TAG = "SetMediaVolume";
+            string dbMsg = "";
+            try {
+                dbMsg += ",SoundValue=" + SoundValue;
+                //double setVolVal = (double)SoundValue/100;
+                //dbMsg += ">>" + setVolVal;
+                await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").volume=" + SoundValue + ";");
+                //SoundValue =(int) setVolVal*100;
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+        public ICommand MuteClick => new DelegateCommand(SoundMute);
+        /// <summary>
+        /// 消音
+        /// </summary>
+        public async void SoundMute() {
+            string TAG = "SoundMute";
+            string dbMsg = "";
+            try {
+                dbMsg += "IsMute=" + IsMute;
+                if (IsMute) {
+                    IsMute = false;
+                } else {
+                    IsMute = true;
+                }
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+
 
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////// プレイヤーコントロール　///
