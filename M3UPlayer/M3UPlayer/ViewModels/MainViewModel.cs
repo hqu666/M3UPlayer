@@ -371,6 +371,16 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
+        /// <summary>
+        /// 送りコンボのソース
+        /// </summary>
+        public List<string> ForwardCBComboSource { get; set; }
+        /// <summary>
+        /// 送りコンボの選択値
+        /// </summary>
+        public string ForwardCBComboSelected { get; set; }
+
+
         ///// <summary>
         ///// 選択されている
         ///// </summary>
@@ -551,6 +561,14 @@ namespace M3UPlayer.ViewModels {
                 RaisePropertyChanged("PlayListSelectionMode");
                 Drag_now = false;
                 RaisePropertyChanged("Drag_now");
+
+				ForwardCBComboSource = new List<String> { "5", "30","60","120","300", "600" };
+				RaisePropertyChanged("ForwardCBComboSource");
+				dbMsg += ",ff=" + ForwardCBComboSource[0] + "～" + ForwardCBComboSource[ForwardCBComboSource.Count-1];
+                ForwardCBComboSelected = Constant.ForwardCBComboSelected;
+                RaisePropertyChanged("ForwardCBComboSelected");
+                dbMsg += ",ForwardCBComboSelected=";
+
                 IsPlaying = false;
                 RaisePropertyChanged("IsPlaying");
                 SoundValue = Constant.SoundValue;
@@ -3224,13 +3242,40 @@ namespace M3UPlayer.ViewModels {
 			}
 		}
 
+//        public ICommand ForwardCB_MouseDoubleClick => new DelegateCommand(ClickForwardAsync);
+        
+        public ICommand FFBtClick => new DelegateCommand(ClickForwardAsync);
+        /// <summary>
+        /// 送りコンボのクリック
+        /// </summary>
+        public async void ClickForwardAsync() {
+            string TAG = "ClickForward";
+            string dbMsg = "";
+            try {
+                dbMsg += "ForwardCBComboSelected=" + ForwardCBComboSelected;
+                double newPosition = SliderValue + double.Parse(ForwardCBComboSelected);
+                dbMsg += ">>" + newPosition;
+                IsPlaying = false;
+                RaisePropertyChanged("IsPlaying");
+                await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
+                IsPlaying = true;
+                RaisePropertyChanged("IsPlaying");
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
-		//		public ICommand PositionSliderValueChanged => new DelegateCommand(PositionSliderValueChang);
 
-		/// <summary>
-		/// 再生ポジションスライダーの Thumb 位置変更
-		/// </summary>
-		public async void PositionSliderValueChang(double newPosition) {
+
+
+
+        //		public ICommand PositionSliderValueChanged => new DelegateCommand(PositionSliderValueChang);
+
+        /// <summary>
+        /// 再生ポジションスライダーの Thumb 位置変更
+        /// </summary>
+        public async void PositionSliderValueChang(double newPosition) {
             string TAG = "PositionSliderValueChang";
             string dbMsg = "";
             try {
@@ -3251,32 +3296,32 @@ namespace M3UPlayer.ViewModels {
         }
 
         public ICommand ListForwarding => new DelegateCommand(ForwardList);
-        /// <summary>
-        /// プレイリストの次アイテムへ
-        /// </summary>
-        public async void ForwardList() {
-            string TAG = "ForwardList";
-            string dbMsg = "";
-            try {
-                PauseVideo();
-                dbMsg += "SelectedPlayListIndex=" + SelectedPlayListIndex;
-                if ((PLList.Count - 2) < SelectedPlayListIndex) {
-                    SelectedPlayListIndex = 0;
-                } else {
-                    SelectedPlayListIndex++;
-                }
-                RaisePropertyChanged("SelectedPlayListIndex");
-                dbMsg += ">>=" + SelectedPlayListIndex;
-                dbMsg += "/" + PLList.Count;
-                PLMouseUp();
-                MyLog(TAG, dbMsg);
-            } catch (Exception er) {
-                MyErrorLog(TAG, dbMsg, er);
-            }
-        }
+		/// <summary>
+		/// プレイリストの次アイテムへ
+		/// </summary>
+		public void ForwardList() {
+			string TAG = "ForwardList";
+			string dbMsg = "";
+			try {
+				PauseVideo();
+				dbMsg += "SelectedPlayListIndex=" + SelectedPlayListIndex;
+				if ((PLList.Count - 2) < SelectedPlayListIndex) {
+					SelectedPlayListIndex = 0;
+				} else {
+					SelectedPlayListIndex++;
+				}
+				RaisePropertyChanged("SelectedPlayListIndex");
+				dbMsg += ">>=" + SelectedPlayListIndex;
+				dbMsg += "/" + PLList.Count;
+				PLMouseUp();
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				MyErrorLog(TAG, dbMsg, er);
+			}
+		}
 
-        public ICommand ListRewind => new DelegateCommand(RewindList);
-        public async void RewindList() {
+		public ICommand ListRewind => new DelegateCommand(RewindList);
+        public void RewindList() {
             string TAG = "RewindList";
             string dbMsg = "";
             try {

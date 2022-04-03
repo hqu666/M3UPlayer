@@ -946,5 +946,8 @@ namespace M3UPlayer.Views {
 			return Util.MessageShowWPF(msgStr, titolStr, buttns, icon);
 		}
 
+		//private void ForwardCB_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
+
+		//}
 	}
 }
