@@ -182,6 +182,8 @@ namespace M3UPlayer.ViewModels {
             set { Properties.Settings.Default.NowSelectedFile = value; }
         }
 
+
+
         /// <summary>
         /// 全長:duration
         /// </summary>
@@ -210,6 +212,9 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
+        /// <summary>
+        /// 再生ポジションスライダーの最大値；Durationの数値
+        /// </summary>
         private double _SliderMaximum;
         /// <summary>
         /// スライダー上限
@@ -3242,19 +3247,25 @@ namespace M3UPlayer.ViewModels {
 			}
 		}
 
-//        public ICommand ForwardCB_MouseDoubleClick => new DelegateCommand(ClickForwardAsync);
-        
+   //     public ICommand FFCBChanged => new DelegateCommand(ClickForwardAsync);
         public ICommand FFBtClick => new DelegateCommand(ClickForwardAsync);
         /// <summary>
         /// 送りコンボのクリック
         /// </summary>
         public async void ClickForwardAsync() {
-            string TAG = "ClickForward";
+            string TAG = "ClickForwardAsync";
             string dbMsg = "";
             try {
                 dbMsg += "ForwardCBComboSelected=" + ForwardCBComboSelected;
                 double newPosition = SliderValue + double.Parse(ForwardCBComboSelected);
                 dbMsg += ">>" + newPosition;
+				if (SliderMaximum < newPosition) {
+                    double difference = ( SliderMaximum - SliderValue) / 2;
+                    dbMsg += ">修正>" + difference;
+                    newPosition = SliderMaximum - difference;
+                    dbMsg += ">>" + newPosition;
+                }
+                dbMsg += " / " + SliderMaximum;
                 IsPlaying = false;
                 RaisePropertyChanged("IsPlaying");
                 await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
@@ -3265,8 +3276,6 @@ namespace M3UPlayer.ViewModels {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
-
-
 
 
 

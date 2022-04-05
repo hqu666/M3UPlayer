@@ -804,6 +804,7 @@
                                       DisplayMemberPath=""
                                       ItemsSource="{Binding ForwardCBComboSource, Mode=TwoWay}"
                                       SelectedValue="{Binding ForwardCBComboSelected, Mode=TwoWay}"
+                                      DropDownClosed="ForwardCB_DropDownClosed"
                                       MinWidth="50" 
                                       Margin="10,0,5,0"
                                       >

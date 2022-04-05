@@ -867,6 +867,23 @@ namespace M3UPlayer.Views {
 		}
 
 		/// <summary>
+		/// FFコンボの変更
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ForwardCB_DropDownClosed(object sender, EventArgs e) {
+			string TAG = "ForwardCB_DropDownClosed";
+			string dbMsg = TAG;
+			try {
+				VM.ClickForwardAsync();
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(TAG, dbMsg);
+			}
+		}
+
+		/// <summary>
 		/// 再生ポジションスライダーのツマミ Thumb の DragCompleted
 		/// 再生ポジションスライダーが変更された
 		/// </summary>
@@ -946,8 +963,5 @@ namespace M3UPlayer.Views {
 			return Util.MessageShowWPF(msgStr, titolStr, buttns, icon);
 		}
 
-		//private void ForwardCB_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
-
-		//}
 	}
 }
