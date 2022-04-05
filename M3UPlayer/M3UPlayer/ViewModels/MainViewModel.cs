@@ -182,8 +182,6 @@ namespace M3UPlayer.ViewModels {
             set { Properties.Settings.Default.NowSelectedFile = value; }
         }
 
-
-
         /// <summary>
         /// 全長:duration
         /// </summary>
@@ -385,6 +383,15 @@ namespace M3UPlayer.ViewModels {
         /// </summary>
         public string ForwardCBComboSelected { get; set; }
 
+        /// <summary>
+        /// 戻しコンボのソース
+        /// </summary>
+        public List<string> RewCBComboSource { get; set; }
+        /// <summary>
+        /// 戻しコンボの選択値
+        /// </summary>
+        public string RewCBComboSelected { get; set; }
+
 
         ///// <summary>
         ///// 選択されている
@@ -572,7 +579,14 @@ namespace M3UPlayer.ViewModels {
 				dbMsg += ",ff=" + ForwardCBComboSource[0] + "～" + ForwardCBComboSource[ForwardCBComboSource.Count-1];
                 ForwardCBComboSelected = Constant.ForwardCBComboSelected;
                 RaisePropertyChanged("ForwardCBComboSelected");
-                dbMsg += ",ForwardCBComboSelected=";
+                dbMsg += ",ForwardCBComboSelected=" + ForwardCBComboSelected;
+
+                RewCBComboSource = new List<String> { "5", "30", "60", "120", "300", "600" };
+                RaisePropertyChanged("RewCBComboSource");
+                dbMsg += ",ff=" + RewCBComboSource[0] + "～" + RewCBComboSource[RewCBComboSource.Count - 1];
+                RewCBComboSelected = Constant.RewCBComboSelected;
+                RaisePropertyChanged("RewCBComboSelected");
+                dbMsg += ",RewCBComboSelected=" + RewCBComboSelected;
 
                 IsPlaying = false;
                 RaisePropertyChanged("IsPlaying");
@@ -3277,9 +3291,34 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
-
-
-        //		public ICommand PositionSliderValueChanged => new DelegateCommand(PositionSliderValueChang);
+        public ICommand RewBtClick => new DelegateCommand(ClickRewAsync);
+        /// <summary>
+        /// 戻りコンボのクリック
+        /// </summary>
+        public async void ClickRewAsync() {
+            string TAG = "ClickRewAsync";
+            string dbMsg = "";
+            try {
+                dbMsg += "RewCBComboSelected=" + RewCBComboSelected;
+                double newPosition = SliderValue - double.Parse(RewCBComboSelected);
+                dbMsg += ">>" + newPosition;
+                if ( newPosition < 0) {
+                    double difference = SliderValue / 2;
+                    dbMsg += ">修正>" + difference;
+                    newPosition = difference;
+                    dbMsg += ">>" + newPosition;
+                }
+                dbMsg += " / " + SliderMaximum;
+                IsPlaying = false;
+                RaisePropertyChanged("IsPlaying");
+                await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
+                IsPlaying = true;
+                RaisePropertyChanged("IsPlaying");
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
         /// <summary>
         /// 再生ポジションスライダーの Thumb 位置変更

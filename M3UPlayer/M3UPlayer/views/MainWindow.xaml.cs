@@ -883,6 +883,19 @@ namespace M3UPlayer.Views {
 			}
 		}
 
+		private void RewCB_DropDownClosed(object sender, EventArgs e) {
+			string TAG = "RewCB_DropDownClosed";
+			string dbMsg = TAG;
+			try {
+				VM.ClickRewAsync();
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(TAG, dbMsg);
+			}
+		}
+
+
 		/// <summary>
 		/// 再生ポジションスライダーのツマミ Thumb の DragCompleted
 		/// 再生ポジションスライダーが変更された
@@ -903,6 +916,7 @@ namespace M3UPlayer.Views {
 				MyLog(TAG, dbMsg);
 			}
 		}
+
 
 		/// <summary>
 		/// 音量調整スライダー
@@ -962,6 +976,5 @@ namespace M3UPlayer.Views {
 			CS_Util Util = new CS_Util();
 			return Util.MessageShowWPF(msgStr, titolStr, buttns, icon);
 		}
-
 	}
 }

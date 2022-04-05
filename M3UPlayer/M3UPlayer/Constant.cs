@@ -17,7 +17,8 @@ namespace M3UPlayer {
 		public static string RootFolderURL;
 		public static double SoundValue = 0.5;
 		public static string ForwardCBComboSelected = "120";
-		
+		public static string RewCBComboSelected = "120";
+
 		/// <summary>
 		/// webに書き込むプレイヤー名
 		/// </summary>
