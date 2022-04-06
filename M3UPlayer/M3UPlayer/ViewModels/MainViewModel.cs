@@ -4852,73 +4852,74 @@ AddType video/MP2T .ts
                 }
                 contlolPart += "\t\t</div>\n";
                 if (contlolPart.Contains("<video")) {
-                    contlolPart += "\t\t<div style=" + '"' + "background-color:#333333; color:#ffffff;" + '"' + ">\n";
-                    contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "再生" + '"' + " onClick=" + '"' + "playVideo()" + '"' + ">\n";
-                    contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "一時停止" + '"' + " onClick=" + '"' + "pauseVideo()" + '"' + ">\n";
-                    contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "↑" + '"' + " onClick=" + '"' + "upVolume()" + '"' + ">\n";
-                    contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "↓" + '"' + " onClick=" + '"' + "downVolume()" + '"' + ">\n";
-                    //contlolPart += "\t\t\t現在（秒）<span id=" + '"' + "currentTimeSP" + '"' + ">0</span>\n";
-                    //contlolPart += "\t\t\t / <span id=" + '"' + "durationSP" + '"' + "></span>\n";
-                    //contlolPart += "\t\t\t<span id=" + '"' + "kanryou" + '"' + "></span>\n";
-                    contlolPart += "\t\t</div>\n";
+                    //contlolPart += "\t\t<div style=" + '"' + "background-color:#333333; color:#ffffff;" + '"' + ">\n";
+                    //contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "再生" + '"' + " onClick=" + '"' + "playVideo()" + '"' + ">\n";
+                    //contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "一時停止" + '"' + " onClick=" + '"' + "pauseVideo()" + '"' + ">\n";
+                    //contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "↑" + '"' + " onClick=" + '"' + "upVolume()" + '"' + ">\n";
+                    //contlolPart += "\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "↓" + '"' + " onClick=" + '"' + "downVolume()" + '"' + ">\n";
+                    ////contlolPart += "\t\t\t現在（秒）<span id=" + '"' + "currentTimeSP" + '"' + ">0</span>\n";
+                    ////contlolPart += "\t\t\t / <span id=" + '"' + "durationSP" + '"' + "></span>\n";
+                    ////contlolPart += "\t\t\t<span id=" + '"' + "kanryou" + '"' + "></span>\n";
+                    //contlolPart += "\t\t</div>\n";
                     contlolPart += "\t\t<script type=" + '"' + "text/javascript" + '"' + ">\n";
                     contlolPart += "\t\t\tvar v = document.getElementById(" + '"' + wiPlayerID + '"' + ");\n";
-                    //contlolPart += "\t\t\tfunction getHMS(sec) {\n";
-                    //contlolPart += "\t\t\t\tvar retStr = " + '"' + '"' + ";\n";
-                    //contlolPart += "\t\t\t\tvar retH = Math.floor(sec/3600);\n";
-                    //contlolPart += "\t\t\t\tif(0 < retH){\n";
-                    //contlolPart += "\t\t\t\t\tretStr = retH + " + '"' + ":" + '"' + ";\n";
-                    //contlolPart += "\t\t\t\t\tsec = sec - retH * 3600;\n";
-                    //contlolPart += "\t\t\t\t}\n";
-                    //contlolPart += "\t\t\t\tvar retM = Math.floor(sec/60);\n";
-                    //contlolPart += "\t\t\t\tif(0 < retM){\n";
-                    //contlolPart += "\t\t\t\t\tif(retM < 10){\n";
-                    //contlolPart += "\t\t\t\t\t\tretStr += " + '"' + "0" + '"' + " + retM + " + '"' + ":" + '"' + ";\n";
-                    //contlolPart += "\t\t\t\t\t}else{\n";
-                    //contlolPart += "\t\t\t\t\t\tretStr += retM + " + '"' + ":" + '"' + ";\n";
-                    //contlolPart += "\t\t\t\t\t}\n";
-                    //contlolPart += "\t\t\t\t\tsec = sec - retM * 60;\n";
-                    //contlolPart += "\t\t\t\t}else{\n";
-                    //contlolPart += "\t\t\t\t\tretStr += " + '"' + "00:" + '"' + ";\n";
-                    //contlolPart += "\t\t\t\t}\n";
-                    //contlolPart += "\t\t\t\tsec = Math.floor(sec);\n";
-                    //contlolPart += "\t\t\t\tif(0 < sec){\n";
-                    //contlolPart += "\t\t\t\t\tif(sec < 10){\n";
-                    //contlolPart += "\t\t\t\t\t\tretStr += " + '"' + "0" + '"' + " + sec;\n";
-                    //contlolPart += "\t\t\t\t\t}else{\n";
-                    //contlolPart += "\t\t\t\t\t\tretStr += sec;\n";
-                    //contlolPart += "\t\t\t\t\t}\n";
-                    //contlolPart += "\t\t\t\t}else{\n";
-                    //contlolPart += "\t\t\t\t\tretStr = retStr + " + '"' + "00" + '"' + ";\n";
-                    //contlolPart += "\t\t\t\t}\n";
-                    //contlolPart += "\t\t\t\treturn retStr;\n";
-                    //contlolPart += "\t\t\t}\n\n";
-                    //contlolPart += "\t\t\tfunction getDuration() {\n";               //動画の長さ（秒）を表示
-                    //contlolPart += "\t\t\t\tvar myDuration = v.duration;\n";
-                    //contlolPart += "\t\t\t\treturn myDuration;\n";
-                    //contlolPart += "\t\t\t}\n\n";
-                    contlolPart += "\t\t\tfunction getCurrentTime() {\n";                //現在の再生位置（秒）を表示
-                    contlolPart += "\t\t\t\tvar myCurrentTime = v.currentTime;\n";
-                    contlolPart += "\t\t\t\treturn myCurrentTime;\n";
-                    contlolPart += "\t\t\t}\n\n";
-                    contlolPart += "\t\t\tfunction playVideo() {\n";                //再生完了の表示をクリア
-                    //動画を再生
-                    contlolPart += "\t\t\t\tv.play();\n";
-                    contlolPart += "\t\t\t\tisEnded=false;\n";
-                    contlolPart += "\t\t\t}\n\n";
-                    contlolPart += "\t\t\tfunction pauseVideo() {\n";            //動画を一時停止
-                    contlolPart += "\t\t\t\tv.pause();\n";
-                    contlolPart += "\t\t\t}\n\n";
-                    contlolPart += "\t\t\tfunction upVolume() {\n";            //音量を上げる
-                    contlolPart += "\t\t\t\tv.volume = v.volume + 0.25;\n";
-                    contlolPart += "\t\t\t}\n\n";
-                    contlolPart += "\t\t\tfunction downVolume() {\n";            //音量を下げる
-                    contlolPart += "\t\t\t\tv.volume = v.volume - 0.25;\n";
-                    contlolPart += "\t\t\t}\n\n";
-                    contlolPart += "\t\t\tfunction myOnLoad() {\n";
+					//contlolPart += "\t\t\tfunction getHMS(sec) {\n";
+					//contlolPart += "\t\t\t\tvar retStr = " + '"' + '"' + ";\n";
+					//contlolPart += "\t\t\t\tvar retH = Math.floor(sec/3600);\n";
+					//contlolPart += "\t\t\t\tif(0 < retH){\n";
+					//contlolPart += "\t\t\t\t\tretStr = retH + " + '"' + ":" + '"' + ";\n";
+					//contlolPart += "\t\t\t\t\tsec = sec - retH * 3600;\n";
+					//contlolPart += "\t\t\t\t}\n";
+					//contlolPart += "\t\t\t\tvar retM = Math.floor(sec/60);\n";
+					//contlolPart += "\t\t\t\tif(0 < retM){\n";
+					//contlolPart += "\t\t\t\t\tif(retM < 10){\n";
+					//contlolPart += "\t\t\t\t\t\tretStr += " + '"' + "0" + '"' + " + retM + " + '"' + ":" + '"' + ";\n";
+					//contlolPart += "\t\t\t\t\t}else{\n";
+					//contlolPart += "\t\t\t\t\t\tretStr += retM + " + '"' + ":" + '"' + ";\n";
+					//contlolPart += "\t\t\t\t\t}\n";
+					//contlolPart += "\t\t\t\t\tsec = sec - retM * 60;\n";
+					//contlolPart += "\t\t\t\t}else{\n";
+					//contlolPart += "\t\t\t\t\tretStr += " + '"' + "00:" + '"' + ";\n";
+					//contlolPart += "\t\t\t\t}\n";
+					//contlolPart += "\t\t\t\tsec = Math.floor(sec);\n";
+					//contlolPart += "\t\t\t\tif(0 < sec){\n";
+					//contlolPart += "\t\t\t\t\tif(sec < 10){\n";
+					//contlolPart += "\t\t\t\t\t\tretStr += " + '"' + "0" + '"' + " + sec;\n";
+					//contlolPart += "\t\t\t\t\t}else{\n";
+					//contlolPart += "\t\t\t\t\t\tretStr += sec;\n";
+					//contlolPart += "\t\t\t\t\t}\n";
+					//contlolPart += "\t\t\t\t}else{\n";
+					//contlolPart += "\t\t\t\t\tretStr = retStr + " + '"' + "00" + '"' + ";\n";
+					//contlolPart += "\t\t\t\t}\n";
+					//contlolPart += "\t\t\t\treturn retStr;\n";
+					//contlolPart += "\t\t\t}\n\n";
+					//contlolPart += "\t\t\tfunction getDuration() {\n";               //動画の長さ（秒）を表示
+					//contlolPart += "\t\t\t\tvar myDuration = v.duration;\n";
+					//contlolPart += "\t\t\t\treturn myDuration;\n";
+					//contlolPart += "\t\t\t}\n\n";
+					//contlolPart += "\t\t\tfunction getCurrentTime() {\n";                //現在の再生位置（秒）を表示
+					//contlolPart += "\t\t\t\tvar myCurrentTime = v.currentTime;\n";
+					//contlolPart += "\t\t\t\treturn myCurrentTime;\n";
+					//contlolPart += "\t\t\t}\n\n";
+					//contlolPart += "\t\t\tfunction playVideo() {\n";                //再生完了の表示をクリア
+					////動画を再生
+					//contlolPart += "\t\t\t\tv.play();\n";
+					//contlolPart += "\t\t\t\tisEnded=false;\n";
+					//contlolPart += "\t\t\t}\n\n";
+					//contlolPart += "\t\t\tfunction pauseVideo() {\n";            //動画を一時停止
+					//contlolPart += "\t\t\t\tv.pause();\n";
+					//contlolPart += "\t\t\t}\n\n";
+					//contlolPart += "\t\t\tfunction upVolume() {\n";            //音量を上げる
+					//contlolPart += "\t\t\t\tv.volume = v.volume + 0.25;\n";
+					//contlolPart += "\t\t\t}\n\n";
+					//contlolPart += "\t\t\tfunction downVolume() {\n";            //音量を下げる
+					//contlolPart += "\t\t\t\tv.volume = v.volume - 0.25;\n";
+					//contlolPart += "\t\t\t}\n\n";
+					contlolPart += "\t\t\tfunction myOnLoad() {\n";
                     //現在の再生位置が変更された時
                     contlolPart += "\t\t\t\tv.addEventListener(" + '"' + "timeupdate" + '"' + ", function(){\n";
-                    contlolPart += "\t\t\t\t\twindow.chrome.webview.postMessage(getCurrentTime()+" + '"' + '"' + ");\n";
+				//	contlolPart += "\t\t\t\t\tvar myCurrentTime = v.currentTime;\n";
+					contlolPart += "\t\t\t\t\twindow.chrome.webview.postMessage(v.currentTime+" + '"' + '"' + ");\n";
                     contlolPart += "\t\t\t\t}, false);\n";            //メディアリソースの末尾に達して、再生が停止した時
 																	  //メディアリソースの末尾に達して、再生が停止した時
 					contlolPart += "\t\t\t\tv.addEventListener(" + '"' + "ended" + '"' + ", function(){\n";
