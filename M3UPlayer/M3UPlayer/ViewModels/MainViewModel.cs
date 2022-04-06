@@ -182,6 +182,40 @@ namespace M3UPlayer.ViewModels {
             set { Properties.Settings.Default.NowSelectedFile = value; }
         }
 
+
+        private bool _IsHideControl;
+        /// <summary>
+        /// プレイヤーコントロールの表示/非表示
+        /// </summary>
+        public bool IsHideControl {
+            get => _IsHideControl;
+            set {
+                string TAG = "IsHideControl(set)";
+                string dbMsg = "";
+                try {
+                    dbMsg += "value=" + value;
+                    if (_IsHideControl == value)
+                        return;
+                    _IsHideControl = value;
+                    RaisePropertyChanged("IsHideControl");
+                    dbMsg += ">>IsHideControl=" + IsHideControl;
+                    dbMsg += ",PlayerContlolGR(h)=" + MyView.PlayerContlolGR.Height;
+                    if (IsHideControl) {
+                        MyView.PlayerContlolGR.Height = 0;
+                        MyView.ControlHideBT.Content = "⇗";
+                    } else {
+                        MyView.PlayerContlolGR.Height = 96;
+                        MyView.ControlHideBT.Content = "⇙";
+                    }
+                    dbMsg += ">>=" + MyView.PlayerContlolGR.Height;
+                    MyLog(TAG, dbMsg);
+                } catch (Exception er) {
+                    MyErrorLog(TAG, dbMsg, er);
+                }
+            }
+        }
+
+
         /// <summary>
         /// 全長:duration
         /// </summary>
@@ -3219,6 +3253,28 @@ namespace M3UPlayer.ViewModels {
         /// プレイヤーコントロール　//////////////////////////////////////////////////////////////////////////////////////////////////////
         /// </summary>
         /// http://memopad.bitter.jp/w3c/html5/html5_video_dom.html
+        public ICommand ControlHide => new DelegateCommand(HideControl);
+        /// <summary>
+        /// プレイヤーコントロールの表示/非表示
+        /// </summary>
+        public async void HideControl() {
+            string TAG = "HideControl";
+            string dbMsg = "";
+            try {
+                dbMsg += "IsHideControl=" + IsHideControl;
+                if (IsHideControl) {
+                    IsHideControl=false;
+				}else{
+                    IsHideControl = true;
+                }
+                dbMsg += ">>=" + IsHideControl;
+                RaisePropertyChanged("IsHideControl");
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
         public ICommand PlayBtClick => new DelegateCommand(ClickPlayBt);
         /// <summary>
         /// Playボタンのクリック

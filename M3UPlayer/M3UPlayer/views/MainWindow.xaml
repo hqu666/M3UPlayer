@@ -46,14 +46,15 @@
 
         <ControlTemplate x:Key="buttonTemplate"  TargetType="{x:Type Button}">
             <Border x:Name="border"
-                BorderThickness="2"
-                BorderBrush="DarkGray"
-				 Padding="5"
                 Background="{TemplateBinding Background}"
                 CornerRadius="2">
                 <ContentPresenter VerticalAlignment="Center"
                               HorizontalAlignment="Center" />
             </Border>
+            <!--BorderThickness="2"
+ 				 Padding="5"
+               BorderBrush="DarkGray"-->
+
         </ControlTemplate>
 
         <Style TargetType="{x:Type Button}">
@@ -324,9 +325,10 @@
                 </Popup>
 
                 <StackPanel Grid.Row="2" 
-                            Orientation="Horizontal" 
-                            HorizontalAlignment="Right"
+                            Orientation="Horizontal" HorizontalAlignment="Left" 
                             >
+                    <!--HorizontalAlignment="Right"-->
+
                     <Button  Content="↑"
                              Command="{Binding ListRewind}" 
                              Width="40" Height="40" MinWidth="30" RenderTransformOrigin="0.5,0.5"
@@ -369,7 +371,9 @@
 
                     <Button Content="↓" 
                             Command="{Binding ListForwarding}" 
-                            Width="40" Height="40" MinWidth="30" RenderTransformOrigin="0.5,0.5"
+                            Width="40" Height="40" 
+                            MinWidth="30" 
+                            RenderTransformOrigin="0.5,0.5"
                             Foreground="White" FontSize="18" FontWeight="Bold" BorderBrush="#00000000" BorderThickness="0,0,0,0" Padding="0,0,0,0" HorizontalContentAlignment="Center"
                             >
                         <Button.RenderTransform>
@@ -387,7 +391,20 @@
 
                 </StackPanel>
 
+                <StackPanel Grid.Row="2" 
+                            Orientation="Horizontal" 
+                            HorizontalAlignment="Right"
+                            >
 
+                    <Button Command="{Binding ControlHide}" 
+                            Content="⇙"
+                            x:Name="ControlHideBT"
+                            MinWidth="30" 
+                            Width="36" Height="36" FontSize="24" 
+                            Padding="-10"
+                            HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"/>
+                </StackPanel>
 
             </Grid>
         </Grid>
@@ -426,7 +443,10 @@
                     -->
                 </Grid>
 
-                <Grid Grid.Row="1">
+                <Grid x:Name="PlayerContlolGR" 
+                    Grid.Row="1"
+                      
+                      >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
@@ -488,6 +508,8 @@
 
                             <Button Grid.Column="0"
                                     Command="{Binding RewBtClick}" 
+                                    BorderBrush="#00000000" 
+                                    BorderThickness="0,0,0,0" 
                                     MinWidth="32" 
                                     Margin="5,5,0,5"
                                     >
@@ -837,6 +859,8 @@
                                     Grid.Column="4"
                                     Command="{Binding FFBtClick}" 
                                     MinWidth="32" 
+                                    BorderBrush="#00000000" 
+                                    BorderThickness="0,0,0,0" 
                                     Margin="0,5,5,5"
                                     >
 
