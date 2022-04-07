@@ -627,8 +627,11 @@ namespace M3UPlayer.ViewModels {
                 SoundValue = Constant.SoundValue;
                 RaisePropertyChanged("SoundValue");
                 IsMute = false;
-                //      WVM = new WsbViewModel();
-                MyLog(TAG, dbMsg);
+				//      WVM = new WsbViewModel();
+				assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;  //実行デレクトリ		+Path.AltDirectorySeparatorChar + "brows.htm";
+                //,assemblyPath=H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\M3UPlayer.dll
+                dbMsg += ",assemblyPath=" + assemblyPath;
+				MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
@@ -3569,10 +3572,10 @@ namespace M3UPlayer.ViewModels {
         string flRightClickItemUrl = "";        //fileTreeクリックアイテムのFullPath
         string copySouce = "";      //コピーするアイテムのurl
         string cutSouce = "";       //カットするアイテムのurl
-        string assemblyPath = "";       //実行デレクトリ
-        string configFileName;      //設定ファイル名 
-        string assemblyName = "";       //実行ファイル名
-        string playerUrl = "";
+        private string assemblyPath = "";       //実行デレクトリ
+        private string configFileName;      //設定ファイル名 
+        private string assemblyName = "";       //実行ファイル名
+        private string playerUrl = "";
         double CurrentPosition;
         double CurrentMediaDuration;
 
@@ -3629,8 +3632,6 @@ namespace M3UPlayer.ViewModels {
         //        null, new System.Drawing.Icon("M3UPlayerb_icon.ico"));
 
         //        InitializeComponent();
-        //        assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;  //実行デレクトリ		+Path.AltDirectorySeparatorChar + "brows.htm";
-        //        dbMsg += ",assemblyPath=" + assemblyPath;
         //        //	configFileName =  Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         //        //							Application.CompanyName + "\\" + Application.ProductName +"\\" + Application.ProductName + ".config");
         //        configFileName = assemblyPath.Replace(".exe", ".config");
@@ -4543,7 +4544,7 @@ AddType video/MP2T .ts
         /// <param name="webHeight"></param>
         /// <returns></returns>
         private string MakeVideoSouce(string fileName, int webWidth, int webHeight) {
-            string TAG = "[MakeVideoSouce]";
+            string TAG = "MakeVideoSouce";
             string dbMsg = "";
             string contlolPart = "";
             try {
@@ -4570,12 +4571,14 @@ AddType video/MP2T .ts
                 contlolPart += "\t<head>\n\t\t<meta charset=utf-8>\n";
                 contlolPart += "\t\t<meta http - equiv = " + '"' + "X - UA - Compatible" + '"' + " content = " + '"' + "IE = edge,chrome = 1" + '"' + " />\n";
                 contlolPart += "\t</head>\n";
-                contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#333333;" + '"' + " onLoad=" + '"' + "myOnLoad()" + '"' + ">\n";
-                contlolPart += "\t\t<div class=" + '"' + "middle" + '"' + " style =" + '"' + "padding: 0px; " + '"' + " >\n";
 
+                if (extentionStr == ".mp4" ||    // ★video要素、audio要素をJavaScriptから操作する   http://www.htmq.com/video/#ui 
+                    extentionStr == ".webm" ||  //http://mrs.suzu841.com/mini_memo/numero_23.html
+                    extentionStr == ".ogv"
+                    ) {
+                    contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#333333;" + '"' + " onLoad=" + '"' + "myOnLoad()" + '"' + ">\n";
+                    contlolPart += "\t\t<div class=" + '"' + "middle" + '"' + " style =" + '"' + "padding: 0px; " + '"' + " >\n";
 
-                if (extentionStr == ".mp4") {
-                    // ★video要素、audio要素をJavaScriptから操作する   http://www.htmq.com/video/#ui 
                     contlolPart += "\t\t\t<video id=" + '"' + wiPlayerID + '"' + " controls style = " + '"' + "width:-webkit-fill-available ;height:-webkit-fill-available;text-align: center;" + '"' + ">\n";
                     contlolPart += "\t\t\t\t<source src=" + '"' + "file://" + fileName + '"' + " type=" + '"' + mineTypeStr + '"' + ">\n";
                     contlolPart += "\t\t\t</video>\n";
@@ -4586,28 +4589,7 @@ AddType video/MP2T .ts
                     //autoplay：Webページを表示した際に自動再生を行う(muted時のみ)
                     //playsinline：スマートフォンのブラウザでもWebページ内で再生する
                     //loop：動画を繰り返し再生する
-                } else if (extentionStr == ".webm" ||
-                    extentionStr == ".ogv"
-                    ) {
-                    //contlolPart += "\t\t\t<meta http - equiv = " + '"' + "X-UA-Compatible" + '"' + " content=" + '"' + "chrome=1" + '"' + " >\n";
-                    ////<meta http-equiv="X-UA-Compatible" content="chrome=1">			http://mrs.suzu841.com/mini_memo/numero_23.html
-                    //contlolPart += "\t\t</head>\n";
-                    //contlolPart += "\t\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n";
-                    //	contlolPart += "\t\t<div class=" + '"' + "video-container" + '"' + ">\n";
-                    contlolPart += "\t\t\t<video id=" + '"' + wiPlayerID + '"' + " controls autoplay style = " + '"' + "width:100%;height: auto;" + '"' + ">\n";
-                    contlolPart += "\t\t\t\t<source src=" + '"' + "file://" + fileName + '"' + " type=" + "'" + mineTypeStr;
-                    if (extentionStr == ".webm") {
-                        contlolPart += "; codecs=" + '"' + "vp8, vorbis" + '"' + "'" + ">\n";
-                    } else if (extentionStr == ".ogv") {
-                        contlolPart += "; codecs=" + '"' + "theora, vorbis" + '"' + "'" + ">\n";
-                    }
-                    // "file://" +		//  <source src="movie.webm" type='video/webm; codecs="vp8, vorbis"' />
-                    /*		contlolPart += "\t\t\t<video id=" + '"' + wiPlayerID + '"' + " src=" + '"' + "file://" + fileName + '"' +
-                                                        " controls autoplay style = " + '"' + "width:100%;height: auto;" + '"' +
-                                                            "></video>\n\t\t</div>";          */
-                    contlolPart += "\t\t\t</video>\n";
-                    //		contlolPart += "\t\t</div>"; 
-                    comentStr = "読み込めないファイルは対策検討中です。。";
+                //    comentStr = "読み込めないファイルは対策検討中です。。";
                 } else if (extentionStr == ".flv" ||
                    extentionStr == ".f4v" ||
                    extentionStr == ".swf"
@@ -4617,7 +4599,12 @@ AddType video/MP2T .ts
                         fileName = urlObj.AbsoluteUri;                 //Windows形式のパス表現に変換する
                         dbMsg += "Path=" + fileName;
                     }
-                    dbMsg += ",assemblyPath=" + assemblyPath + ",assemblyName=" + assemblyName;
+                    dbMsg += ",assemblyPath=" + assemblyPath;
+                    string[] urlStrs = assemblyPath.Split(Path.DirectorySeparatorChar);
+                    assemblyName = urlStrs[urlStrs.Length - 1];
+                    playerUrl = assemblyPath.Replace(assemblyName, "fladance.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
+                                                                                          //		string nextMove = assemblyPath.Replace( assemblyName, "tonext.htm" );
+                    dbMsg += ",assemblyName=" + assemblyName;
                     dbMsg += ",playerUrl=" + playerUrl;//,playerUrl=C:\Users\博臣\source\repos\file_tree_clock_web1\file_tree_clock_web1\bin\Debug\fladance.swf 
                     clsId = "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000";       //ブラウザーの ActiveX コントロール
                     codeBase = "http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0";
@@ -4629,14 +4616,12 @@ AddType video/MP2T .ts
                                 webWidth = webHeight / 3 * 4;
                             }
                             dbMsg += ">>[" + webWidth + "×" + webHeight + "]";*/
-                    playerUrl = assemblyPath.Replace(assemblyName, "fladance.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
-                                                                                          //		string nextMove = assemblyPath.Replace( assemblyName, "tonext.htm" );
-                    string flashVvars = "fms_app=&video_file=" + fileName + "&" +       // & amp;
-                                                                                        //								"link_url ="+ nextMove + "&" +
+                    string flashVvars = "fms_app=&video_file=" + fileName + "&" +       // & amp;		"link_url ="+ nextMove + "&" +
                                              "image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10" + '"';
-                    contlolPart += "\t</head>\n";
-                    contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n\t\t";
-                    contlolPart += "<object id=" + '"' + wiPlayerID + '"' +
+                    contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#333333;" + '"' + ">\n";
+                    contlolPart += "\t\t<div class=" + '"' + "middle" + '"' + " style =" + '"' + "padding: 0px; " + '"' + " >\n";
+
+                    contlolPart += "\t\t\t<object id=" + '"' + wiPlayerID + '"' +
                                         " classid=" + '"' + clsId + '"' +
                                     " codebase=" + '"' + codeBase + '"' +
                                     " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
@@ -4655,7 +4640,7 @@ AddType video/MP2T .ts
                                                 " pluginspage=" + '"' + pluginspage + '"' +
                                        "/>\n";
 
-                    comentStr = souceName + " ; プレイヤーには「ふらだんす」http://www.streaming.jp/fladance/　を使っています。" + dbWorning;
+      //              comentStr = souceName + " ; プレイヤーには「ふらだんす」http://www.streaming.jp/fladance/　を使っています。" + dbWorning;
 
                     /*				playerUrl = assemblyPath.Replace(assemblyName, "flvplayer-305.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
                                                                                                                //	string flashVvars = "fms_app=&video_file=" + fileName + "&" +       // & amp;
@@ -4795,7 +4780,7 @@ AddType video/MP2T .ts
                     extentionStr == ".mp2" ||
                     extentionStr == ".mpa" ||
                     extentionStr == ".mpe" ||
-                    extentionStr == ".mp4" ||        //ver12:MP4 ビデオ ファイル 
+              //      extentionStr == ".mp4" ||        //ver12:MP4 ビデオ ファイル 
                     extentionStr == ".m4v" ||
                     extentionStr == ".mp4v" ||
                     extentionStr == ".mpeg" ||

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<flaver version="3.0" xmlns="http://rexef.com/FLAVER3.0">
+
+  <!-- 初期設定 (省略可) --> <!-- 以下の設定は全てプレイヤーの初期値につき省略可能です -->
+  <init>
+    <title></title>               <!-- タイトル -->
+    <text></text>                 <!-- テキスト (タイトルに連結) -->
+    <author></author>             <!-- 著作者 (タイトルに連結) -->
+    <link></link>                 <!-- リンク (タイトルに付加) -->
+
+    <time></time>                 <!-- 総再生時間 -->
+    <color>0x666666</color>       <!-- 文字・ボタンカラー -->
+    <bgcolor>0xECF0F3</bgcolor>   <!-- スキン背景カラー -->
+    <image></image>               <!-- 起動画面用画像 -->
+    <cookie>true</cookie>         <!-- クッキー -->
+
+    <toolzoom>true</toolzoom>     <!-- ツールズーム倍率 -->
+
+    <autoplay>false</autoplay>    <!-- オートプレイ -->
+    <repeat>false</repeat>        <!-- リピート -->
+
+    <bright>50</bright>           <!-- ブライト(明るさ) -->
+    <smooth>true</smooth>         <!-- スムーズ -->
+    <aspect>auto</aspect>         <!-- アスペクト比 -->
+
+    <getmeta>true</getmeta>       <!-- メタ情報自動取得 -->
+    <wheel>true</wheel>           <!-- ホイールスクロール -->
+    <scroll>true</scroll>         <!-- 座標スクロール -->
+
+    <volume>75</volume>           <!-- ボリューム -->
+
+    <!-- ビデオコーデック表示名 (以下は組み込み済みにつき記述不要) -->
+    <codec type="video" name="0" value="*" />
+    <codec type="video" name="1" value="*" />
+    <codec type="video" name="2" value="Sorenson H.263" />
+    <codec type="video" name="3" value="Screen Video" />
+    <codec type="video" name="4" value="On2VP6" />
+    <codec type="video" name="5" value="On2VP6 alpha" />
+    <codec type="video" name="6" value="Screen Video V2" />
+    <codec type="video" name="7" value="H.264/AVC" />
+    <codec type="video" name="8" value="*" />
+    <codec type="video" name="9" value="*" />
+    <codec type="video" name="10" value="*" />
+    <codec type="video" name="11" value="*" />
+    <codec type="video" name="avc1" value="H.264/AVC" />
+    <codec type="video" name="VP6F" value="VP6F" />
+
+    <!-- オーディオコーデック表示名 (以下は組み込み済みにつき記述不要) -->
+    <codec type="audio" name="0" value="uncompressed PCM" />
+    <codec type="audio" name="1" value="ADPCM" />
+    <codec type="audio" name="2" value="MP3" />
+    <codec type="audio" name="3" value="*" />
+    <codec type="audio" name="4" value="Nellymoser 16kHz mono" />
+    <codec type="audio" name="5" value="Nellymoser 8kHz mono" />
+    <codec type="audio" name="6" value="Nellymoser" />
+    <codec type="audio" name="7" value="*" />
+    <codec type="audio" name="8" value="*" />
+    <codec type="audio" name="9" value="AAC" />
+    <codec type="audio" name="10" value="AAC" />
+    <codec type="audio" name="11" value="Speex" />
+    <codec type="audio" name=".mp3" value="MP3" />
+    <codec type="audio" name="mp4a" value="MP4A" />
+  </init>
+
+  <!-- 動画設定 (いくつでも配置可/最低1セット必須) -->
+  <data>
+    <file></file>       <!-- 動画・音楽ファイルパス (必須) -->
+    <image></image>     <!-- 画像・サムネイルパス -->
+    <title></title>     <!-- タイトル -->
+    <text></text>       <!-- テキスト (タイトルに連結) -->
+    <author></author>   <!-- 著作者 (タイトルに連結) -->
+    <link></link>       <!-- リンク (タイトルに付加) -->
+    <time></time>       <!-- 再生時間 -->
+    <size></size>       <!-- サイズ表示用 -->
+    <byte></byte>       <!-- 容量表示用 -->
+  </data>
+
+</flaver>

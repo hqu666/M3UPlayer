@@ -4,6 +4,13 @@ H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\runtimes\win-ar
 H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Microsoft.Azure.Cosmos.ServiceInterop.dll
 H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Cosmos.CRTCompat.dll
 H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\M3UPlayer.exe
+H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Resources\fladance.swf
+H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Resources\Interop.Acrobat.dll
+H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Resources\Interop.FlashBrokerLib.dll
+H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Resources\Interop.MediaPlayer.dll
+H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Resources\Interop.ShockwaveFlashObjects.dll
+H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Resources\Interop.VSLangProj2.dll
+H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Resources\Interop.WMPLib.dll
 H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\M3UPlayer.deps.json
 H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\M3UPlayer.runtimeconfig.json
 H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\M3UPlayer.dll
