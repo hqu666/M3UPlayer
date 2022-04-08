@@ -94,21 +94,82 @@ namespace M3UPlayer.Properties {
                 this["IsFullScreen"] = value;
             }
         }
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("100")]
-        public double WindowLeft {
+        [global::System.Configuration.DefaultSettingValueAttribute("0.7")]
+        public double SoundValue {
             get {
-                return ((double)(this["WindowLeft"]));
+                return ((double)(this["SoundValue"]));
             }
             set {
-                this["WindowLeft"] = value;
+                this["SoundValue"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("800")]
+        [global::System.Configuration.DefaultSettingValueAttribute("\"120\"")]
+        public string ForwardCBComboSelected {
+            get {
+                return ((string)(this["ForwardCBComboSelected"]));
+            }
+            set {
+                this["ForwardCBComboSelected"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\"120\"")]
+        public string RewCBComboSelected {
+            get {
+                return ((string)(this["RewCBComboSelected"]));
+            }
+            set {
+                this["RewCBComboSelected"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("960")]
+        public double VWidth {
+            get {
+                return ((double)(this["VWidth"]));
+            }
+            set {
+                this["VWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("540")]
+        public double VHeight {
+            get {
+                return ((double)(this["VHeight"]));
+            }
+            set {
+                this["VHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("600")]
+        public double ListWidth {
+            get {
+                return ((double)(this["ListWidth"]));
+            }
+            set {
+                this["ListWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1728")]
         public double WindowWidth {
             get {
                 return ((double)(this["WindowWidth"]));
@@ -117,10 +178,10 @@ namespace M3UPlayer.Properties {
                 this["WindowWidth"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("600")]
+        [global::System.Configuration.DefaultSettingValueAttribute("972")]
         public double WindowHeight {
             get {
                 return ((double)(this["WindowHeight"]));
@@ -129,112 +190,28 @@ namespace M3UPlayer.Properties {
                 this["WindowHeight"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("200")]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public double WindowLeft {
+            get {
+                return ((double)(this["WindowLeft"]));
+            }
+            set {
+                this["WindowLeft"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
         public double WindowTop {
             get {
                 return ((double)(this["WindowTop"]));
             }
             set {
                 this["WindowTop"] = value;
-            }
-        }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool WindowMaximized {
-            get {
-                return ((bool)(this["WindowMaximized"]));
-            }
-            set {
-                this["WindowMaximized"] = value;
-            }
-        }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("200")]
-        public double WsbViewLeft {
-            get {
-                return ((double)(this["WsbViewLeft"]));
-            }
-            set {
-                this["WsbViewLeft"] = value;
-            }
-        }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("300")]
-        public double WsbViewTop {
-            get {
-                return ((double)(this["WsbViewTop"]));
-            }
-            set {
-                this["WsbViewTop"] = value;
-            }
-        }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("800")]
-        public double WsbViewWidth {
-            get {
-                return ((double)(this["WsbViewWidth"]));
-            }
-            set {
-                this["WsbViewWidth"] = value;
-            }
-        }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("600")]
-        public double WsbViewHeight {
-            get {
-                return ((double)(this["WsbViewHeight"]));
-            }
-            set {
-                this["WsbViewHeight"] = value;
-            }
-        }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool WsbViewMaximized {
-            get {
-                return ((bool)(this["WsbViewMaximized"]));
-            }
-            set {
-                this["WsbViewMaximized"] = value;
-            }
-        }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string MyGoogleAcount {
-            get {
-                return ((string)(this["MyGoogleAcount"]));
-            }
-            set {
-                this["MyGoogleAcount"] = value;
-            }
-        }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string MyAcounts {
-            get {
-                return ((string)(this["MyAcounts"]));
-            }
-            set {
-                this["MyAcounts"] = value;
             }
         }
     }

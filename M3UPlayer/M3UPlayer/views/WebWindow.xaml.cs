@@ -106,30 +106,30 @@ namespace M3UPlayer.Views
             try
             {
                 var settings = Settings.Default;
-                dbMsg += "(" + settings.WsbViewLeft + "," + settings.WsbViewTop + ")";
-                // 左
-                if (settings.WsbViewLeft >= 0 &&
-                    (settings.WsbViewLeft + settings.WindowWidth) < SystemParameters.VirtualScreenWidth)
-                {
-                    Left = settings.WsbViewLeft;
-                }
-                // 上
-                if (settings.WsbViewTop >= 0 &&
-                    (settings.WsbViewTop + settings.WsbViewHeight) < SystemParameters.VirtualScreenHeight) { Top = settings.WsbViewTop; }
-                dbMsg += "[" + settings.WsbViewWidth + "×" + settings.WsbViewHeight + "]" + settings.WsbViewMaximized;
-                // 幅
-                if (settings.WsbViewWidth > 0 &&
-                    settings.WsbViewWidth <= SystemParameters.WorkArea.Width) { Width = settings.WsbViewWidth; }
-                // 高さ
-                if (settings.WsbViewHeight > 0 &&
-                    settings.WsbViewHeight <= SystemParameters.WorkArea.Height) { Height = settings.WsbViewHeight; }
-                // 最大化
-                if (settings.WsbViewMaximized)
-                {
-                    // ロード後に最大化
-                    Loaded += (o, e) => WindowState = WindowState.Maximized;
-                }
-                MyLog(TAG, dbMsg);
+                //dbMsg += "(" + settings.WsbViewLeft + "," + settings.WsbViewTop + ")";
+                //// 左
+                //if (settings.WsbViewLeft >= 0 &&
+                //    (settings.WsbViewLeft + settings.WindowWidth) < SystemParameters.VirtualScreenWidth)
+                //{
+                //    Left = settings.WsbViewLeft;
+                //}
+                //// 上
+                //if (settings.WsbViewTop >= 0 &&
+                //    (settings.WsbViewTop + settings.WsbViewHeight) < SystemParameters.VirtualScreenHeight) { Top = settings.WsbViewTop; }
+                //dbMsg += "[" + settings.WsbViewWidth + "×" + settings.WsbViewHeight + "]" + settings.WsbViewMaximized;
+                //// 幅
+                //if (settings.WsbViewWidth > 0 &&
+                //    settings.WsbViewWidth <= SystemParameters.WorkArea.Width) { Width = settings.WsbViewWidth; }
+                //// 高さ
+                //if (settings.WsbViewHeight > 0 &&
+                //    settings.WsbViewHeight <= SystemParameters.WorkArea.Height) { Height = settings.WsbViewHeight; }
+                //// 最大化
+                //if (settings.WsbViewMaximized)
+                //{
+                //    // ロード後に最大化
+                //    Loaded += (o, e) => WindowState = WindowState.Maximized;
+                //}
+                //MyLog(TAG, dbMsg);
             }
             catch (Exception er)
             {
@@ -148,14 +148,14 @@ namespace M3UPlayer.Views
             try
             {
                 dbMsg += "(" + Left + "," + Top + ")[" + Width + "×" + Height + "]" + WindowState;
-                var settings = Settings.Default;
-                settings.WsbViewMaximized = WindowState == WindowState.Maximized;
-                WindowState = WindowState.Normal; // 最大化解除
-                settings.WsbViewLeft = Left;
-                settings.WsbViewTop = Top;
-                settings.WsbViewWidth = Width;
-                settings.WsbViewHeight = Height;
-                settings.Save();
+                //var settings = Settings.Default;
+                //settings.WsbViewMaximized = WindowState == WindowState.Maximized;
+                //WindowState = WindowState.Normal; // 最大化解除
+                //settings.WsbViewLeft = Left;
+                //settings.WsbViewTop = Top;
+                //settings.WsbViewWidth = Width;
+                //settings.WsbViewHeight = Height;
+                //settings.Save();
                 MyLog(TAG, dbMsg);
             }
             catch (Exception er)

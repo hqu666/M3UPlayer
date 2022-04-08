@@ -28,12 +28,40 @@ namespace M3UPlayer.Views {
 		/// </summary>
 		public bool IsDragging;
 
+		private double _ListWidth;
+		/// <summary>
+		/// リストの幅 
+		/// </summary>
+		public double ListWidth {
+			get => _ListWidth;
+			set {
+				string TAG = "SliderValue(set)";
+				string dbMsg = "";
+				try {
+					dbMsg += "value=" + value;
+					if (_ListWidth == value)
+						return;
+				} catch (Exception er) {
+					MyErrorLog(TAG, dbMsg, er);
+				}
+			}
+		}
+
 		public MainWindow() {
-			InitializeComponent();
-			VM = new MainViewModel();
-			VM.MyView = this;
-			this.DataContext = VM;
-			this.Loaded += this_loaded;
+
+			string TAG = "this_loaded";
+			string dbMsg = "";
+			try {
+				InitializeComponent();
+				VM = new MainViewModel();
+				VM.MyView = this;
+				this.DataContext = VM;
+				this.Loaded += this_loaded;
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				MyErrorLog(TAG, dbMsg, er);
+			}
+
 		}
 
 		/// <summary>
@@ -42,16 +70,37 @@ namespace M3UPlayer.Views {
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void this_loaded(object sender, RoutedEventArgs e) {
-			//ViewModelのViewプロパティに自分のインスタンス（つまりViewのインスタンス）を渡しています。
-			VM.MyView = this;
-			InitializeAsync();
-			//初期表示
-			PlayListModel targetItem = new PlayListModel();
-			targetItem.UrlStr = "https://www.yahoo.co.jp/";
-			//	targetItem.UrlStr = "https://www.google.co.jp/maps/";
-			targetItem.Summary = "StartUp";
-			//	VM.PlayListToPlayer(targetItem);
-			IsDragging = false;
+			string TAG = "this_loaded";
+			string dbMsg = "";
+			try {
+				//ViewModelのViewプロパティに自分のインスタンス（つまりViewのインスタンス）を渡しています。
+				VM.MyView = this;
+				InitializeAsync();
+				//初期表示
+				PlayListModel targetItem = new PlayListModel();
+				targetItem.UrlStr = "https://www.yahoo.co.jp/";
+				//	targetItem.UrlStr = "https://www.google.co.jp/maps/";
+				targetItem.Summary = "StartUp";
+				//	VM.PlayListToPlayer(targetItem);
+				IsDragging = false;
+				if (Properties.Settings.Default.IsFullScreen) {
+					WindowState = WindowState.Maximized;
+				} else {
+					WindowState = WindowState.Normal;
+				}
+				dbMsg += "、WindowState=" + WindowState;
+				if (WindowState == WindowState.Normal) {
+					dbMsg += "(" + Left + "," + Top + ")[" + Width + "," + Height + "]";
+					// Settings の値をウィンドウに反映
+					Left = Properties.Settings.Default.WindowLeft;
+					Top = Properties.Settings.Default.WindowTop;
+					Width = Properties.Settings.Default.WindowWidth;
+					Height = Properties.Settings.Default.WindowHeight;
+				}
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				MyErrorLog(TAG, dbMsg, er);
+			}
 		}
 
 		///webView2 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -102,7 +151,28 @@ namespace M3UPlayer.Views {
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-			VM.BeforeClose();
+			string TAG = "Window_Closing";
+			string dbMsg = "";
+			try {
+				VM.BeforeClose();
+				dbMsg += "、WindowState=" + WindowState;
+				if (WindowState == WindowState.Normal) {
+					dbMsg += "(" + Left + "," + Top + ")[" + Width + "," + Height + "]";                    
+					// ウィンドウの値を Settings に格納
+					Properties.Settings.Default.WindowLeft = Left;
+					Properties.Settings.Default.WindowTop = Top;
+					Properties.Settings.Default.WindowWidth = Width;
+					Properties.Settings.Default.WindowHeight = Height;
+					Properties.Settings.Default.IsFullScreen = false;
+				} else {
+					Properties.Settings.Default.IsFullScreen = true;
+				}
+				// ファイルに保存
+				Properties.Settings.Default.Save();
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				MyErrorLog(TAG, dbMsg, er);
+			}
 		}
 
 		//Drag: https://hilapon.hatenadiary.org/entry/20110209/1297247754 ///////////////////////////////////////////////////////////////////////
