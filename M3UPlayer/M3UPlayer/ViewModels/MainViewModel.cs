@@ -632,6 +632,11 @@ namespace M3UPlayer.ViewModels {
 				assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;  //実行デレクトリ		+Path.AltDirectorySeparatorChar + "brows.htm";
                 //,assemblyPath=H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\M3UPlayer.dll
                 dbMsg += ",assemblyPath=" + assemblyPath;
+
+                SoundValue = Properties.Settings.Default.SoundValue;
+                ForwardCBComboSelected = Properties.Settings.Default.ForwardCBComboSelected;
+                RewCBComboSelected = Properties.Settings.Default.RewCBComboSelected;
+
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
@@ -652,6 +657,11 @@ namespace M3UPlayer.ViewModels {
                         IsDoSavePlayList(false);
                     }
                 }
+                Properties.Settings.Default.SoundValue = SoundValue;
+                Properties.Settings.Default.ForwardCBComboSelected = ForwardCBComboSelected;
+                Properties.Settings.Default.RewCBComboSelected = RewCBComboSelected;
+                Properties.Settings.Default.Save();
+
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
