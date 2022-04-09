@@ -28,25 +28,6 @@ namespace M3UPlayer.Views {
 		/// </summary>
 		public bool IsDragging;
 
-		private double _ListWidth;
-		/// <summary>
-		/// リストの幅 
-		/// </summary>
-		public double ListWidth {
-			get => _ListWidth;
-			set {
-				string TAG = "SliderValue(set)";
-				string dbMsg = "";
-				try {
-					dbMsg += "value=" + value;
-					if (_ListWidth == value)
-						return;
-				} catch (Exception er) {
-					MyErrorLog(TAG, dbMsg, er);
-				}
-			}
-		}
-
 		public MainWindow() {
 
 			string TAG = "this_loaded";
@@ -96,6 +77,12 @@ namespace M3UPlayer.Views {
 					Top = Properties.Settings.Default.WindowTop;
 					Width = Properties.Settings.Default.WindowWidth;
 					Height = Properties.Settings.Default.WindowHeight;
+				}
+				dbMsg += ",ListWidth=" + Properties.Settings.Default.ListWidth;
+				ListColumnDefinition.Width = new GridLength(Properties.Settings.Default.ListWidth);
+				//		PlayList.Width =  Properties.Settings.Default.ListWidth;
+				if (Double.Parse(ListColumnDefinition.Width.ToString()) < 600) {
+					ListColumnDefinition.Width = new GridLength(600);
 				}
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
@@ -167,6 +154,10 @@ namespace M3UPlayer.Views {
 				} else {
 					Properties.Settings.Default.IsFullScreen = true;
 				}
+				dbMsg += ",ListWidth=" + ListColumnDefinition.Width;
+				Properties.Settings.Default.ListWidth = Double.Parse(ListColumnDefinition.Width.ToString());
+				//dbMsg += ",ListWidth=" + PlayList.Width;
+				//Properties.Settings.Default.ListWidth = PlayList.Width;
 				// ファイルに保存
 				Properties.Settings.Default.Save();
 				MyLog(TAG, dbMsg);

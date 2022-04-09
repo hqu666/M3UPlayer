@@ -107,7 +107,14 @@
     <!--<UniformGrid Columns="3">-->
     <Grid Background = "Black">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="600" MinWidth="100" />
+            <ColumnDefinition x:Name="ListColumnDefinition"
+                              MinWidth="100" 
+                              Width="*"
+                             />
+            <!--
+            "{Binding ListWidth, Mode=TwoWay} で
+            System.Windows.Data Error: 40 : BindingExpression path error: 'ExploreShow' property not found on 'object' 
+            "-->
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition  Width="*" MinWidth="50" />
         </Grid.ColumnDefinitions>
@@ -247,7 +254,7 @@
                            DragEnter="PlayList_DragEnter" 
                            Drop="PlayList_Drop" 
                            MouseDown="PlayList_MouseDown" 
-                           MouseUp="PlayList_MouseUp" 
+                           MouseUp="PlayList_MouseUp" Margin="0,0,5,0" 
 						>
                     <!--
     						   SelectionMode="Extended"

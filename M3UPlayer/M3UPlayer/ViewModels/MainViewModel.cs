@@ -522,6 +522,7 @@ namespace M3UPlayer.ViewModels {
         }
 
 
+
         /// <summary>
         /// 最後に再生したメディアファイルの再生ポジション
         /// </summary>
@@ -631,7 +632,7 @@ namespace M3UPlayer.ViewModels {
 				assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;  //実行デレクトリ		+Path.AltDirectorySeparatorChar + "brows.htm";
                 //,assemblyPath=H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\M3UPlayer.dll
                 dbMsg += ",assemblyPath=" + assemblyPath;
-				MyLog(TAG, dbMsg);
+                MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
@@ -640,6 +641,7 @@ namespace M3UPlayer.ViewModels {
 
         /// <summary>
         /// 終了前イベントのメソッド
+        /// このVMで管理しているSettings項目の保存
         /// </summary>
         public void BeforeClose() {
             string TAG = "BeforeClose";
@@ -650,6 +652,7 @@ namespace M3UPlayer.ViewModels {
                         IsDoSavePlayList(false);
                     }
                 }
+                MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
