@@ -7,7 +7,15 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="views\ProgressDialog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="views\MainWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="views\ProgressDialog.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="views\WebWindow.xaml">

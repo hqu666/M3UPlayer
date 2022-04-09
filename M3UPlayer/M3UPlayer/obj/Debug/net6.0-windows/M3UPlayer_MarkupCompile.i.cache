@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET6_0;NETCOREAPP
 H:\develop\2022\M3U\M3UPlayer\M3UPlayer\App.xaml
-2397883069
+3657105712
 41584173683
-16-888767545
+18263280898
 218-348641388
-views\MainWindow.xaml;views\WebWindow.xaml;
+views\MainWindow.xaml;views\ProgressDialog.xaml;views\WebWindow.xaml;
 
-False
+True
 
