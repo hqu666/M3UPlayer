@@ -717,6 +717,9 @@ namespace M3UPlayer.ViewModels {
             return retStr;
         }
 
+
+        private string _FileURL="";
+
         /// <summary>
         /// 指定されたプレイリストの内容を読み込み、DataGridにBaindinｇする
         /// </summary>
@@ -726,12 +729,25 @@ namespace M3UPlayer.ViewModels {
             string dbMsg = "";
             try {
                 dbMsg += "、FileURL=" + FileURL;
+				if (_FileURL.Equals(FileURL)) {
+                    dbMsg += "重複";
+                    MyLog(TAG, dbMsg);
+                    return;
+
+				}
                 string rText = ReadTextFile(FileURL, "UTF-8"); //"Shift_JIS"では文字化け発生
                 string[] delimiter = { "\r\n" };
                 string[] Strs = rText.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
                 PLList = new ObservableCollection<PlayListModel>();
                 var list = new List<string>();
                 list.AddRange(videoFiles);
+
+                ProgressDialogViewModel PDVM= new ProgressDialogViewModel();
+                PDVM.PrgTitle = FileURL + "をプレイリストに書き込みます。";
+                PDVM.PrgVal = 0;
+                PDVM.PrgMax = Strs.Count();
+                PDVM.ProgressExec();
+
                 foreach (string item in Strs) {
                     dbMsg += "\r\n" + item;
                     //拡張部分を破棄してURLを読み出す
@@ -739,8 +755,10 @@ namespace M3UPlayer.ViewModels {
                     string url = items[0];
                     PlayListModel playListModel = MakeOneItem(url);
                     if (playListModel.UrlStr != null) {
+                        PDVM.PrgStatus = playListModel.Summary;
                         PLList.Add(playListModel);
                     }
+                    PDVM.PrgVal= PLList.Count();
                 }
                 RaisePropertyChanged("PLList");
                 ListItemCount = PLList.Count();
@@ -873,143 +891,6 @@ namespace M3UPlayer.ViewModels {
             return retBool;
         }
 
-
-        //        /// <summary>
-        //        /// 指定フォルダ内の指定TypeファイルをPlayListにリストアップ
-        //        /// </summary>
-        //        /// <param name="carrentDir"></param>
-        //        /// <param name="type"></param>
-        //        /// <returns></returns>
-        //        /// 呼出し元	SetPlayListItems
-        //        private List<PlayListItems> ListUpFiles(string carrentDir, string type)
-        //        {
-        //            string TAG = "[ListUpFiles]";
-        //            string dbMsg = TAG;
-        //            try
-        //            {
-        //                dbMsg += "carrentDir=" + carrentDir + ",type=" + type;
-        //                string sarchDir = carrentDir;
-        //                DirectoryInfo di = new DirectoryInfo(sarchDir);
-        //                if (carrentDir == di.Root.ToString())
-        //                {
-        //                    string MessageStr = "ドライブルートです。\n時間が掛かるかもしれませんが構いませんか？";
-        //                    DialogResult result = MessageBox.Show(MessageStr,
-        //                        sarchDir + "から" + type + "の抽出",
-        //                        MessageBoxButtons.OKCancel,
-        //                        MessageBoxIcon.Exclamation,
-        //                        MessageBoxDefaultButton.Button1);                   //メッセージボックスを表示する
-        //                    if (result == DialogResult.Cancel)
-        //                    {                   //何が選択されたか調べる
-        //                        dbMsg += "「Cancel」が選択されました";
-        //                        return null;
-        //                    }
-        //                }
-        //                string[] files = Directory.GetFiles(sarchDir);
-        //                int listCount = -1;
-        //                int tCount = 0;
-        //                int nowCount = PlayListBoxItem.Count;
-        //                dbMsg += "/PlayListBoxItem; " + PlayListBoxItem.Count + "件";
-        //                string wrTitol = "";
-        //                int nowToTal = CurrentItemCount(sarchDir);      // サブディレクトリ内のファイルもカウントする場合	, SearchOption.AllDirectories
-        //                dbMsg += ",このデレクトリには" + nowToTal + "件";
-        //                int barMax = progressBar1.Maximum;
-        //                dbMsg += ",progressMax=" + barMax + "件";
-        //                if (barMax < nowToTal)
-        //                {
-        //                    progressBar1.Maximum = nowToTal;
-        //                    ProgressMaxLabel.Text = progressBar1.Maximum.ToString();        //Max
-        //                    ProgressMaxLabel.Update();
-        //                }
-        //                if (files != null)
-        //                {
-        //                    dbMsg += "ファイル=" + files.Length + "件";
-        //                    foreach (string plFileName in files)
-        //                    {
-        //                        listCount++;
-        //                        dbMsg += "\n(" + listCount + ")" + plFileName;
-        //                        string[] pathStrs = plFileName.Split(Path.DirectorySeparatorChar);
-        //                        System.IO.FileAttributes attr = System.IO.File.GetAttributes(plFileName);
-        //                        dbMsg += ",attr=" + attr;
-        //                        if ((attr & System.IO.FileAttributes.Hidden) == System.IO.FileAttributes.Hidden)
-        //                        {
-        //                            dbMsg += ">>Hidden";
-        //                        }
-        //                        else if ((attr & System.IO.FileAttributes.System) == System.IO.FileAttributes.System)
-        //                        {
-        //                            dbMsg += ">>System";
-        //                        }
-        //                        else
-        //                        {
-        //                            string[] extStrs = plFileName.Split('.');
-        //                            string extentionStr = "." + extStrs[extStrs.Length - 1].ToLower();
-        //                            dbMsg += "拡張子=" + extentionStr;
-        //                            if (type == "video" && 0 < Array.IndexOf(videoFiles, extentionStr) ||
-        //                                type == "audio" && 0 < Array.IndexOf(audioFiles, extentionStr)
-        //                                )
-        //                            {
-        //                                string wrPathStr = plFileName.Replace((":" + Path.DirectorySeparatorChar), ":" + Path.DirectorySeparatorChar + Path.DirectorySeparatorChar);
-        //                                wrPathStr = checKLocalFile(wrPathStr);
-        //                                dbMsg += "Path=" + wrPathStr;
-        //                                wrTitol = Path2titol(wrPathStr);
-        //                                dbMsg += ",Titol=" + wrTitol;
-        //                                PlayListItems pli = new PlayListItems(wrTitol, wrPathStr);
-        //                                PlayListBoxItem.Add(pli);
-        //                                tCount = Int32.Parse(targetCountLabel.Text) + 1;
-        //                                targetCountLabel.Text = tCount.ToString();                    //確認
-        //                                targetCountLabel.Update();
-        //                                prgMessageLabel.Text = pathStrs[pathStrs.Length - 1];
-        //                                prgMessageLabel.Update();
-        //                            }
-        //                        }
-
-        //                        int checkCount = Int32.Parse(progCountLabel.Text) + 1;                          //pDialog.GetProgValue() + 1;
-        //                        progCountLabel.Text = checkCount.ToString();                   //確認
-        //                        progCountLabel.Update();
-        //                        dbMsg += ",vCount=" + checkCount;
-        //                        if (progressBar1.Maximum < checkCount)
-        //                        {
-        //                            progressBar1.Maximum = checkCount + 10;
-        //                            ProgressMaxLabel.Text = progressBar1.Maximum.ToString();        //Max
-        //                            ProgressMaxLabel.Update();
-        //                        }
-        //                        progressBar1.Value = checkCount;
-        //                        progresPanel.Update();
-        //                        PlayListLabelWrigt(tCount.ToString(), plFileName);
-        //                        //	pDialog.RedrowPDialog(checkCount.ToString(),  maxvaluestr, nowCount.ToString(), wrTitol);   保留；プログレスダイアログ更新
-        //                    }
-        //                }
-        //                string[] folderes = Directory.GetDirectories(sarchDir);//
-        //                if (folderes != null)
-        //                {
-        //                    foreach (string directoryName in folderes)
-        //                    {
-        //                        System.IO.FileAttributes attr = System.IO.File.GetAttributes(sarchDir);
-        //                        dbMsg += ",attr=" + attr;
-        //                        if (-1 < directoryName.IndexOf("RECYCLE", StringComparison.OrdinalIgnoreCase) ||
-        //                            -1 < directoryName.IndexOf("System Vol", StringComparison.OrdinalIgnoreCase) ||
-        //                            (attr & System.IO.FileAttributes.System) == System.IO.FileAttributes.System ||
-        //                            (attr & System.IO.FileAttributes.Hidden) == System.IO.FileAttributes.Hidden
-        //                            )
-        //                        {
-        //                        }
-        //                        else
-        //                        {
-        //                            string rdirectoryName = directoryName.Replace(sarchDir, "");// + 
-        //                            rdirectoryName = rdirectoryName.Replace(Path.DirectorySeparatorChar + "", "");
-        //                            dbMsg += ",foler=" + rdirectoryName;
-        //                            ListUpFiles(directoryName, type);        //再帰
-        //                        }
-        //                    }           //ListBox1に結果を表示する
-        //                }
-        //                //			MyLog(TAG, dbMsg);
-        //            }
-        //            catch (Exception er)
-        //            {
-        //                dbMsg += "<<以降でエラー発生>>" + er.Message;
-        //                MyLog(TAG, dbMsg);
-        //            }
-        //            return PlayListBoxItem;
-        //        }
 
         #region プレイリスト選択コンボボックス
         /// <summary>
@@ -3501,109 +3382,7 @@ namespace M3UPlayer.ViewModels {
 
 
         //プログレス/////////////////////////////////////////////////////////////////////////////// プレイヤーコントロール　///
-        //public event PropertyChangedEventHandler PropertyChanged;
-        //private void NotifyPropertyChanged([CallerMemberName] String propertyName = "") {
-        //    if (PropertyChanged != null) {
-        //        PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        //    }
-        //}
 
-        private string prgTitle = "Progress";
-        public string PrgTitle {
-            get {
-                return prgTitle;
-            }
-            set {
-                prgTitle = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        private string prgStatus = "処理実行中";
-        public string PrgStatus {
-            get {
-                return prgStatus;
-            }
-            set {
-                prgStatus = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        private int prgMin = 1;
-        public int PrgMin {
-            get {
-                return prgMin;
-            }
-            set {
-                prgMin = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        private int prgMax = 100;
-        public int PrgMax {
-            get {
-                return prgMax;
-            }
-            set {
-                prgMax = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        private int prgVal = 0;
-        public int PrgVal {
-            get {
-                return prgVal;
-            }
-            set {
-                prgVal = value;
-                int range = (prgMax - prgMin) + 1;
-                int percent = (int)(((double)prgVal / range) * 100);
-                PrgPer = percent.ToString() + "%";
-                NotifyPropertyChanged();
-            }
-        }
-
-        private string prgPer = "0%";
-        public string PrgPer {
-            get {
-                return prgPer;
-            }
-            set {
-                prgPer = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        public ICommand ExecProgress {
-            get {
-                return new BaseCommand(new Action(() => {
-                    CancellationTokenSource cancelToken = new CancellationTokenSource();
-                    PrgTitle = "処理実行中";
-                    PrgVal = 0;
-                    PrgMin = 1;
-                    PrgMax = 100;
-                    ProgressDialog pd = new ProgressDialog(this, () => {
-                        for (PrgVal = 0; PrgVal < PrgMax; PrgVal++) {
-                            if (cancelToken != null && cancelToken.IsCancellationRequested) {
-                                return;
-                            }
-                            PrgStatus = "処理" + PrgVal.ToString("000") + "を実行しています";
-                            Thread.Sleep(1000);
-                        }
-                    }, cancelToken);
-
-                    pd.ShowDialog();
-                    if (pd.IsCanceled) {
-                        MessageBox.Show("キャンセルしました", "Info", MessageBoxButton.OK);
-                    } else {
-                        MessageBox.Show("完了しました", "Info", MessageBoxButton.OK);
-                    }
-                }));
-            }
-        }
         ///以下使用待ち///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         Microsoft.Win32.RegistryKey regkey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(FEATURE_BROWSER_EMULATION);

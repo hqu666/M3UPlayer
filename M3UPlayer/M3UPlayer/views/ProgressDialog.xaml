@@ -7,7 +7,8 @@
 		xmlns:vm="clr-namespace:M3UPlayer.ViewModels" 
         xmlns:local="clr-namespace:M3UPlayer"
         mc:Ignorable="d"
-        Title="{Binding PrgTitle}" Height="110" Width="300"
+        Title="{Binding PrgTitle}" 
+        Height="110" Width="300"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
     <Grid>
@@ -16,19 +17,24 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Margin="10">
-            <ProgressBar Minimum="{Binding PrgMin}" Maximum="{Binding PrgMax}" Value="{Binding PrgVal}"/>
-            <TextBlock Text="{Binding PrgPer}" TextAlignment="Center" VerticalAlignment="Center"/>
+            <ProgressBar Minimum="{Binding PrgMin}" 
+                         Maximum="{Binding PrgMax}" 
+                         Value="{Binding PrgVal}"/>
+            <TextBlock Text="{Binding PrgPer}" 
+                       TextAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="80"/>
             </Grid.ColumnDefinitions>
-            <Label Grid.Column="0" Content="{Binding PrgStatus}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+            <Label Grid.Column="0" 
+                   Content="{Binding PrgStatus}" 
+                   HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
             <Button x:Name="CancelBT"
                     Grid.Column="1"  
                     Click="Cancel_Click"
-                    Margin="10,5,10,5" Content="Cancel"/>
+                    Margin="10,27,10,5" Content="Cancel"/>
 
         </Grid>
     </Grid>

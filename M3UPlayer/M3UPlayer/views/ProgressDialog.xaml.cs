@@ -49,56 +49,90 @@ namespace M3UPlayer.Views {
 
 
         public ProgressDialog(object context, Action action, CancellationTokenSource cancelToken) {
-			InitializeComponent();
-            DataContext = context;
-            this.action = action;
-            this.cancelToken = cancelToken;
-            worker.DoWork += DoWork;
-            worker.RunWorkerCompleted += RunWorkerCompleted;
-            worker.RunWorkerAsync();
+            string TAG = "ProgressDialog";
+            string dbMsg = "";
+            try {
+                InitializeComponent();
+                DataContext = context;
+                this.action = action;
+                this.cancelToken = cancelToken;
+                worker.DoWork += DoWork;
+                worker.RunWorkerCompleted += RunWorkerCompleted;
+                worker.RunWorkerAsync();
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+
         }
 
 
 		protected override void OnSourceInitialized(EventArgs e) {
-            base.OnSourceInitialized(e);
-            IntPtr handle = new WindowInteropHelper(this).Handle;
-            int style = GetWindowLong(handle, GWL_STYLE);
-            style = style & ~WS_SYSMENU;
-            SetWindowLong(handle, GWL_STYLE, style);
+            string TAG = "OnSourceInitialized";
+            string dbMsg = "";
+            try {
+                base.OnSourceInitialized(e);
+                IntPtr handle = new WindowInteropHelper(this).Handle;
+                int style = GetWindowLong(handle, GWL_STYLE);
+                style = style & ~WS_SYSMENU;
+                SetWindowLong(handle, GWL_STYLE, style);
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
         }
 
         private void DoWork(object sender, DoWorkEventArgs e) {
-            if (action == null) {
-                return;
-            }
-            Task task = Task.Factory.StartNew((obj) => {
-                action.Invoke();
-            }, cancelToken);
+            string TAG = "DoWork";
+            string dbMsg = "";
+            try {
+                if (action == null) {
+                    return;
+                }
+                Task task = Task.Factory.StartNew((obj) => {
+                    action.Invoke();
+                }, cancelToken);
 
-            task.Wait();
+                task.Wait();
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
         }
 
         private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            Close();
+            string TAG = "RunWorkerCompleted";
+            string dbMsg = "";
+            try {
+                Close();
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e) {
-            cancelToken.Cancel();
-            isCanceled = true;
+            string TAG = "Cancel_Click";
+            string dbMsg = "";
+            try {
+                cancelToken.Cancel();
+                isCanceled = true;
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
         }
 
         ///////////////////////////////////////////////////////////////////
-        Boolean debug_now = true;
-
         public static void MyLog(string TAG, string dbMsg) {
-            dbMsg = "[MainViewModel]" + dbMsg;
+            dbMsg = "[ProgressDialog]" + dbMsg;
             //dbMsg = "[" + MethodBase.GetCurrentMethod().Name + "]" + dbMsg;
             CS_Util Util = new CS_Util();
             Util.MyLog(TAG, dbMsg);
         }
 
         public static void MyErrorLog(string TAG, string dbMsg, Exception err) {
-            dbMsg = "[MainViewModel]" + dbMsg;
+            dbMsg = "[ProgressDialog]" + dbMsg;
             CS_Util Util = new CS_Util();
             Util.MyErrorLog(TAG, dbMsg, err);
         }
