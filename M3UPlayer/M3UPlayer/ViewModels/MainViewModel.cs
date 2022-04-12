@@ -742,12 +742,15 @@ namespace M3UPlayer.ViewModels {
                 var list = new List<string>();
                 list.AddRange(videoFiles);
 
-                ProgressDialogViewModel PDVM= new ProgressDialogViewModel();
-                PDVM.PrgTitle = FileURL + "をプレイリストに書き込みます。";
-                PDVM.PrgVal = 0;
-                PDVM.PrgMax = Strs.Count();
-                PDVM.ProgressExec();
-
+				ProgressDialogViewModel PDVM = new ProgressDialogViewModel();
+				PDVM.PrgTitle = FileURL + "をプレイリストに書き込みます。";
+				PDVM.PrgVal = 0;
+				PDVM.PrgMax = Strs.Count();
+                //	PDVM.ShowProgress();
+                ////    PDVM.ProgressExec();
+                CancellationTokenSource cancelToken = new CancellationTokenSource();
+                ProgressDialog pd = new ProgressDialog(this, () => PDVM.DoProgress(1, ""), cancelToken);
+                pd.ShowDialog();
                 foreach (string item in Strs) {
                     dbMsg += "\r\n" + item;
                     //拡張部分を破棄してURLを読み出す
@@ -755,11 +758,13 @@ namespace M3UPlayer.ViewModels {
                     string url = items[0];
                     PlayListModel playListModel = MakeOneItem(url);
                     if (playListModel.UrlStr != null) {
-                        PDVM.PrgStatus = playListModel.Summary;
-                        PLList.Add(playListModel);
-                    }
-                    PDVM.PrgVal= PLList.Count();
+						PLList.Add(playListModel);
+						//PDVM.PrgStatus = playListModel.Summary;
+						//PDVM.PrgVal = PLList.Count();
+						PDVM.DoProgress(PLList.Count(), playListModel.Summary + "");
+					}
                 }
+                pd.Close();
                 RaisePropertyChanged("PLList");
                 ListItemCount = PLList.Count();
                 RaisePropertyChanged("ListItemCount");

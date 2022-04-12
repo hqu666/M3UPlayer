@@ -8,6 +8,7 @@
         xmlns:local="clr-namespace:M3UPlayer"
         mc:Ignorable="d"
         Title="{Binding PrgTitle}" 
+        Topmost="True"
         Height="110" Width="300"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">

@@ -36,6 +36,9 @@ namespace M3UPlayer.Views {
 
         private BackgroundWorker worker = new BackgroundWorker();
 
+        /// <summary>
+        /// DoWorkで使用
+        /// </summary>
         private Action action;
 
         private CancellationTokenSource cancelToken;
