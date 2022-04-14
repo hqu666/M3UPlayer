@@ -51,6 +51,10 @@ namespace M3UPlayer.Views {
         }
 
 
+        public ProgressDialogViewModel VM;
+
+
+
         public ProgressDialog(object context, Action action, CancellationTokenSource cancelToken) {
             string TAG = "ProgressDialog";
             string dbMsg = "";
@@ -59,6 +63,8 @@ namespace M3UPlayer.Views {
                 DataContext = context;
                 this.action = action;
                 this.cancelToken = cancelToken;
+                VM = new ProgressDialogViewModel();
+                this.DataContext = VM;
                 worker.DoWork += DoWork;
                 worker.RunWorkerCompleted += RunWorkerCompleted;
                 worker.RunWorkerAsync();

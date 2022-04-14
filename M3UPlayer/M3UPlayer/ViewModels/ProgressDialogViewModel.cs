@@ -17,7 +17,7 @@ namespace M3UPlayer.ViewModels {
     /// <summary>
     /// 
     /// </summary>
-    class ProgressDialogViewModel : INotifyPropertyChanged {
+    public class ProgressDialogViewModel : INotifyPropertyChanged {
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "") {
             if (PropertyChanged != null) {
@@ -91,9 +91,12 @@ namespace M3UPlayer.ViewModels {
             }
             set {
                 prgVal = value;
-                int range = (prgMax - prgMin) + 1;
-                int percent = (int)(((double)prgVal / range) * 100);
-                PrgPer = percent.ToString() + "%";
+				if (0< prgVal && 0< prgMax) {
+					//int range = (prgMax - prgMin) + 1;
+					//int percent = (int)(((double)prgVal / range) * 100);
+					int percent = PrgVal / PrgMax * 100;
+					PrgPer = percent.ToString() + "%";
+                }
                 NotifyPropertyChanged();
             }
         }
@@ -181,36 +184,26 @@ namespace M3UPlayer.ViewModels {
 
 
 
-        public ICommand ExecProgress => new DelegateCommand(ProgressExec);
+        //       public ICommand ExecProgress => new DelegateCommand(ProgressExec);
         /// <summary>
         /// プログレスダイアログの表示実行
         /// </summary>
-        public void ProgressExec() {
-			//   get {
-			//    return
-		//	new BaseCommand(new Action(() => {
-				string TAG = "ProgressExec";
+        public ICommand ExecProgress {
+            get {
+                return new BaseCommand(new Action(() => {
+                    string TAG = "ExecProgress";
                     string dbMsg = "";
                     try {
                         CancellationTokenSource cancelToken = new CancellationTokenSource();
                         dbMsg += "、PrgTitle=" + PrgTitle;
-                        PrgVal = 0;
-                        PrgMin = 1;
-         //               PrgMax = 100;
+                        dbMsg += "、PrgMax=" + PrgMax;
                         ProgressDialog pd = new ProgressDialog(this, () => {
-                            while (0< PrgVal && PrgVal < PrgMax) {
-                                dbMsg += "\r\n" + PrgVal + "/" + PrgMax;
-                                dbMsg += "、PrgStatus=" + PrgStatus;
-                                int pPae = PrgVal / PrgMax * 100;
-                                prgPer = pPae + "%";
-
-                                //  for (PrgVal = 0; PrgVal < PrgMax; PrgVal++) {
-                                if (cancelToken != null && cancelToken.IsCancellationRequested) {
+                            while (0 < PrgVal && PrgVal < PrgMax) {
+                         //   for (PrgVal = 0; PrgVal < PrgMax; PrgVal++) {
+								if (cancelToken != null && cancelToken.IsCancellationRequested) {
                                     return;
                                 }
-                                //   PrgStatus = "処理" + PrgVal.ToString("000") + "を実行しています";
                                 Thread.Sleep(10);
-                                //	}
                             }
                         }, cancelToken);
 
@@ -218,16 +211,15 @@ namespace M3UPlayer.ViewModels {
                         if (pd.IsCanceled) {
                             MessageBox.Show("キャンセルしました", "Info", MessageBoxButton.OK);
                         } else {
-                            //MessageBox.Show("完了しました", "Info", MessageBoxButton.OK);
+              //              MessageBox.Show("完了しました", "Info", MessageBoxButton.OK);
                         }
                         MyLog(TAG, dbMsg);
                     } catch (Exception er) {
                         MyErrorLog(TAG, dbMsg, er);
                     }
-		//	}));
-			//  }
-		}
-
+                }));
+            }
+        }
         //デバッグツール///////////////////////////////////////////////////////////その他//
 
         public static void MyLog(string TAG, string dbMsg) {

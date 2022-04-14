@@ -42,6 +42,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
+using System.Windows.Data;
 //using AxShockwaveFlashObjects;
 
 namespace M3UPlayer.ViewModels {
@@ -717,8 +718,7 @@ namespace M3UPlayer.ViewModels {
             return retStr;
         }
 
-
-        private string _FileURL="";
+		private ProgressDialog pd;
 
         /// <summary>
         /// 指定されたプレイリストの内容を読み込み、DataGridにBaindinｇする
@@ -729,42 +729,51 @@ namespace M3UPlayer.ViewModels {
             string dbMsg = "";
             try {
                 dbMsg += "、FileURL=" + FileURL;
-				if (_FileURL.Equals(FileURL)) {
-                    dbMsg += "重複";
-                    MyLog(TAG, dbMsg);
-                    return;
+				//if (_FileURL.Equals(FileURL)) {
+    //                dbMsg += "重複";
+    //                MyLog(TAG, dbMsg);
+    //                return;
 
-				}
+				//}
                 string rText = ReadTextFile(FileURL, "UTF-8"); //"Shift_JIS"では文字化け発生
                 string[] delimiter = { "\r\n" };
                 string[] Strs = rText.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
                 PLList = new ObservableCollection<PlayListModel>();
                 var list = new List<string>();
                 list.AddRange(videoFiles);
-
-				ProgressDialogViewModel PDVM = new ProgressDialogViewModel();
-				PDVM.PrgTitle = FileURL + "をプレイリストに書き込みます。";
-				PDVM.PrgVal = 0;
-				PDVM.PrgMax = Strs.Count();
-                //	PDVM.ShowProgress();
-                ////    PDVM.ProgressExec();
+                // 複数スレッドで使用されるコレクションへの参加
+				BindingOperations.EnableCollectionSynchronization(PLList, new object());
                 CancellationTokenSource cancelToken = new CancellationTokenSource();
-                ProgressDialog pd = new ProgressDialog(this, () => PDVM.DoProgress(1, ""), cancelToken);
+                pd = new ProgressDialog(this, async () => {
+                    ProgressDialogViewModel PDVM = pd.VM; //new ProgressDialogViewModel();
+                    PDVM.PrgTitle = FileURL + "をプレイリストに書き込みます。";
+                    PDVM.PrgVal = 0;
+                    PDVM.PrgMax = Strs.Count();
+
+                    foreach (string item in Strs) {
+                        dbMsg += "\r\n" + item;
+                        //拡張部分を破棄してURLを読み出す
+                        string[] items = item.Split(',');
+                        string url = items[0];
+                        PlayListModel playListModel = MakeOneItem(url);
+                        if (playListModel.UrlStr != null) {
+                            PLList.Add(playListModel);
+                            PDVM.PrgStatus = playListModel.Summary;
+							PDVM.PrgVal = PLList.Count();
+							PDVM.DoProgress(PLList.Count(), playListModel.Summary + "");
+                        }
+                    }
+                }, cancelToken);
+
                 pd.ShowDialog();
-                foreach (string item in Strs) {
-                    dbMsg += "\r\n" + item;
-                    //拡張部分を破棄してURLを読み出す
-                    string[] items = item.Split(',');
-                    string url = items[0];
-                    PlayListModel playListModel = MakeOneItem(url);
-                    if (playListModel.UrlStr != null) {
-						PLList.Add(playListModel);
-						//PDVM.PrgStatus = playListModel.Summary;
-						//PDVM.PrgVal = PLList.Count();
-						PDVM.DoProgress(PLList.Count(), playListModel.Summary + "");
-					}
+                if (pd.IsCanceled) {
+                    MessageBox.Show("キャンセルしました", "Info", MessageBoxButton.OK);
+                } else {
+                    //              MessageBox.Show("完了しました", "Info", MessageBoxButton.OK);
                 }
-                pd.Close();
+
+
+                //pd.Close();
                 RaisePropertyChanged("PLList");
                 ListItemCount = PLList.Count();
                 RaisePropertyChanged("ListItemCount");
