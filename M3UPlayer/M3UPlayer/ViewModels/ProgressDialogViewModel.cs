@@ -34,6 +34,7 @@ namespace M3UPlayer.ViewModels {
                 return prgTitle;
             }
             set {
+                if (value == prgTitle) return;
                 prgTitle = value;
                 NotifyPropertyChanged();
             }
@@ -48,6 +49,7 @@ namespace M3UPlayer.ViewModels {
                 return prgStatus;
             }
             set {
+                if (value == prgStatus) return;
                 prgStatus = value;
                 NotifyPropertyChanged();
             }
@@ -62,6 +64,7 @@ namespace M3UPlayer.ViewModels {
                 return prgMin;
             }
             set {
+                if (value == prgMin) return;
                 prgMin = value;
                 NotifyPropertyChanged();
             }
@@ -76,8 +79,9 @@ namespace M3UPlayer.ViewModels {
                 return prgMax;
             }
             set {
+                if (value == prgMax) return;
                 prgMax = value;
-                NotifyPropertyChanged();
+                NotifyPropertyChanged("PrgMax");
             }
         }
 
@@ -90,14 +94,24 @@ namespace M3UPlayer.ViewModels {
                 return prgVal;
             }
             set {
-                prgVal = value;
-				if (0< prgVal && 0< prgMax) {
-					//int range = (prgMax - prgMin) + 1;
-					//int percent = (int)(((double)prgVal / range) * 100);
-					int percent = PrgVal / PrgMax * 100;
-					PrgPer = percent.ToString() + "%";
+                string TAG = "PrgVal(set)";
+                string dbMsg = "";
+                try {
+                    dbMsg += value + "/" + PrgMax;
+                    if (value == prgVal) return;
+                    prgVal = value;
+                    //	if (0< value && 0< PrgMax) {
+                    int range = (prgMax - prgMin) + 1;
+                    int percent = (int)(((double)prgVal / range) * 100);
+                    //   int percent = (int)(((double)prgVal / prgMax) * 100);
+                    prgPer = percent.ToString() + "%";
+                    dbMsg +=  ":" + prgPer + PrgStatus;
+                    //   }
+                    NotifyPropertyChanged("PrgVal");
+                    MyLog(TAG, dbMsg);
+                } catch (Exception er) {
+                    MyErrorLog(TAG, dbMsg, er);
                 }
-                NotifyPropertyChanged();
             }
         }
 
@@ -110,6 +124,7 @@ namespace M3UPlayer.ViewModels {
                 return prgPer;
             }
             set {
+                if (value == prgPer) return;
                 prgPer = value;
                 NotifyPropertyChanged();
             }

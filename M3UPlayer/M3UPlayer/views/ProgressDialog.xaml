@@ -18,10 +18,13 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Margin="10">
-            <ProgressBar Minimum="{Binding PrgMin}" 
-                         Maximum="{Binding PrgMax}" 
-                         Value="{Binding PrgVal}"/>
-            <TextBlock Text="{Binding PrgPer}" 
+            <ProgressBar x:Name="ProgBar"
+                         Minimum="{Binding PrgMin, Mode=TwoWay}"
+                         Maximum="{Binding PrgMax, Mode=TwoWay}"
+                         Value="{Binding PrgVal, Mode=TwoWay}"
+                         />
+            <TextBlock x:Name="ParcentTB"
+                        Text="{Binding PrgPer, Mode=TwoWay}"
                        TextAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
         <Grid Grid.Row="1">
@@ -29,8 +32,9 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="80"/>
             </Grid.ColumnDefinitions>
-            <Label Grid.Column="0" 
-                   Content="{Binding PrgStatus}" 
+            <Label Name="ProgStatus"
+                   Grid.Column="0" 
+                   Content="{Binding PrgStatus, Mode=TwoWay}"
                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
             <Button x:Name="CancelBT"
                     Grid.Column="1"  

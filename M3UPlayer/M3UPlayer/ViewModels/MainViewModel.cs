@@ -728,6 +728,9 @@ namespace M3UPlayer.ViewModels {
             string TAG = "ListUpFiles";
             string dbMsg = "";
             try {
+				//if (pd != null) {
+    //                pd = null;
+    //            }
                 dbMsg += "、FileURL=" + FileURL;
 				//if (_FileURL.Equals(FileURL)) {
     //                dbMsg += "重複";
@@ -744,41 +747,50 @@ namespace M3UPlayer.ViewModels {
                 // 複数スレッドで使用されるコレクションへの参加
 				BindingOperations.EnableCollectionSynchronization(PLList, new object());
                 CancellationTokenSource cancelToken = new CancellationTokenSource();
-                pd = new ProgressDialog(this, async () => {
-                    ProgressDialogViewModel PDVM = pd.VM; //new ProgressDialogViewModel();
-                    PDVM.PrgTitle = FileURL + "をプレイリストに書き込みます。";
-                    PDVM.PrgVal = 0;
-                    PDVM.PrgMax = Strs.Count();
+            //    BaseCommand BC = new BaseCommand(new Action(() => {
+                    pd = new ProgressDialog(this, async () => {
+						ProgressDialogViewModel PDVM = pd.VM; //new ProgressDialogViewModel();
+						PDVM.PrgTitle = FileURL + "をプレイリストに書き込みます。";
+						dbMsg += "," + PDVM.PrgTitle;
+                        PDVM.PrgMax = Strs.Count();
+                        dbMsg += ",PrgMax" + PDVM.PrgMax;
+                        PDVM.PrgMin = 1;
+                        PDVM.PrgVal = 0;
+						//pd.Title = FileURL + "をプレイリストに書き込みます。";
+      //                  pd.ProgBar.Maximum = Strs.Count();
+      //                  pd.ProgBar.Minimum = 1;
+      //                  pd.ProgBar.Value = 0;
 
-                    foreach (string item in Strs) {
-                        dbMsg += "\r\n" + item;
-                        //拡張部分を破棄してURLを読み出す
-                        string[] items = item.Split(',');
-                        string url = items[0];
-                        PlayListModel playListModel = MakeOneItem(url);
-                        if (playListModel.UrlStr != null) {
-                            PLList.Add(playListModel);
-                            PDVM.PrgStatus = playListModel.Summary;
-							PDVM.PrgVal = PLList.Count();
-							PDVM.DoProgress(PLList.Count(), playListModel.Summary + "");
+
+                        foreach (string item in Strs) {
+                            //拡張部分を破棄してURLを読み出す
+                            string[] items = item.Split(',');
+                            string url = items[0];
+                            PlayListModel playListModel = MakeOneItem(url);
+                            if (playListModel.UrlStr != null) {
+                                PLList.Add(playListModel);
+                                //pd.ProgBar.Value = PLList.Count();
+                                //pd.ProgStatus.Content = playListModel.Summary +"";
+								PDVM.PrgStatus = playListModel.Summary;
+								PDVM.PrgVal = PLList.Count();
+								PDVM.DoProgress(PLList.Count(), playListModel.Summary + "");
+								dbMsg += "\r\n[" + PDVM.PrgVal + "/" + PDVM.PrgMax + "]" + PDVM.PrgStatus;
+							}
                         }
+                    }, cancelToken);
+
+                    pd.ShowDialog();
+                    if (pd.IsCanceled) {
+                        MessageBox.Show("キャンセルしました", "Info", MessageBoxButton.OK);
+                    } else {
+                        dbMsg += ",完了しました";
                     }
-                }, cancelToken);
+                //    }));
 
-                pd.ShowDialog();
-                if (pd.IsCanceled) {
-                    MessageBox.Show("キャンセルしました", "Info", MessageBoxButton.OK);
-                } else {
-                    //              MessageBox.Show("完了しました", "Info", MessageBoxButton.OK);
-                }
-
-
-                //pd.Close();
                 RaisePropertyChanged("PLList");
                 ListItemCount = PLList.Count();
                 RaisePropertyChanged("ListItemCount");
                 dbMsg += "\r\n" + ListItemCount + "件";
-
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
