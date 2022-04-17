@@ -582,11 +582,8 @@ namespace M3UPlayer.ViewModels {
                 playImage = new BitmapImage(new Uri("/views/pl_r_btn.png", UriKind.Relative));
                 MuteOnImage = new BitmapImage(new Uri("/views/ei_silence.png", UriKind.Relative));
                 MuteOffImage = new BitmapImage(new Uri("/views/ei-sound.png", UriKind.Relative));
-
-                //            pouseBrush = new ImageBrush(pouseImage);
-                //playBrush = new ImageBrush(playImage);
-                // ICommandの場合
-                //	EditCommand = CreateCommand(t_events => MyDoubleClickCommand(t_events));
+                assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;  //実行デレクトリ		+Path.AltDirectorySeparatorChar + "brows.htm";
+                dbMsg += ",assemblyPath=" + assemblyPath;
                 dbMsg += ",CurrentPlayListFileName=" + CurrentPlayListFileName;
                 PLComboSource = new Dictionary<string, string>();
                 //       PLComboSelectedItem = new List<string>();
@@ -594,13 +591,16 @@ namespace M3UPlayer.ViewModels {
                 MakePlayListComboMenu();
                 dbMsg += "[" + VWidth + "×" + VHeight + "]";
                 if (CurrentPlayListFileName.Contains(".M3u")) {
-                    ListUpFiles(CurrentPlayListFileName);
                     //PlayListsからCurrentPlayListFileNameのインデックスを取得
                     int listIndex = Array.IndexOf(PlayLists, CurrentPlayListFileName);
                     PLComboSelectedIndex = listIndex;
-                } else if (0 <= PlayLists.Length) {
-                    PLComboSelectedIndex = 0;
+                //} else if (0 <= PlayLists.Length) {
+                //    PLComboSelectedIndex = 0;
                 }
+                if (PLComboSelectedIndex == 0) {
+                    ListUpFiles(CurrentPlayListFileName);
+                }
+                dbMsg += " [" + PLComboSelectedIndex + "]" + CurrentPlayListFileName;
                 dbMsg += ",NowSelectedFile=" + NowSelectedFile;
                 dbMsg += " [" + NowSelectedPosition + "]";
                 PlayListSaveRoot.IsEnabled = false;
@@ -630,9 +630,6 @@ namespace M3UPlayer.ViewModels {
                 RaisePropertyChanged("SoundValue");
                 IsMute = false;
 				//      WVM = new WsbViewModel();
-				assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;  //実行デレクトリ		+Path.AltDirectorySeparatorChar + "brows.htm";
-                //,assemblyPath=H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\M3UPlayer.dll
-                dbMsg += ",assemblyPath=" + assemblyPath;
 
                 SoundValue = Properties.Settings.Default.SoundValue;
                 ForwardCBComboSelected = Properties.Settings.Default.ForwardCBComboSelected;
@@ -719,7 +716,7 @@ namespace M3UPlayer.ViewModels {
         }
 
 		private ProgressDialog pd;
-
+        private string _FileURL = "";
         /// <summary>
         /// 指定されたプレイリストの内容を読み込み、DataGridにBaindinｇする
         /// </summary>
@@ -728,17 +725,14 @@ namespace M3UPlayer.ViewModels {
             string TAG = "ListUpFiles";
             string dbMsg = "";
             try {
-				//if (pd != null) {
-    //                pd = null;
-    //            }
                 dbMsg += "、FileURL=" + FileURL;
-				//if (_FileURL.Equals(FileURL)) {
-    //                dbMsg += "重複";
-    //                MyLog(TAG, dbMsg);
-    //                return;
+				if (_FileURL.Equals(FileURL)) {
+					dbMsg += "重複";
+					MyLog(TAG, dbMsg);
+					return;
 
-				//}
-                string rText = ReadTextFile(FileURL, "UTF-8"); //"Shift_JIS"では文字化け発生
+				}
+				string rText = ReadTextFile(FileURL, "UTF-8"); //"Shift_JIS"では文字化け発生
                 string[] delimiter = { "\r\n" };
                 string[] Strs = rText.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
                 PLList = new ObservableCollection<PlayListModel>();

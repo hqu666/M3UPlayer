@@ -25,6 +25,15 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
+        public ProgressDialogViewModel() {
+            PrgTitle = "";
+            PrgStatus = "";
+            prgMax = -1;
+            PrgMin =-1;
+            PrgVal = -1;
+        }
+
+
         private string prgTitle = "Progress";
         /// <summary>
         /// プログレスダイアログのタイトル
@@ -104,8 +113,8 @@ namespace M3UPlayer.ViewModels {
                     int range = (prgMax - prgMin) + 1;
                     int percent = (int)(((double)prgVal / range) * 100);
                     //   int percent = (int)(((double)prgVal / prgMax) * 100);
-                    prgPer = percent.ToString() + "%";
-                    dbMsg +=  ":" + prgPer + PrgStatus;
+                    PrgPer = percent.ToString() + "%";
+                    dbMsg +=  ":" + PrgPer + PrgStatus;
                     //   }
                     NotifyPropertyChanged("PrgVal");
                     MyLog(TAG, dbMsg);
@@ -115,95 +124,101 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
-        private string prgPer = "0%";
-        /// <summary>
-        /// プログレスダイアログの%表示文字
-        /// </summary>
-        public string PrgPer {
-            get {
-                return prgPer;
-            }
-            set {
-                if (value == prgPer) return;
-                prgPer = value;
-                NotifyPropertyChanged();
-            }
-        }
+  //      public string PrgPer;
 
-        CancellationTokenSource cancelToken;
-        ProgressDialog pd;
+		private string prgPer = "0%";
+		/// <summary>
+		/// プログレスダイアログの%表示文字
+		/// </summary>
+		public string PrgPer {
+			get {
+				return prgPer;
+			}
+			set {
+				if (value == prgPer) return;
+				prgPer = value;
+				NotifyPropertyChanged();
+			}
+		}
 
-        public void ShowProgress() {
-            string TAG = "ShowProgress";
-            string dbMsg = "";
-            try {
-                dbMsg += "、PrgTitle=" + PrgTitle;
-                PrgVal = 0;
-                PrgMin = 1;
-                cancelToken = new CancellationTokenSource();
-                pd = new ProgressDialog(this, () => DoProgress(PrgMin, PrgStatus), cancelToken);
-                //pd = new ProgressDialog(this, () => {
-                //    while (0 < PrgVal && PrgVal < PrgMax) {
-                //        //dbMsg += "\r\n" + PrgVal + "/" + PrgMax;
-                //        //dbMsg += "、PrgStatus=" + PrgStatus;
-                //        //int pPae = PrgVal / PrgMax * 100;
-                //        //prgPer = pPae + "%";
+		//    CancellationTokenSource cancelToken;
+		//    ProgressDialog pd;
 
-                //        //  for (PrgVal = 0; PrgVal < PrgMax; PrgVal++) {
-                //        if (cancelToken != null && cancelToken.IsCancellationRequested) {
-                //            return;
-                //        }
-                //        //      Thread.Sleep(10);
-                //        //	}
-                //    }
-                //}, cancelToken);
+		//    public void ShowProgress() {
+		//        string TAG = "ShowProgress";
+		//        string dbMsg = "";
+		//        try {
+		//            dbMsg += "、PrgTitle=" + PrgTitle;
+		//            PrgVal = 0;
+		//            PrgMin = 1;
+		//            cancelToken = new CancellationTokenSource();
+		//            pd = new ProgressDialog(this, () => DoProgress(PrgMin, PrgStatus), cancelToken);
+		//            //pd = new ProgressDialog(this, () => {
+		//            //    while (0 < PrgVal && PrgVal < PrgMax) {
+		//            //        //dbMsg += "\r\n" + PrgVal + "/" + PrgMax;
+		//            //        //dbMsg += "、PrgStatus=" + PrgStatus;
+		//            //        //int pPae = PrgVal / PrgMax * 100;
+		//            //        //prgPer = pPae + "%";
 
-                pd.ShowDialog();
-                if (pd.IsCanceled) {
-                    MessageBox.Show("キャンセルしました", "Info", MessageBoxButton.OK);
-                } else {
-                    //MessageBox.Show("完了しました", "Info", MessageBoxButton.OK);
-                }
-                MyLog(TAG, dbMsg);
-            } catch (Exception er) {
-                MyErrorLog(TAG, dbMsg, er);
-            }
-            //	}));
-            //  }
-        }
+		//            //        //  for (PrgVal = 0; PrgVal < PrgMax; PrgVal++) {
+		//            //        if (cancelToken != null && cancelToken.IsCancellationRequested) {
+		//            //            return;
+		//            //        }
+		//            //        //      Thread.Sleep(10);
+		//            //        //	}
+		//            //    }
+		//            //}, cancelToken);
 
-        public void DoProgress(int PrgressVal,string messege) {
-            string TAG = "DoProgress";
-            string dbMsg = "";
-            try {
-                PrgVal = PrgressVal;
-                PrgStatus = messege;
-                dbMsg += PrgVal + "/" + PrgMax;
-                dbMsg += "、PrgStatus=" + PrgStatus;
-                int pPae = PrgVal / PrgMax * 100;
-                prgPer = pPae + "%";
-                dbMsg += prgPer;
-				if (0 < PrgVal && PrgVal < PrgMax) {
-					//if (cancelToken != null && cancelToken.IsCancellationRequested) {
-					//	return;
-					//}
-				//	Thread.Sleep(10);
-				}
+		//            pd.ShowDialog();
+		//            if (pd.IsCanceled) {
+		//                MessageBox.Show("キャンセルしました", "Info", MessageBoxButton.OK);
+		//            } else {
+		//                //MessageBox.Show("完了しました", "Info", MessageBoxButton.OK);
+		//            }
+		//            MyLog(TAG, dbMsg);
+		//        } catch (Exception er) {
+		//            MyErrorLog(TAG, dbMsg, er);
+		//        }
+		//        //	}));
+		//        //  }
+		//    }
+
+		/// <summary>
+		/// 表示値更新
+		/// </summary>
+		/// <param name="PrgressVal"></param>
+		/// <param name="messege"></param>
+		public void DoProgress(int PrgressVal, string messege) {
+			string TAG = "DoProgress";
+			string dbMsg = "";
+			try {
+				PrgVal = PrgressVal;
+				PrgStatus = messege;
+				dbMsg += PrgVal + "/" + PrgMax;
+				dbMsg += "、PrgStatus=" + PrgStatus;
+				//int pPae = PrgVal / PrgMax * 100;
+				//prgPer = pPae + "%";
+				//dbMsg += prgPer;
+				//if (0 < PrgVal && PrgVal < PrgMax) {
+				//	//if (cancelToken != null && cancelToken.IsCancellationRequested) {
+				//	//	return;
+				//	//}
+				//	//	Thread.Sleep(10);
+				//}
 				MyLog(TAG, dbMsg);
-            } catch (Exception er) {
-                MyErrorLog(TAG, dbMsg, er);
-            }
-            //	}));
-            //  }
-        }
+			} catch (Exception er) {
+				MyErrorLog(TAG, dbMsg, er);
+			}
+			//	}));
+			//  }
+		}
 
 
-
-        //       public ICommand ExecProgress => new DelegateCommand(ProgressExec);
-        /// <summary>
-        /// プログレスダイアログの表示実行
-        /// </summary>
-        public ICommand ExecProgress {
+		//       public ICommand ExecProgress => new DelegateCommand(ProgressExec);
+		/// <summary>
+		/// プログレスダイアログの表示実行
+		/// </summary>
+		public ICommand ExecProgress {
             get {
                 return new BaseCommand(new Action(() => {
                     string TAG = "ExecProgress";
