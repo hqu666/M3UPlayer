@@ -51,21 +51,21 @@ namespace M3UPlayer.Views {
         }
 
 
-        public ProgressDialogViewModel VM;
-
-
-
+        /// <summary>
+        /// コンテキスト
+        /// </summary>
+        /// <param name="context">ViewModelを呼出元で作って渡す</param>
+        /// <param name="action"></param>
+        /// <param name="cancelToken"></param>
         public ProgressDialog(object context, Action action, CancellationTokenSource cancelToken) {
             string TAG = "ProgressDialog";
             string dbMsg = "";
             try {
                 InitializeComponent();
-                DataContext = context;
-                this.action = action;
+				this.DataContext = context;
+				this.action = action;
                 this.cancelToken = cancelToken;
-                VM = new ProgressDialogViewModel();
-                this.DataContext = VM;
-                worker.DoWork += DoWork;
+				worker.DoWork += DoWork;
                 worker.RunWorkerCompleted += RunWorkerCompleted;
                 worker.RunWorkerAsync();
                 MyLog(TAG, dbMsg);

@@ -594,8 +594,6 @@ namespace M3UPlayer.ViewModels {
                     //PlayListsからCurrentPlayListFileNameのインデックスを取得
                     int listIndex = Array.IndexOf(PlayLists, CurrentPlayListFileName);
                     PLComboSelectedIndex = listIndex;
-                //} else if (0 <= PlayLists.Length) {
-                //    PLComboSelectedIndex = 0;
                 }
                 if (PLComboSelectedIndex == 0) {
                     ListUpFiles(CurrentPlayListFileName);
@@ -741,35 +739,27 @@ namespace M3UPlayer.ViewModels {
                 // 複数スレッドで使用されるコレクションへの参加
 				BindingOperations.EnableCollectionSynchronization(PLList, new object());
                 CancellationTokenSource cancelToken = new CancellationTokenSource();
-            //    BaseCommand BC = new BaseCommand(new Action(() => {
-                    pd = new ProgressDialog(this, async () => {
-						ProgressDialogViewModel PDVM = pd.VM; //new ProgressDialogViewModel();
-						PDVM.PrgTitle = FileURL + "をプレイリストに書き込みます。";
-						dbMsg += "," + PDVM.PrgTitle;
-                        PDVM.PrgMax = Strs.Count();
+                // コンテキストになるVMはここで作って渡す。
+                ProgressDialogViewModel PDVM = new ProgressDialogViewModel();
+                pd = new ProgressDialog(PDVM, async () => {
+                        PDVM.IntProgress(FileURL + "をプレイリストに書き込みます。", Strs.Count(),1);
+                        dbMsg += "," + PDVM.PrgTitle;
                         dbMsg += ",PrgMax" + PDVM.PrgMax;
-                        PDVM.PrgMin = 1;
-                        PDVM.PrgVal = 0;
-						//pd.Title = FileURL + "をプレイリストに書き込みます。";
-      //                  pd.ProgBar.Maximum = Strs.Count();
-      //                  pd.ProgBar.Minimum = 1;
-      //                  pd.ProgBar.Value = 0;
-
-
-                        foreach (string item in Strs) {
+                        int loopCount = 0;
+						foreach (string item in Strs) {
                             //拡張部分を破棄してURLを読み出す
                             string[] items = item.Split(',');
                             string url = items[0];
                             PlayListModel playListModel = MakeOneItem(url);
                             if (playListModel.UrlStr != null) {
+
                                 PLList.Add(playListModel);
-                                //pd.ProgBar.Value = PLList.Count();
-                                //pd.ProgStatus.Content = playListModel.Summary +"";
-								PDVM.PrgStatus = playListModel.Summary;
-								PDVM.PrgVal = PLList.Count();
+								//PDVM.PrgStatus = playListModel.Summary + "";
+								//PDVM.PrgVal = PLList.Count();
 								PDVM.DoProgress(PLList.Count(), playListModel.Summary + "");
 								dbMsg += "\r\n[" + PDVM.PrgVal + "/" + PDVM.PrgMax + "]" + PDVM.PrgStatus;
-							}
+                                loopCount++;
+                            }
                         }
                     }, cancelToken);
 

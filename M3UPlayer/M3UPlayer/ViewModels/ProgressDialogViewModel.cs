@@ -141,54 +141,34 @@ namespace M3UPlayer.ViewModels {
 			}
 		}
 
-		//    CancellationTokenSource cancelToken;
-		//    ProgressDialog pd;
+        /// <summary>
+        /// 初期化
+        /// </summary>
+        /// <param name="titol"></param>
+        /// <param name="maxVar"></param>
+        /// <param name="miniVar"></param>
+        public void IntProgress( string titol, int maxVar, int miniVar) {
+            string TAG = "IntProgress";
+            string dbMsg = "";
+            try {
+                PrgTitle = titol;
+                PrgMax = maxVar;
+                PrgMin = miniVar;
+                dbMsg += PrgTitle + ":"+ PrgMin + "～" + PrgMax;
+                PrgStatus = "";
+                PrgVal = 0;
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
-		//    public void ShowProgress() {
-		//        string TAG = "ShowProgress";
-		//        string dbMsg = "";
-		//        try {
-		//            dbMsg += "、PrgTitle=" + PrgTitle;
-		//            PrgVal = 0;
-		//            PrgMin = 1;
-		//            cancelToken = new CancellationTokenSource();
-		//            pd = new ProgressDialog(this, () => DoProgress(PrgMin, PrgStatus), cancelToken);
-		//            //pd = new ProgressDialog(this, () => {
-		//            //    while (0 < PrgVal && PrgVal < PrgMax) {
-		//            //        //dbMsg += "\r\n" + PrgVal + "/" + PrgMax;
-		//            //        //dbMsg += "、PrgStatus=" + PrgStatus;
-		//            //        //int pPae = PrgVal / PrgMax * 100;
-		//            //        //prgPer = pPae + "%";
-
-		//            //        //  for (PrgVal = 0; PrgVal < PrgMax; PrgVal++) {
-		//            //        if (cancelToken != null && cancelToken.IsCancellationRequested) {
-		//            //            return;
-		//            //        }
-		//            //        //      Thread.Sleep(10);
-		//            //        //	}
-		//            //    }
-		//            //}, cancelToken);
-
-		//            pd.ShowDialog();
-		//            if (pd.IsCanceled) {
-		//                MessageBox.Show("キャンセルしました", "Info", MessageBoxButton.OK);
-		//            } else {
-		//                //MessageBox.Show("完了しました", "Info", MessageBoxButton.OK);
-		//            }
-		//            MyLog(TAG, dbMsg);
-		//        } catch (Exception er) {
-		//            MyErrorLog(TAG, dbMsg, er);
-		//        }
-		//        //	}));
-		//        //  }
-		//    }
-
-		/// <summary>
-		/// 表示値更新
-		/// </summary>
-		/// <param name="PrgressVal"></param>
-		/// <param name="messege"></param>
-		public void DoProgress(int PrgressVal, string messege) {
+        /// <summary>
+        /// 表示値更新
+        /// </summary>
+        /// <param name="PrgressVal"></param>
+        /// <param name="messege"></param>
+        public void DoProgress(int PrgressVal, string messege) {
 			string TAG = "DoProgress";
 			string dbMsg = "";
 			try {
@@ -196,21 +176,10 @@ namespace M3UPlayer.ViewModels {
 				PrgStatus = messege;
 				dbMsg += PrgVal + "/" + PrgMax;
 				dbMsg += "、PrgStatus=" + PrgStatus;
-				//int pPae = PrgVal / PrgMax * 100;
-				//prgPer = pPae + "%";
-				//dbMsg += prgPer;
-				//if (0 < PrgVal && PrgVal < PrgMax) {
-				//	//if (cancelToken != null && cancelToken.IsCancellationRequested) {
-				//	//	return;
-				//	//}
-				//	//	Thread.Sleep(10);
-				//}
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
-			//	}));
-			//  }
 		}
 
 
