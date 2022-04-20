@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "u6E3Vih2XFhirXF6Jj9qp10DPCFt3yF/dzXcohCJnCmksAG4dwj9dSN9a+Ejn5dRIrCwlPS6SPnzzXS6AKxTvA==",
+  "dgSpecHash": "3FcVgxVTpEnCkQ4i2JrTkrx/CSDSyw+f/EaQOyRHeeTwSKVbKTBW1Lb1Ui0BEqEyvbBXgDwuVcvWaHbi/PGdZA==",
   "success": true,
-  "projectFilePath": "H:\\develop\\2022\\M3U\\M3UPlayer\\M3UPlayer\\M3UPlayer.csproj",
+  "projectFilePath": "C:\\Users\\hqu66\\AppData\\Local\\Atlassian\\hqu666\\M3UPlayer\\M3UPlayer\\M3UPlayer\\M3UPlayer.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\hqu66\\.nuget\\packages\\azure.core\\1.19.0\\azure.core.1.19.0.nupkg.sha512",
     "C:\\Users\\hqu66\\.nuget\\packages\\microsoft.aspnet.webapi.client\\5.2.7\\microsoft.aspnet.webapi.client.5.2.7.nupkg.sha512",

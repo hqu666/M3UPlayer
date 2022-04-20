@@ -6208,11 +6208,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "H:\\develop\\2022\\M3U\\M3UPlayer\\M3UPlayer\\M3UPlayer.csproj",
+      "projectUniqueName": "C:\\Users\\hqu66\\AppData\\Local\\Atlassian\\hqu666\\M3UPlayer\\M3UPlayer\\M3UPlayer\\M3UPlayer.csproj",
       "projectName": "M3UPlayer",
-      "projectPath": "H:\\develop\\2022\\M3U\\M3UPlayer\\M3UPlayer\\M3UPlayer.csproj",
+      "projectPath": "C:\\Users\\hqu66\\AppData\\Local\\Atlassian\\hqu666\\M3UPlayer\\M3UPlayer\\M3UPlayer\\M3UPlayer.csproj",
       "packagesPath": "C:\\Users\\hqu66\\.nuget\\packages\\",
-      "outputPath": "H:\\develop\\2022\\M3U\\M3UPlayer\\M3UPlayer\\obj\\",
+      "outputPath": "C:\\Users\\hqu66\\AppData\\Local\\Atlassian\\hqu666\\M3UPlayer\\M3UPlayer\\M3UPlayer\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\hqu66\\AppData\\Roaming\\NuGet\\NuGet.Config",

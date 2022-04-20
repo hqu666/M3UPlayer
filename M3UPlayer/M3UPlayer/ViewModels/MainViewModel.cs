@@ -369,7 +369,7 @@ namespace M3UPlayer.ViewModels {
                     //	axWmp.SetVolume(value);
                     //}
                     RaisePropertyChanged("SoundValue");
-      //              MyLog(TAG, dbMsg);
+                    //              MyLog(TAG, dbMsg);
                 } catch (Exception er) {
                     MyErrorLog(TAG, dbMsg, er);
                 }
@@ -556,7 +556,17 @@ namespace M3UPlayer.ViewModels {
         public System.Diagnostics.Process pEXPLORER;
         public double VWidth = 960;
         public double VHeight = 540;
-
+        private ProgressDialog pd;
+        /// <summary>
+        /// プログレスのキャンセル
+        /// </summary>
+        private CancellationTokenSource cancelToken;
+        /// <summary>
+        /// プログレスのVM
+        /// </summary>
+        private ProgressDialogViewModel PDVM;
+        private int DelCount = 0;
+        private string progTitol;
         /// <summary>
         /// メイン画面
         /// </summary>
@@ -572,6 +582,9 @@ namespace M3UPlayer.ViewModels {
             string TAG = "Initialize";
             string dbMsg = "";
             try {
+                cancelToken = new CancellationTokenSource();
+                // プログレスダイアログのコンテキストになるVMはここで作って渡す。
+                PDVM = new ProgressDialogViewModel();
                 MakePlayListMenu();
                 PlayListItemViewExplore.IsEnabled = false;
                 PlayListItemMove.IsEnabled = false;
@@ -608,9 +621,9 @@ namespace M3UPlayer.ViewModels {
                 Drag_now = false;
                 RaisePropertyChanged("Drag_now");
 
-				ForwardCBComboSource = new List<String> { "5", "30","60","120","300", "600" };
-				RaisePropertyChanged("ForwardCBComboSource");
-				dbMsg += ",ff=" + ForwardCBComboSource[0] + "～" + ForwardCBComboSource[ForwardCBComboSource.Count-1];
+                ForwardCBComboSource = new List<String> { "5", "30", "60", "120", "300", "600" };
+                RaisePropertyChanged("ForwardCBComboSource");
+                dbMsg += ",ff=" + ForwardCBComboSource[0] + "～" + ForwardCBComboSource[ForwardCBComboSource.Count - 1];
                 ForwardCBComboSelected = Constant.ForwardCBComboSelected;
                 RaisePropertyChanged("ForwardCBComboSelected");
                 dbMsg += ",ForwardCBComboSelected=" + ForwardCBComboSelected;
@@ -627,7 +640,7 @@ namespace M3UPlayer.ViewModels {
                 SoundValue = Constant.SoundValue;
                 RaisePropertyChanged("SoundValue");
                 IsMute = false;
-				//      WVM = new WsbViewModel();
+                //      WVM = new WsbViewModel();
 
                 SoundValue = Properties.Settings.Default.SoundValue;
                 ForwardCBComboSelected = Properties.Settings.Default.ForwardCBComboSelected;
@@ -713,7 +726,6 @@ namespace M3UPlayer.ViewModels {
             return retStr;
         }
 
-		private ProgressDialog pd;
         private string _FileURL = "";
         /// <summary>
         /// 指定されたプレイリストの内容を読み込み、DataGridにBaindinｇする
@@ -724,53 +736,59 @@ namespace M3UPlayer.ViewModels {
             string dbMsg = "";
             try {
                 dbMsg += "、FileURL=" + FileURL;
-				if (_FileURL.Equals(FileURL)) {
-					dbMsg += "重複";
-					MyLog(TAG, dbMsg);
-					return;
+                if (_FileURL.Equals(FileURL)) {
+                    dbMsg += "重複";
+                    MyLog(TAG, dbMsg);
+                    return;
 
-				}
-				string rText = ReadTextFile(FileURL, "UTF-8"); //"Shift_JIS"では文字化け発生
+                }
+                string rText = ReadTextFile(FileURL, "UTF-8"); //"Shift_JIS"では文字化け発生
                 string[] delimiter = { "\r\n" };
                 string[] Strs = rText.Split(delimiter, StringSplitOptions.RemoveEmptyEntries);
                 PLList = new ObservableCollection<PlayListModel>();
-                var list = new List<string>();
-                list.AddRange(videoFiles);
+                var CompareList = new List<string>();
+                CompareList.AddRange(videoFiles);
                 // 複数スレッドで使用されるコレクションへの参加
-				BindingOperations.EnableCollectionSynchronization(PLList, new object());
-                CancellationTokenSource cancelToken = new CancellationTokenSource();
-                // コンテキストになるVMはここで作って渡す。
-                ProgressDialogViewModel PDVM = new ProgressDialogViewModel();
+                BindingOperations.EnableCollectionSynchronization(PLList, new object());
+                //CancellationTokenSource cancelToken = new CancellationTokenSource();
+                //// コンテキストになるVMはここで作って渡す。
+                //ProgressDialogViewModel PDVM = new ProgressDialogViewModel();
                 pd = new ProgressDialog(PDVM, async () => {
-                        PDVM.IntProgress(FileURL + "をプレイリストに書き込みます。", Strs.Count(),1);
-                        dbMsg += "," + PDVM.PrgTitle;
-                        dbMsg += ",PrgMax" + PDVM.PrgMax;
-                        int loopCount = 0;
-						foreach (string item in Strs) {
-                            //拡張部分を破棄してURLを読み出す
-                            string[] items = item.Split(',');
-                            string url = items[0];
+                    PDVM.IntProgress(FileURL + "をプレイリストに書き込みます。", Strs.Count(), 1);
+                    dbMsg += "," + PDVM.PrgTitle;
+                    dbMsg += ",PrgMax" + PDVM.PrgMax;
+                    int loopCount = 0;
+                    foreach (string item in Strs) {
+                        //拡張部分を破棄してURLを読み出す
+                        string[] items = item.Split(',');
+                        string url = items[0];
+                        bool IsWright = false;
+                        foreach (string CompareStr in CompareList) {
+                            if (url.Contains(CompareStr)) {
+                                IsWright = true;
+                            }
+                        }
+                        if (IsWright) {
                             PlayListModel playListModel = MakeOneItem(url);
                             if (playListModel.UrlStr != null) {
 
                                 PLList.Add(playListModel);
-								//PDVM.PrgStatus = playListModel.Summary + "";
-								//PDVM.PrgVal = PLList.Count();
-								PDVM.DoProgress(PLList.Count(), playListModel.Summary + "");
-								dbMsg += "\r\n[" + PDVM.PrgVal + "/" + PDVM.PrgMax + "]" + PDVM.PrgStatus;
+                                //PDVM.PrgStatus = playListModel.Summary + "";
+                                //PDVM.PrgVal = PLList.Count();
+                                PDVM.DoProgress(PLList.Count(), playListModel.Summary + "");
+                                dbMsg += "\r\n[" + PDVM.PrgVal + "/" + PDVM.PrgMax + "]" + PDVM.PrgStatus;
                                 loopCount++;
                             }
                         }
-                    }, cancelToken);
-
-                    pd.ShowDialog();
-                    if (pd.IsCanceled) {
-                        MessageBox.Show("キャンセルしました", "Info", MessageBoxButton.OK);
-                    } else {
-                        dbMsg += ",完了しました";
                     }
-                //    }));
+                }, cancelToken);
 
+                pd.ShowDialog();
+                if (pd.IsCanceled) {
+                    MessageBox.Show("キャンセルしました", "Info", MessageBoxButton.OK);
+                } else {
+                    dbMsg += ",完了しました";
+                }
                 RaisePropertyChanged("PLList");
                 ListItemCount = PLList.Count();
                 RaisePropertyChanged("ListItemCount");
@@ -1290,18 +1308,18 @@ namespace M3UPlayer.ViewModels {
             string TAG = "GetDuration";
             string dbMsg = "";
             try {
-         //       DurationStr = null;
+                //       DurationStr = null;
                 //string rStr = await MyView.webView.ExecuteScriptAsync($"document.getElementById(" +'"' + "durationSP" + '"' + ").innerHTML;");
                 //dbMsg += "、rStr=" + rStr;
                 //if (0<rStr.Length) {
                 string CurrentTime = await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime;");
                 dbMsg += "、CurrentTime=" + CurrentTime;
                 if (CurrentTime == null) {
-				} else {
+                } else {
                     PositionStr = GetHMS(CurrentTime);
                     dbMsg += "、PositionStr=" + PositionStr;
-					double Position = double.Parse(CurrentTime);
-                    if (0<Position ) {
+                    double Position = double.Parse(CurrentTime);
+                    if (0 < Position) {
                         MyLog(TAG, dbMsg);
                         return;
                     }
@@ -1309,12 +1327,12 @@ namespace M3UPlayer.ViewModels {
                 string Duration = await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").duration;");
                 dbMsg += "、Duration=" + Duration;
                 if (Duration == null) {
-   //                 return;
+                    //                 return;
                 } else if (Duration.Equals("null")) {
                     dbMsg += "、Duration=nullという文字";
-                } else if( Duration.Equals("")) {
+                } else if (Duration.Equals("")) {
                     dbMsg += "、Duration=空白";
-				} else {
+                } else {
                     DurationStr = GetHMS(Duration);
                     dbMsg += "、DurationStr=" + DurationStr;
                     RaisePropertyChanged("DurationStr");
@@ -1371,9 +1389,9 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += ",s=" + s;
                 if (s.Equals("ended")) {
                     dbMsg += "、再生終了";
-					//              await Task.Delay(1000);
-					ForwardList();
-					MyLog(TAG, dbMsg);
+                    //              await Task.Delay(1000);
+                    ForwardList();
+                    MyLog(TAG, dbMsg);
                 } else {
                     //decimalに変換できれば（保留）再生ポジション
                     string CurrentTime = await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime;");
@@ -2802,26 +2820,48 @@ namespace M3UPlayer.ViewModels {
             string TAG = "PlayListDeleteCannotRead_Click";
             string dbMsg = "";
             try {
+
                 dbMsg += "ListItemCount=" + ListItemCount + "件";
-                ObservableCollection<PlayListModel> DeleteList = new ObservableCollection<PlayListModel>();
-                foreach (PlayListModel item in PLList) {
-                    if (File.Exists(item.UrlStr)) {
-                    } else {
-                        dbMsg += "不在=" + item.UrlStr;
-                        DeleteList.Add(item);
+                progTitol = "読めないファイルを削除";
+                // 複数スレッドで使用されるコレクションへの参加
+                BindingOperations.EnableCollectionSynchronization(PLList, new object());
+                pd = new ProgressDialog(PDVM, async () => {
+                    PDVM.IntProgress(progTitol, PLList.Count, 1);
+                    dbMsg += "," + PDVM.PrgTitle;
+                    dbMsg += ",PrgMax=" + PDVM.PrgMax;
+                    ObservableCollection<PlayListModel> DeleteList = new ObservableCollection<PlayListModel>();
+                    int lCount = 0;
+                    foreach (PlayListModel item in PLList) {
+                        if (File.Exists(item.UrlStr)) {
+                        } else {
+                            dbMsg += "不在=" + item.UrlStr;
+                            DeleteList.Add(item);
+                        }
+                        lCount++;
+                        PDVM.DoProgress(lCount, item.Summary + "");
+                        dbMsg += "\r\n[" + PDVM.PrgVal + "/" + PDVM.PrgMax + "]" + PDVM.PrgStatus;
                     }
-                }
-                dbMsg += ">削除待ち>" + DeleteList.Count + "件";
-                if (0 < DeleteList.Count) {
-                    foreach (PlayListModel item in DeleteList) {
-                        PLList.Remove(item);
+                    dbMsg += ">削除待ち>" + DeleteList.Count + "件";
+                    if (0 < DeleteList.Count) {
+                        foreach (PlayListModel item in DeleteList) {
+                            PLList.Remove(item);
+                        }
+                        RaisePropertyChanged("PLList");
                     }
-                    RaisePropertyChanged("PLList");
-                    ListItemCount = PLList.Count();
-                    RaisePropertyChanged("ListItemCount");
-                    dbMsg += ">>" + ListItemCount + "件";
+                    IsDoSavePlayList(true);
+                }, cancelToken);
+
+                pd.ShowDialog();
+                if (pd.IsCanceled) {
+                    MessageBox.Show("キャンセルしました", progTitol, MessageBoxButton.OK);
+                } else {
+                    dbMsg += ",完了しました";
                 }
-                IsDoSavePlayList(true);
+
+                ListItemCount = PLList.Count();
+                RaisePropertyChanged("ListItemCount");
+                dbMsg += ">>" + ListItemCount + "件";
+
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
@@ -2838,31 +2878,53 @@ namespace M3UPlayer.ViewModels {
             string dbMsg = "";
             try {
                 dbMsg += "ListItemCount=" + ListItemCount + "件";
-                ObservableCollection<PlayListModel> DeleteList = new ObservableCollection<PlayListModel>();
-                foreach (PlayListModel checkItem in PLList) {
-                    int checkIndex = PLList.IndexOf(checkItem);
-                    foreach (PlayListModel tItem in PLList) {
-                        int tIndex = PLList.IndexOf(tItem);
-                        if (checkIndex < tIndex) {
-                            if (tItem.UrlStr.Equals(checkItem.UrlStr)) {
-                                dbMsg += ">重複>=" + tItem.UrlStr;
-                                checkItem.ActionFlag = true;
-                                DeleteList.Add(checkItem);
+                progTitol = "先頭側の重複アイテムを削除";
+                BindingOperations.EnableCollectionSynchronization(PLList, new object());
+                pd = new ProgressDialog(PDVM, async () => {
+                    PDVM.IntProgress(progTitol, PLList.Count, 1);
+                    dbMsg += "," + PDVM.PrgTitle;
+                    dbMsg += ",PrgMax=" + PDVM.PrgMax;
+                    ObservableCollection<PlayListModel> DeleteList = new ObservableCollection<PlayListModel>();
+                    int lCount = 0;
+                    foreach (PlayListModel checkItem in PLList) {
+                        int checkIndex = PLList.IndexOf(checkItem);
+                        foreach (PlayListModel tItem in PLList) {
+                            int tIndex = PLList.IndexOf(tItem);
+                            if (checkIndex < tIndex) {
+                                if (tItem.UrlStr.Equals(checkItem.UrlStr)) {
+                                    dbMsg += ">重複>=" + tItem.UrlStr;
+                                    checkItem.ActionFlag = true;
+                                    DeleteList.Add(checkItem);
+                                }
                             }
                         }
+                        lCount++;
+                        PDVM.DoProgress(lCount, checkItem.Summary + "");
+                        dbMsg += "\r\n[" + PDVM.PrgVal + "/" + PDVM.PrgMax + "]" + PDVM.PrgStatus;
                     }
-                }
-                dbMsg += ">削除待ち>" + DeleteList.Count + "件";
-                if (0 < DeleteList.Count) {
-                    foreach (PlayListModel item in DeleteList) {
-                        PLList.Remove(item);
+                    DelCount = DeleteList.Count;
+                    dbMsg += ">削除待ち>" + DelCount + "件";
+                    if (0 < DelCount) {
+                        foreach (PlayListModel item in DeleteList) {
+                            PLList.Remove(item);
+                        }
+                        RaisePropertyChanged("PLList");
                     }
-                    RaisePropertyChanged("PLList");
-                    ListItemCount = PLList.Count();
-                    RaisePropertyChanged("ListItemCount");
-                    dbMsg += ">>" + ListItemCount + "件";
+                    IsDoSavePlayList(false);
+                }, cancelToken);
+
+                pd.ShowDialog();
+                if (pd.IsCanceled) {
+                    MessageBox.Show("キャンセルしました", progTitol, MessageBoxButton.OK);
+                } else if (0 < DelCount) {
+                    MessageBox.Show(DelCount + "件削除しました", progTitol, MessageBoxButton.OK);
+                    DelCount = 0;
+                } else {
+                    MessageBox.Show("重複はありませんでした", progTitol, MessageBoxButton.OK);
                 }
-                IsDoSavePlayList(false);
+                ListItemCount = PLList.Count();
+                RaisePropertyChanged("ListItemCount");
+                dbMsg += ">>" + ListItemCount + "件";
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
@@ -2879,32 +2941,54 @@ namespace M3UPlayer.ViewModels {
             string dbMsg = "";
             try {
                 dbMsg += "ListItemCount=" + ListItemCount + "件";
-                ObservableCollection<PlayListModel> DeleteList = new ObservableCollection<PlayListModel>();
-                foreach (PlayListModel checkItem in PLList) {
-                    int checkIndex = PLList.IndexOf(checkItem);
-                    foreach (PlayListModel tItem in PLList) {
-                        int tIndex = PLList.IndexOf(tItem);
-                        if (checkIndex < tIndex) {
-                            if (tItem.UrlStr.Equals(checkItem.UrlStr)) {
-                                dbMsg += ">重複>=" + tItem.UrlStr;
-                                tItem.ActionFlag = true;
-                                DeleteList.Add(tItem);
+                progTitol = "末尾側の重複アイテムを削除";
+                BindingOperations.EnableCollectionSynchronization(PLList, new object());
+                pd = new ProgressDialog(PDVM, async () => {
+                    PDVM.IntProgress(progTitol, PLList.Count, 1);
+                    dbMsg += "," + PDVM.PrgTitle;
+                    dbMsg += ",PrgMax=" + PDVM.PrgMax;
+                    ObservableCollection<PlayListModel> DeleteList = new ObservableCollection<PlayListModel>();
+                    int lCount = 0;
+                    foreach (PlayListModel checkItem in PLList) {
+                        int checkIndex = PLList.IndexOf(checkItem);
+                        foreach (PlayListModel tItem in PLList) {
+                            int tIndex = PLList.IndexOf(tItem);
+                            if (checkIndex < tIndex) {
+                                if (tItem.UrlStr.Equals(checkItem.UrlStr)) {
+                                    dbMsg += ">重複>=" + tItem.UrlStr;
+                                    tItem.ActionFlag = true;
+                                    DeleteList.Add(tItem);
+                                }
                             }
                         }
+                        lCount++;
+                        PDVM.DoProgress(lCount, checkItem.Summary + "");
+                        dbMsg += "\r\n[" + PDVM.PrgVal + "/" + PDVM.PrgMax + "]" + PDVM.PrgStatus;
                     }
-                }
-                dbMsg += ">削除待ち>" + DeleteList.Count + "件";
-                if (0 < DeleteList.Count) {
-                    while (0 < DeleteList.Count) {
-                        PLList.Remove(DeleteList[0]);
-                        DeleteList.Remove(DeleteList[0]);
+                    DelCount = DeleteList.Count;
+                    dbMsg += ">削除待ち>" + DelCount + "件";
+                    if (0 < DelCount) {
+                        while (0 < DeleteList.Count) {
+                            PLList.Remove(DeleteList[0]);
+                            DeleteList.Remove(DeleteList[0]);
+                        }
+                        RaisePropertyChanged("PLList");
                     }
-                    RaisePropertyChanged("PLList");
-                    ListItemCount = PLList.Count();
-                    RaisePropertyChanged("ListItemCount");
-                    dbMsg += ">>" + ListItemCount + "件";
+                    IsDoSavePlayList(false);
+                }, cancelToken);
+
+                pd.ShowDialog();
+                if (pd.IsCanceled) {
+                    MessageBox.Show("キャンセルしました", progTitol, MessageBoxButton.OK);
+                } else if (0 < DelCount) {
+                    MessageBox.Show(DelCount + "件削除しました", progTitol, MessageBoxButton.OK);
+                    DelCount = 0;
+                } else {
+                    MessageBox.Show("重複はありませんでした", progTitol, MessageBoxButton.OK);
                 }
-                IsDoSavePlayList(false);
+                ListItemCount = PLList.Count();
+                RaisePropertyChanged("ListItemCount");
+                dbMsg += ">>" + ListItemCount + "件";
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
@@ -3170,8 +3254,8 @@ namespace M3UPlayer.ViewModels {
             try {
                 dbMsg += "IsHideControl=" + IsHideControl;
                 if (IsHideControl) {
-                    IsHideControl=false;
-				}else{
+                    IsHideControl = false;
+                } else {
                     IsHideControl = true;
                 }
                 dbMsg += ">>=" + IsHideControl;
@@ -3204,27 +3288,27 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
-		/// <summary>
-		/// pauseにするだけ(Thumb.DragStarted)
-		/// </summary>
-		public void PauseVideo() {
-			string TAG = "PauseVideo";
-			string dbMsg = "";
-			try {
-				dbMsg += ",SliderValue=" + SliderValue;
-				dbMsg += ",IsPlaying=" + IsPlaying;
-				if (IsPlaying) {
-					IsPlaying = false;
-					RaisePropertyChanged("IsPlaying");
-				}
-				dbMsg += ">>=" + IsPlaying;
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+        /// <summary>
+        /// pauseにするだけ(Thumb.DragStarted)
+        /// </summary>
+        public void PauseVideo() {
+            string TAG = "PauseVideo";
+            string dbMsg = "";
+            try {
+                dbMsg += ",SliderValue=" + SliderValue;
+                dbMsg += ",IsPlaying=" + IsPlaying;
+                if (IsPlaying) {
+                    IsPlaying = false;
+                    RaisePropertyChanged("IsPlaying");
+                }
+                dbMsg += ">>=" + IsPlaying;
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
-   //     public ICommand FFCBChanged => new DelegateCommand(ClickForwardAsync);
+        //     public ICommand FFCBChanged => new DelegateCommand(ClickForwardAsync);
         public ICommand FFBtClick => new DelegateCommand(ClickForwardAsync);
         /// <summary>
         /// 送りコンボのクリック
@@ -3236,8 +3320,8 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += "ForwardCBComboSelected=" + ForwardCBComboSelected;
                 double newPosition = SliderValue + double.Parse(ForwardCBComboSelected);
                 dbMsg += ">>" + newPosition;
-				if (SliderMaximum < newPosition) {
-                    double difference = ( SliderMaximum - SliderValue) / 2;
+                if (SliderMaximum < newPosition) {
+                    double difference = (SliderMaximum - SliderValue) / 2;
                     dbMsg += ">修正>" + difference;
                     newPosition = SliderMaximum - difference;
                     dbMsg += ">>" + newPosition;
@@ -3265,7 +3349,7 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += "RewCBComboSelected=" + RewCBComboSelected;
                 double newPosition = SliderValue - double.Parse(RewCBComboSelected);
                 dbMsg += ">>" + newPosition;
-                if ( newPosition < 0) {
+                if (newPosition < 0) {
                     double difference = SliderValue / 2;
                     dbMsg += ">修正>" + difference;
                     newPosition = difference;
@@ -3307,31 +3391,31 @@ namespace M3UPlayer.ViewModels {
         }
 
         public ICommand ListForwarding => new DelegateCommand(ForwardList);
-		/// <summary>
-		/// プレイリストの次アイテムへ
-		/// </summary>
-		public void ForwardList() {
-			string TAG = "ForwardList";
-			string dbMsg = "";
-			try {
-				PauseVideo();
-				dbMsg += "SelectedPlayListIndex=" + SelectedPlayListIndex;
-				if ((PLList.Count - 2) < SelectedPlayListIndex) {
-					SelectedPlayListIndex = 0;
-				} else {
-					SelectedPlayListIndex++;
-				}
-				RaisePropertyChanged("SelectedPlayListIndex");
-				dbMsg += ">>=" + SelectedPlayListIndex;
-				dbMsg += "/" + PLList.Count;
-				PLMouseUp();
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+        /// <summary>
+        /// プレイリストの次アイテムへ
+        /// </summary>
+        public void ForwardList() {
+            string TAG = "ForwardList";
+            string dbMsg = "";
+            try {
+                PauseVideo();
+                dbMsg += "SelectedPlayListIndex=" + SelectedPlayListIndex;
+                if ((PLList.Count - 2) < SelectedPlayListIndex) {
+                    SelectedPlayListIndex = 0;
+                } else {
+                    SelectedPlayListIndex++;
+                }
+                RaisePropertyChanged("SelectedPlayListIndex");
+                dbMsg += ">>=" + SelectedPlayListIndex;
+                dbMsg += "/" + PLList.Count;
+                PLMouseUp();
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
-		public ICommand ListRewind => new DelegateCommand(RewindList);
+        public ICommand ListRewind => new DelegateCommand(RewindList);
         public void RewindList() {
             string TAG = "RewindList";
             string dbMsg = "";
@@ -4493,7 +4577,7 @@ AddType video/MP2T .ts
                     //autoplay：Webページを表示した際に自動再生を行う(muted時のみ)
                     //playsinline：スマートフォンのブラウザでもWebページ内で再生する
                     //loop：動画を繰り返し再生する
-                //    comentStr = "読み込めないファイルは対策検討中です。。";
+                    //    comentStr = "読み込めないファイルは対策検討中です。。";
                 } else if (extentionStr == ".flv" ||
                    extentionStr == ".f4v" ||
                    extentionStr == ".swf"
@@ -4544,7 +4628,7 @@ AddType video/MP2T .ts
                                                 " pluginspage=" + '"' + pluginspage + '"' +
                                        "/>\n";
 
-      //              comentStr = souceName + " ; プレイヤーには「ふらだんす」http://www.streaming.jp/fladance/　を使っています。" + dbWorning;
+                    //              comentStr = souceName + " ; プレイヤーには「ふらだんす」http://www.streaming.jp/fladance/　を使っています。" + dbWorning;
 
                     /*				playerUrl = assemblyPath.Replace(assemblyName, "flvplayer-305.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
                                                                                                                //	string flashVvars = "fms_app=&video_file=" + fileName + "&" +       // & amp;
@@ -4684,7 +4768,7 @@ AddType video/MP2T .ts
                     extentionStr == ".mp2" ||
                     extentionStr == ".mpa" ||
                     extentionStr == ".mpe" ||
-              //      extentionStr == ".mp4" ||        //ver12:MP4 ビデオ ファイル 
+                    //      extentionStr == ".mp4" ||        //ver12:MP4 ビデオ ファイル 
                     extentionStr == ".m4v" ||
                     extentionStr == ".mp4v" ||
                     extentionStr == ".mpeg" ||
@@ -4752,72 +4836,72 @@ AddType video/MP2T .ts
                     //contlolPart += "\t\t</div>\n";
                     contlolPart += "\t\t<script type=" + '"' + "text/javascript" + '"' + ">\n";
                     contlolPart += "\t\t\tvar v = document.getElementById(" + '"' + wiPlayerID + '"' + ");\n";
-					//contlolPart += "\t\t\tfunction getHMS(sec) {\n";
-					//contlolPart += "\t\t\t\tvar retStr = " + '"' + '"' + ";\n";
-					//contlolPart += "\t\t\t\tvar retH = Math.floor(sec/3600);\n";
-					//contlolPart += "\t\t\t\tif(0 < retH){\n";
-					//contlolPart += "\t\t\t\t\tretStr = retH + " + '"' + ":" + '"' + ";\n";
-					//contlolPart += "\t\t\t\t\tsec = sec - retH * 3600;\n";
-					//contlolPart += "\t\t\t\t}\n";
-					//contlolPart += "\t\t\t\tvar retM = Math.floor(sec/60);\n";
-					//contlolPart += "\t\t\t\tif(0 < retM){\n";
-					//contlolPart += "\t\t\t\t\tif(retM < 10){\n";
-					//contlolPart += "\t\t\t\t\t\tretStr += " + '"' + "0" + '"' + " + retM + " + '"' + ":" + '"' + ";\n";
-					//contlolPart += "\t\t\t\t\t}else{\n";
-					//contlolPart += "\t\t\t\t\t\tretStr += retM + " + '"' + ":" + '"' + ";\n";
-					//contlolPart += "\t\t\t\t\t}\n";
-					//contlolPart += "\t\t\t\t\tsec = sec - retM * 60;\n";
-					//contlolPart += "\t\t\t\t}else{\n";
-					//contlolPart += "\t\t\t\t\tretStr += " + '"' + "00:" + '"' + ";\n";
-					//contlolPart += "\t\t\t\t}\n";
-					//contlolPart += "\t\t\t\tsec = Math.floor(sec);\n";
-					//contlolPart += "\t\t\t\tif(0 < sec){\n";
-					//contlolPart += "\t\t\t\t\tif(sec < 10){\n";
-					//contlolPart += "\t\t\t\t\t\tretStr += " + '"' + "0" + '"' + " + sec;\n";
-					//contlolPart += "\t\t\t\t\t}else{\n";
-					//contlolPart += "\t\t\t\t\t\tretStr += sec;\n";
-					//contlolPart += "\t\t\t\t\t}\n";
-					//contlolPart += "\t\t\t\t}else{\n";
-					//contlolPart += "\t\t\t\t\tretStr = retStr + " + '"' + "00" + '"' + ";\n";
-					//contlolPart += "\t\t\t\t}\n";
-					//contlolPart += "\t\t\t\treturn retStr;\n";
-					//contlolPart += "\t\t\t}\n\n";
-					//contlolPart += "\t\t\tfunction getDuration() {\n";               //動画の長さ（秒）を表示
-					//contlolPart += "\t\t\t\tvar myDuration = v.duration;\n";
-					//contlolPart += "\t\t\t\treturn myDuration;\n";
-					//contlolPart += "\t\t\t}\n\n";
-					//contlolPart += "\t\t\tfunction getCurrentTime() {\n";                //現在の再生位置（秒）を表示
-					//contlolPart += "\t\t\t\tvar myCurrentTime = v.currentTime;\n";
-					//contlolPart += "\t\t\t\treturn myCurrentTime;\n";
-					//contlolPart += "\t\t\t}\n\n";
-					//contlolPart += "\t\t\tfunction playVideo() {\n";                //再生完了の表示をクリア
-					////動画を再生
-					//contlolPart += "\t\t\t\tv.play();\n";
-					//contlolPart += "\t\t\t\tisEnded=false;\n";
-					//contlolPart += "\t\t\t}\n\n";
-					//contlolPart += "\t\t\tfunction pauseVideo() {\n";            //動画を一時停止
-					//contlolPart += "\t\t\t\tv.pause();\n";
-					//contlolPart += "\t\t\t}\n\n";
-					//contlolPart += "\t\t\tfunction upVolume() {\n";            //音量を上げる
-					//contlolPart += "\t\t\t\tv.volume = v.volume + 0.25;\n";
-					//contlolPart += "\t\t\t}\n\n";
-					//contlolPart += "\t\t\tfunction downVolume() {\n";            //音量を下げる
-					//contlolPart += "\t\t\t\tv.volume = v.volume - 0.25;\n";
-					//contlolPart += "\t\t\t}\n\n";
-					contlolPart += "\t\t\tfunction myOnLoad() {\n";
+                    //contlolPart += "\t\t\tfunction getHMS(sec) {\n";
+                    //contlolPart += "\t\t\t\tvar retStr = " + '"' + '"' + ";\n";
+                    //contlolPart += "\t\t\t\tvar retH = Math.floor(sec/3600);\n";
+                    //contlolPart += "\t\t\t\tif(0 < retH){\n";
+                    //contlolPart += "\t\t\t\t\tretStr = retH + " + '"' + ":" + '"' + ";\n";
+                    //contlolPart += "\t\t\t\t\tsec = sec - retH * 3600;\n";
+                    //contlolPart += "\t\t\t\t}\n";
+                    //contlolPart += "\t\t\t\tvar retM = Math.floor(sec/60);\n";
+                    //contlolPart += "\t\t\t\tif(0 < retM){\n";
+                    //contlolPart += "\t\t\t\t\tif(retM < 10){\n";
+                    //contlolPart += "\t\t\t\t\t\tretStr += " + '"' + "0" + '"' + " + retM + " + '"' + ":" + '"' + ";\n";
+                    //contlolPart += "\t\t\t\t\t}else{\n";
+                    //contlolPart += "\t\t\t\t\t\tretStr += retM + " + '"' + ":" + '"' + ";\n";
+                    //contlolPart += "\t\t\t\t\t}\n";
+                    //contlolPart += "\t\t\t\t\tsec = sec - retM * 60;\n";
+                    //contlolPart += "\t\t\t\t}else{\n";
+                    //contlolPart += "\t\t\t\t\tretStr += " + '"' + "00:" + '"' + ";\n";
+                    //contlolPart += "\t\t\t\t}\n";
+                    //contlolPart += "\t\t\t\tsec = Math.floor(sec);\n";
+                    //contlolPart += "\t\t\t\tif(0 < sec){\n";
+                    //contlolPart += "\t\t\t\t\tif(sec < 10){\n";
+                    //contlolPart += "\t\t\t\t\t\tretStr += " + '"' + "0" + '"' + " + sec;\n";
+                    //contlolPart += "\t\t\t\t\t}else{\n";
+                    //contlolPart += "\t\t\t\t\t\tretStr += sec;\n";
+                    //contlolPart += "\t\t\t\t\t}\n";
+                    //contlolPart += "\t\t\t\t}else{\n";
+                    //contlolPart += "\t\t\t\t\tretStr = retStr + " + '"' + "00" + '"' + ";\n";
+                    //contlolPart += "\t\t\t\t}\n";
+                    //contlolPart += "\t\t\t\treturn retStr;\n";
+                    //contlolPart += "\t\t\t}\n\n";
+                    //contlolPart += "\t\t\tfunction getDuration() {\n";               //動画の長さ（秒）を表示
+                    //contlolPart += "\t\t\t\tvar myDuration = v.duration;\n";
+                    //contlolPart += "\t\t\t\treturn myDuration;\n";
+                    //contlolPart += "\t\t\t}\n\n";
+                    //contlolPart += "\t\t\tfunction getCurrentTime() {\n";                //現在の再生位置（秒）を表示
+                    //contlolPart += "\t\t\t\tvar myCurrentTime = v.currentTime;\n";
+                    //contlolPart += "\t\t\t\treturn myCurrentTime;\n";
+                    //contlolPart += "\t\t\t}\n\n";
+                    //contlolPart += "\t\t\tfunction playVideo() {\n";                //再生完了の表示をクリア
+                    ////動画を再生
+                    //contlolPart += "\t\t\t\tv.play();\n";
+                    //contlolPart += "\t\t\t\tisEnded=false;\n";
+                    //contlolPart += "\t\t\t}\n\n";
+                    //contlolPart += "\t\t\tfunction pauseVideo() {\n";            //動画を一時停止
+                    //contlolPart += "\t\t\t\tv.pause();\n";
+                    //contlolPart += "\t\t\t}\n\n";
+                    //contlolPart += "\t\t\tfunction upVolume() {\n";            //音量を上げる
+                    //contlolPart += "\t\t\t\tv.volume = v.volume + 0.25;\n";
+                    //contlolPart += "\t\t\t}\n\n";
+                    //contlolPart += "\t\t\tfunction downVolume() {\n";            //音量を下げる
+                    //contlolPart += "\t\t\t\tv.volume = v.volume - 0.25;\n";
+                    //contlolPart += "\t\t\t}\n\n";
+                    contlolPart += "\t\t\tfunction myOnLoad() {\n";
                     //現在の再生位置が変更された時
                     contlolPart += "\t\t\t\tv.addEventListener(" + '"' + "timeupdate" + '"' + ", function(){\n";
-				//	contlolPart += "\t\t\t\t\tvar myCurrentTime = v.currentTime;\n";
-					contlolPart += "\t\t\t\t\twindow.chrome.webview.postMessage(v.currentTime+" + '"' + '"' + ");\n";
+                    //	contlolPart += "\t\t\t\t\tvar myCurrentTime = v.currentTime;\n";
+                    contlolPart += "\t\t\t\t\twindow.chrome.webview.postMessage(v.currentTime+" + '"' + '"' + ");\n";
                     contlolPart += "\t\t\t\t}, false);\n";            //メディアリソースの末尾に達して、再生が停止した時
-																	  //メディアリソースの末尾に達して、再生が停止した時
-					contlolPart += "\t\t\t\tv.addEventListener(" + '"' + "ended" + '"' + ", function(){\n";
-					contlolPart += "\t\t\t\t\twindow.chrome.webview.postMessage(" + '"' + "ended" + '"' + ");\n";
-					contlolPart += "\t\t\t\t});\n";
-					//            v.addEventListener("loadeddata", function(){
-					//                playVideo();
-					//            }, false);
-					contlolPart += "\t\t\t}\n";
+                                                                      //メディアリソースの末尾に達して、再生が停止した時
+                    contlolPart += "\t\t\t\tv.addEventListener(" + '"' + "ended" + '"' + ", function(){\n";
+                    contlolPart += "\t\t\t\t\twindow.chrome.webview.postMessage(" + '"' + "ended" + '"' + ");\n";
+                    contlolPart += "\t\t\t\t});\n";
+                    //            v.addEventListener("loadeddata", function(){
+                    //                playVideo();
+                    //            }, false);
+                    contlolPart += "\t\t\t}\n";
                     ////メディアリソースの末尾に達して、再生が停止した時
                     //contlolPart += "\t\t\tv.onended = function ( event ) {\n";
                     //contlolPart += "\t\t\t\twindow.chrome.webview.postMessage(" + '"' + "ended" + '"' + ");\n";
