@@ -5,19 +5,15 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Text;
-using System.Windows.Controls;
 using System.Windows.Threading;
 using System.Threading;
 using M3UPlayer.Views;
-// H:\develop\dnet\AWFC2\M3UPlayer\M3UPlayer
-// H:\develop\2021\kyokutou1\uitest\Tab\TabCon\TabCon
 using System.IO;
 //using System.Windows;だとDragDropEffectsでエラー発生
 using System.Runtime.InteropServices;
 
 ///FileOpenDialogのカスタマイズ//////////////////////////////////////////////////////////////////////
 //WMP//////////////////////////////////////
-using System.Xml;                       //flv
 using ListBox = System.Windows.Controls.ListBox;
 //using Point = System.Drawing.Point;
 using Path = System.IO.Path;
@@ -26,22 +22,20 @@ using Path = System.IO.Path;
 using M3UPlayer.Models;
 using ContextMenu = System.Windows.Controls.ContextMenu;
 using MenuItem = System.Windows.Controls.MenuItem;
-using System.Windows.Threading;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using Microsoft.Azure.Cosmos.Core.Collections;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Text.RegularExpressions;
 using System.Collections;
 using Microsoft.Web.WebView2.Core;
 using System.Threading.Tasks;
-using System.Threading;
 using System.Windows.Media.Imaging;
-using System.Windows.Media;
 using System.Windows.Data;
-//using AxShockwaveFlashObjects;
-//using ShockwaveFlashObjects;
+using AxShockwaveFlashObjects;
+using ShockwaveFlashObjects;
+using AxWMPLib;
+using Microsoft.Web.WebView2.Wpf;
 
 namespace M3UPlayer.ViewModels {
     public class MainViewModel : INotifyPropertyChanged {
@@ -284,6 +278,27 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
+        private string _infoStr = "再生中のファイルに情報はありません";
+        /// <summary>
+        /// タイトルなどの表示
+        /// </summary>
+        public string infoStr {
+            //get { return GetDataBindItem<string>("Title").Value; }
+            //private set { GetDataBindItem<string>("Title").Value = value; }
+            get => _infoStr;
+            set {
+                if (_infoStr == value)
+                    return;
+                if (value.Equals("") || value == null) {
+                    _infoStr = "再生中のファイルに情報はありません";
+                } else {
+                    _infoStr = value;
+                }
+                RaisePropertyChanged("infoStr");
+            }
+        }
+
+
         private double _SliderValue;
         /// <summary>
         /// スライダー位置 
@@ -311,15 +326,22 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
-        public double FreamWidth { get; set; }
-        public double FreamHeigh { get; set; }
-
-
         public BitmapImage playImage;
         public BitmapImage pouseImage;
         public BitmapImage MuteOnImage;
         public BitmapImage MuteOffImage;
 
+        public bool toWeb = true;  // false;
+        public System.Windows.Forms.Integration.WindowsFormsHost host;
+        /// <summary>
+        /// WindowsMwdiaPlayer
+        /// </summary>
+        public AxWindowsMediaPlayer? axWmp;
+        //   public ShockwaveFlashObjects.FlashObject flash;
+        public AxShockwaveFlash? flash;
+
+        private WebView2 webView2;
+        //     public WsbViewModel WVM;
         private bool _IsPlaying;
         /// <summary>
         /// 再生中
@@ -337,10 +359,18 @@ namespace M3UPlayer.ViewModels {
                     RaisePropertyChanged("IsPlaying");
                     dbMsg += ">>IsPlaying==" + IsPlaying;
                     if (IsPlaying) {
-                        MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
+                        if (toWeb) {
+                            MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
+                        } else if (axWmp != null) {
+                            axWmp.Ctlcontrols.play();
+                        }
                         MyView.PlayBtImage.Source = pouseImage;
                     } else {
-                        MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").pause();");
+                        if (toWeb) {
+                            MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").pause();");
+                        } else if (axWmp != null) {
+                            axWmp.Ctlcontrols.pause();
+                        }
                         MyView.PlayBtImage.Source = playImage;
                     }
                     //RaisePropertyChanged("PlayBtImageSource");
@@ -395,13 +425,19 @@ namespace M3UPlayer.ViewModels {
                     RaisePropertyChanged("IsMute");
                     dbMsg += ">>IsMute=" + IsMute;
                     if (IsMute) {
-                        MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").volume=" + 0 + ";");
+                        if (toWeb) {
+                            MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").volume=" + 0 + ";");
+                        } else if (axWmp != null) {
+                            axWmp.settings.volume = 0;
+                        }
                         MyView.MuteBtImage.Source = MuteOnImage;
                     } else {
                         dbMsg += ",SoundValue=" + SoundValue;
-                        //double setVolVal = SoundValue ;
-                        //dbMsg += ">>" + setVolVal;
-                        MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").volume=" + SoundValue + ";");
+                        if (toWeb) {
+                            MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").volume=" + SoundValue + ";");
+                        } else if (axWmp != null) {
+                            axWmp.settings.volume = (int)Math.Round(SoundValue * 100);
+                        }
                         MyView.MuteBtImage.Source = MuteOffImage;
                     }
                     MyLog(TAG, dbMsg);
@@ -498,8 +534,6 @@ namespace M3UPlayer.ViewModels {
                 RaisePropertyChanged("PlayListComboSelected");
             }
         }
-
-        //     public WsbViewModel WVM;
         private Uri _TargetURI;
         /// <summary>
         /// webViewのSource
@@ -524,8 +558,6 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
-
-
         /// <summary>
         /// 最後に再生したメディアファイルの再生ポジション
         /// </summary>
@@ -540,6 +572,12 @@ namespace M3UPlayer.ViewModels {
             get { return Properties.Settings.Default.IsFullScreen; }
             set { Properties.Settings.Default.IsFullScreen = value; }
         }
+
+
+        public double FreamWidth { get; set; }
+        public double FreamHeigh { get; set; }
+
+
         //追加待ち///////////////////////////////////////////////////////////////////////////////////////////////////////////
         public int summaryCol = 2;
         public string[] videoFiles = new string[] {  ".mp4",".flv",".f4v",".webm",  ".ogv",".3gp",  ".rm",  ".asf",   ".swf",
@@ -647,6 +685,8 @@ namespace M3UPlayer.ViewModels {
                 SoundValue = Properties.Settings.Default.SoundValue;
                 ForwardCBComboSelected = Properties.Settings.Default.ForwardCBComboSelected;
                 RewCBComboSelected = Properties.Settings.Default.RewCBComboSelected;
+
+                flash = new AxShockwaveFlash();
 
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
@@ -1409,7 +1449,6 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
-
         /// <summary>
         /// プレイヤーへ
         /// </summary>
@@ -1420,11 +1459,17 @@ namespace M3UPlayer.ViewModels {
             string TAG = "PlayListToPlayer";
             string dbMsg = "";
             try {
-                //axWmp = null;
-                //if (0 < MyView.FrameGrid.Children.Count) {
-                //	dbMsg += ">delete既存=" + MyView.FrameGrid.Children.Count + "件";
-                //	MyView.FrameGrid.Children.RemoveAt(0);
-                //}
+                if (1 < MyView.FrameGrid.Children.Count) {
+                    dbMsg += ">delete既存=" + MyView.FrameGrid.Children.Count + "件";
+                    if (axWmp != null) {
+                        axWmp.close();
+                        axWmp = null;
+                        //}else if (flash != null) {
+                        //    flash.Dispose();
+                        //    flash = null;
+                    }
+                    MyView.FrameGrid.Children.RemoveAt(1);
+                }
                 //if (myview.mainframe.source != null) {
                 //	myview.mainframe.source = null;
                 //	//dbmsg += "既存=" + myview.mainframe.children.count + "件";
@@ -1434,139 +1479,196 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += "、targetURLStr=" + targetURLStr;
                 string extention = System.IO.Path.GetExtension(targetURLStr);
                 dbMsg += "、拡張子=" + extention;
-                bool toWeb = true;  // false;
-                                    //if (-1 < Array.IndexOf(WebVideo, extention) ||
-                                    //	targetURLStr.StartsWith("https")) {
-                                    //	toWeb = true;
-                                    //}
-                                    //Frame frame = new Frame();
-                dbMsg += "、Web=" + toWeb;
-                if (toWeb) {
-                    if (MyView == null) {
-                    } else {
-                        //             CallWeb();
-                        //WebView2のロード完了時のイベント
-                        MyView.webView.NavigationCompleted += WebView_NavigationCompleted; PlayListSaveBTVisble = "Hidden";
-                        //JavaScriptからのデータ送信    https://knooto.info/csharp-webview2-snippets/
-                        MyView.webView.WebMessageReceived += webView_CurrentTimeeReceived;
+                infoStr = targetItem.fileName;
+                toWeb = true;  // false;
 
-
-                        //video要素、audio要素をJavaScriptから操作する http://www.htmq.com/video/
-                        string tagStr = MakeVideoSouce(targetURLStr, 1000, 1000);
-                        dbMsg += "、tagStr\r\n" + tagStr;
-                        // 実行ディレクトリを取得
-                        dbMsg += "、\r\n" + Constant.currentDirectory;
-                        SaveFile(Constant.currentDirectory, tagStr);
-                        // ローカルファイルのURIを作成
-                        Uri uri = new Uri(Constant.currentDirectory);
-                        TargetURI = uri;
-                        RaisePropertyChanged("TargetURI");
-                        // WebView2にローカルファイルのURIを設定
-                        MyView.webView.CoreWebView2.Navigate(TargetURI.AbsoluteUri);
-                        IsPlaying = false;
-
-                        //               GetDuration();
-                        await Task.Run(() => {
-                            MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
-                        });
-                        ClickPlayBt();
-                    }
-                } else if (-1 < Array.IndexOf(FlashVideo, extention)) {
-                    //// Create the interop host control.
-                    //System.Windows.Forms.Integration.WindowsFormsHost host =
-                    //	new System.Windows.Forms.Integration.WindowsFormsHost();
-
-                    //// Create the ActiveX control.
-                    //PlayerWFCL.FlushControl axFLP = new PlayerWFCL.FlushControl(targetURLStr);
-                    // Assign the ActiveX control as the host control's child.
-                    //	host.Child = axFLP;
-
-                    //	// Add the interop host control to the Grid
-                    //	// control's collection of child controls.
-                    //	MyView.FrameGrid.Children.Add(host);
-
-                    ////	//		axFLP.InitAxShockwaveFlash();
-                    ////	axFLP.AddURl(targetURLStr);
-
-
-                    //	//if (axFLP.SFPlayer != null) {
-                    //	//} else {
-                    //	//	dbMsg += ">>FlushControl生成できず";
-                    //	//}
-
-                } else {
-                    //// Create the interop host control.
-                    //System.Windows.Forms.Integration.WindowsFormsHost host =
-                    //	new System.Windows.Forms.Integration.WindowsFormsHost();
-
-                    //// Create the ActiveX control.
-                    //axWmp = new PlayerWFCL.WMPControl(targetURLStr);
-
-                    //// Assign the ActiveX control as the host control's child.
-                    //host.Child = axWmp;
-
-                    //// Add the interop host control to the Grid
-                    //// control's collection of child controls.
-                    //MyView.FrameGrid.Children.Add(host);
-                    //axWmp.ReSizeContlor((int)MyView.FrameGrid.Width , (int)MyView.FrameGrid.Height);
-                    //// Play a .wav file with the ActiveX control.
-                    //axWmp.AddURl(targetURLStr);
-                    //double playPosition = axWmp.GetPlayPosition();
-                    //DurationStr = "00:00:00";
-                    //double playDuration = axWmp.GetDuration();
-                    //if (0 < playDuration) {
-                    //	TimeSpan span = new TimeSpan(0, 0, (int)playDuration);
-                    //	DurationStr = span.ToString("HH:mm:ss");
-                    //}
-                    //RaisePropertyChanged("DurationStr");
-                    //SetupTimer();
-                    //// player = axWmp.GetPlayer();
-                    ////player.currentMedia.
-                }
-                //} else {
-                //	dbMsg += ">>MyView == null";
+                //if (-1 < Array.IndexOf(WebVideo, extention) ||
+                //	targetURLStr.StartsWith("https")) {
+                //	toWeb = true;
                 //}
+                //Frame frame = new Frame();
+                dbMsg += "、[" + FreamWidth + "×" + FreamHeigh + "]";
+                if (extention.Equals(".mp4") ||
+                    extention.Equals(".flv") ||
+                     extention.Equals(".wmv")
+                   ) {
+                    host = new System.Windows.Forms.Integration.WindowsFormsHost();
+                    //       host.HorizontalAlignment= "Stretch"
+                    toWeb = false;
+                    MyView.webView.Visibility = Visibility.Hidden;
+                }
+                dbMsg += "、Web=" + toWeb;
+                if (MyView == null) {
+                } else if (toWeb) {
+                    MyView.webView.Visibility = Visibility.Visible;
+                    //WebView2のロード完了時のイベント
+                    MyView.webView.NavigationCompleted += WebView_NavigationCompleted; PlayListSaveBTVisble = "Hidden";
+                    //JavaScriptからのデータ送信    https://knooto.info/csharp-webview2-snippets/
+                    MyView.webView.WebMessageReceived += webView_CurrentTimeeReceived;
+
+
+                    //video要素、audio要素をJavaScriptから操作する http://www.htmq.com/video/
+                    string tagStr = MakeVideoSouce(targetURLStr, (int)FreamWidth - 24, (int)FreamHeigh - 24);
+                    dbMsg += "、tagStr\r\n" + tagStr;
+                    // 実行ディレクトリを取得
+                    dbMsg += "、\r\n" + Constant.currentDirectory;
+                    SaveFile(Constant.currentDirectory, tagStr);
+                    // ローカルファイルのURIを作成
+                    Uri uri = new Uri(Constant.currentDirectory);
+                    TargetURI = uri;
+                    RaisePropertyChanged("TargetURI");
+                    // WebView2にローカルファイルのURIを設定
+                    MyView.webView.CoreWebView2.Navigate(TargetURI.AbsoluteUri);
+                    IsPlaying = false;
+
+                    //               GetDuration();
+                    await Task.Run(() => {
+                        MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
+                    });
+                    ClickPlayBt();
+                } else if (extention.Equals(".mp4") ||
+                             extention.Equals(".wmv")
+                            ) {
+                    //       System.Windows.Forms.Integration.WindowsFormsHost host = new System.Windows.Forms.Integration.WindowsFormsHost();
+                    axWmp = new AxWindowsMediaPlayer();
+                    host.Child = axWmp;
+                    MyView.FrameGrid.Children.Add(host);
+                    axWmp.stretchToFit = true;
+                    axWmp.URL = targetURLStr;
+                    AxWMPLib._WMPOCXEvents_MediaChangeEventHandler handler = null;
+                    handler = delegate (object sender, AxWMPLib._WMPOCXEvents_MediaChangeEvent e) {
+                        axWmp.MediaChange -= handler;
+
+                        // 新しいメディア情報の取得；これでしかdurationを取得できなかった
+                        WMPLib.IWMPMedia media = (WMPLib.IWMPMedia)e.item;
+                        SliderMaximum = media.duration;                   ///GetDuration();
+                        RaisePropertyChanged("SliderMaximum");
+                        if (0 < SliderMaximum) {
+                            DurationStr = media.durationString;                  // span.ToString("HH:mm:ss");
+                        }
+                        RaisePropertyChanged("DurationStr");
+                    };
+                    axWmp.MediaChange += handler;
+                    SetupTimer();
+                    //    axWmp.PositionChange += axWindowsMediaPlayer_PositionChange;  //はシークなどの操作がされた時のみ発生  
+                    // UIを無効化
+                    axWmp.uiMode = "none";
+                    infoStr = axWmp.currentMedia.name;
+                } else if (extention.Equals(".flv")) {
+
+                    //  https://csharp.hotexamples.com/jp/examples/AxShockwaveFlashObjects/AxShockwaveFlash/-/php-axshockwaveflash-class-examples.html
+
+                    if (flash == null) {
+                        flash = new AxShockwaveFlash();
+                    }
+
+                    flash.BeginInit();
+                    flash.Name = "flashPlayer";
+                    flash.EndInit();
+
+                    host.Child = flash;
+                    MyView.FrameGrid.Children.Add(host);
+                    //System.Runtime.InteropServices.COMException: 'クラスが登録されていません (0x80040154 (REGDB_E_CLASSNOTREG))'
+                    //>>C:\Windows\System32\FlashにFlash.ocxなどをコピー
+                    //>>ツール/ツールボックスアイテムの選択 のCOMコンポーネントタグから参照して読み込ませる
+                    //>>(これでもツールボックスには表示されない)
+                    //     flashMovie.stretchToFit = true;
+                    dbMsg += ",assemblyPath=" + assemblyPath;
+                    string[] urlStrs = assemblyPath.Split(Path.DirectorySeparatorChar);
+                    assemblyName = urlStrs[urlStrs.Length - 1];
+                    dbMsg += ">>" + assemblyName;
+                    playerUrl = @assemblyPath.Replace(assemblyName, "fladance.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
+                                                                                           //		string nextMove = assemblyPath.Replace( assemblyName, "tonext.htm" );
+                    dbMsg += ",playerUrl=" + playerUrl;
+                    //,playerUrl=C:\Users\博臣\source\repos\file_tree_clock_web1\file_tree_clock_web1\bin\Debug\fladance.swf 
+                    if (File.Exists(playerUrl)) {
+                        dbMsg += ",Exists=true";
+                    } else {
+                        dbMsg += ",Exists=false";
+                    }
+
+                    ////clsId = "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000";       //ブラウザーの ActiveX コントロール
+                    ////codeBase = @"http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0";
+                    ////string pluginspage = @"http://www.macromedia.com/go/getflashplayer";
+                    string flashVvars = @"fms_app=&video_file=" + targetURLStr + "&" +       // & amp;		"link_url ="+ nextMove + "&" +
+                                                            "image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10" + '"';
+                    flash.FlashVars = flashVvars;
+                    flash.MovieData = targetURLStr;
+                    flash.LoadMovie(0, playerUrl);
+                    flash.AllowScriptAccess = "always";
+                    //string playre = flash.Movie;
+
+                    /*
+                     			<object id="wiPlayer" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" width="2813" height="1606">
+				<param name="FlashVars" value="fms_app=&video_file=file:///P:/%E5%86%8D%E7%94%9F/FLV/bvyu4tbrnks8xleniv84zhgrbhtb4urlvb738anwx83%20uyt7wvyt4aiwy3ndy4renkty7sbt/1.flv&image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10"/>
+				<param name= "allowFullScreen" value="true"/>
+				<param name ="movie" value="H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\fladance.swf"/>
+				<embed name="wiPlayer" src="H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\fladance.swf"
+					 width="2813" height= "1606" type="application/x-shockwave-flash" allowfullscreen="true"
+					 flashvars="fms_app=&video_file=file:///P:/%E5%86%8D%E7%94%9F/FLV/bvyu4tbrnks8xleniv84zhgrbhtb4urlvb738anwx83%20uyt7wvyt4aiwy3ndy4renkty7sbt/1.flv&image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10" type="application/x-shockwave-flash"/>
+		</object>
+                     
+                     */
+                }
+
+                RaisePropertyChanged("infoStr");
+                dbMsg += "、infoStr=" + infoStr;
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
 
+        void axWindowsMediaPlayer_PositionChange(object sender, AxWMPLib._WMPOCXEvents_PositionChangeEvent e) {
+            //   SliderValue = axWmp.Ctlcontrols.currentPosition;                        //GetPlayPosition();
+            SliderValue = e.newPosition;
+            RaisePropertyChanged("SliderValue");
+            //	TimeSpan span = new TimeSpan(0, 0, (int)SliderValue);
+            PositionStr = GetHMS(SliderValue.ToString());             //.ToString(@"hh\:mm\:ss");
+            //axWmp.Ctlcontrols.currentPositionString;                   //
+            RaisePropertyChanged("PositionStr");
+        }
+
+
         // タイマメソッド
         private void MyTimerMethod(object sender, EventArgs e) {
             string TAG = "MyTimerMethod";
             string dbMsg = "";
             try {
-                //if (axWmp != null) {
-                //	this.IsPlaying = axWmp.IsPlaying;
-                //	dbMsg += ":IsPlaying=" + IsPlaying;
-                //	double position = axWmp.GetPlayPosition();
-                //	SliderMaximum = axWmp.GetDuration();
-                //	dbMsg += "," + position;
-                //	if (0 < position) {
-                //		TimeSpan span = new TimeSpan(0, 0, (int)position);
-                //		this.PositionStr = span.ToString(@"hh\:mm\:ss");
-                //		if (position < 1) {
-                //			SliderMaximum = axWmp.GetDuration();
-                //			dbMsg +=  " / " + SliderMaximum ;
-                //			span = new TimeSpan(0, 0, (int)SliderMaximum);
-                //			this.DurationStr = span.ToString(@"hh\:mm\:ss");
-                //		}
-                //		SliderValue = position;
-                //	} else {
-                //		this.DurationStr ="00:00:00";
-                //		this.PositionStr = "00:00:00";
-                //	}
-                //	dbMsg += ",>>" + PositionStr + " / " + DurationStr;
-                //	SoundValue = axWmp.GetVolume();
-                //	dbMsg += "," + SoundValue;
-                //	if (SoundValue == 0) {
-                //		IsMute = true;
-                //	} else {
-                //		IsMute = false;
-                //	}
+                if (axWmp != null) {
+                    SliderValue = axWmp.Ctlcontrols.currentPosition;                        //GetPlayPosition();
+                    RaisePropertyChanged("SliderValue");
+                    PositionStr = GetHMS(SliderValue.ToString());             //.ToString(@"hh\:mm\:ss");
+                    RaisePropertyChanged("PositionStr");
+                    //this.IsPlaying = axWmp.IsPlaying;
+                    //dbMsg += ":IsPlaying=" + IsPlaying;
+                    //double position = axWmp.GetPlayPosition();
+                    //SliderMaximum = axWmp.GetDuration();
+                    //dbMsg += "," + position;
+                    //if (0 < position) {
+                    //	TimeSpan span = new TimeSpan(0, 0, (int)position);
+                    //	this.PositionStr = span.ToString(@"hh\:mm\:ss");
+                    //	if (position < 1) {
+                    //		SliderMaximum = axWmp.GetDuration();
+                    //		dbMsg += " / " + SliderMaximum;
+                    //		span = new TimeSpan(0, 0, (int)SliderMaximum);
+                    //		this.DurationStr = span.ToString(@"hh\:mm\:ss");
+                    //	}
+                    //	SliderValue = position;
+                    //} else {
+                    //	this.DurationStr = "00:00:00";
+                    //	this.PositionStr = "00:00:00";
+                    //}
+                    //dbMsg += ",>>" + PositionStr + " / " + DurationStr;
+                    //SoundValue = axWmp.GetVolume();
+                    //dbMsg += "," + SoundValue;
+                    //if (SoundValue == 0) {
+                    //	IsMute = true;
+                    //} else {
+                    //	IsMute = false;
+                    //}
 
-                //}
+                }
                 //			RaisePropertyChanged();
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
@@ -3331,7 +3433,11 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += " / " + SliderMaximum;
                 IsPlaying = false;
                 RaisePropertyChanged("IsPlaying");
-                await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
+                if (toWeb) {
+                    await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
+                } else if (axWmp != null) {
+                    axWmp.Ctlcontrols.currentPosition = newPosition;
+                }
                 IsPlaying = true;
                 RaisePropertyChanged("IsPlaying");
                 MyLog(TAG, dbMsg);
@@ -3360,7 +3466,12 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += " / " + SliderMaximum;
                 IsPlaying = false;
                 RaisePropertyChanged("IsPlaying");
-                await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
+                if (toWeb) {
+                    await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
+                } else if (axWmp != null) {
+                    axWmp.Ctlcontrols.currentPosition = newPosition;
+                }
+                //await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
                 IsPlaying = true;
                 RaisePropertyChanged("IsPlaying");
                 MyLog(TAG, dbMsg);
@@ -3446,8 +3557,13 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += ",SoundValue=" + SoundValue;
                 //double setVolVal = (double)SoundValue/100;
                 //dbMsg += ">>" + setVolVal;
-                await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").volume=" + SoundValue + ";");
-                //SoundValue =(int) setVolVal*100;
+                if (toWeb) {
+                    await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").volume=" + SoundValue + ";");
+                } else if (axWmp != null) {
+                    dbMsg += ",volume=" + axWmp.settings.volume;
+                    axWmp.settings.volume = (int)Math.Round(SoundValue * 100);
+                    dbMsg += ">>" + axWmp.settings.volume;
+                }
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
@@ -3475,11 +3591,9 @@ namespace M3UPlayer.ViewModels {
         }
 
 
+        //WindowsMediaPlayer  /////////////////////////////////////////////////////////////////////////////// プレイヤーコントロール　///
 
-
-        //プログレス/////////////////////////////////////////////////////////////////////////////// プレイヤーコントロール　///
-
-        ///以下使用待ち///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///以下使用待ち//////////////////////////////////////////////////////////////////////////////////////////WindowsMediaPlayer  ///
 
         Microsoft.Win32.RegistryKey regkey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(FEATURE_BROWSER_EMULATION);
         const string FEATURE_BROWSER_EMULATION = @"Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION";
@@ -4562,8 +4676,9 @@ AddType video/MP2T .ts
                 contlolPart += "\t\t<meta http - equiv = " + '"' + "X - UA - Compatible" + '"' + " content = " + '"' + "IE = edge,chrome = 1" + '"' + " />\n";
                 contlolPart += "\t</head>\n";
 
-                if (extentionStr == ".mp4" ||    // ★video要素、audio要素をJavaScriptから操作する   http://www.htmq.com/video/#ui 
-                    extentionStr == ".webm" ||  //http://mrs.suzu841.com/mini_memo/numero_23.html
+                if (extentionStr == ".webm" ||    // ★video要素、audio要素をJavaScriptから操作する   http://www.htmq.com/video/#ui 
+                                                  //           extentionStr == ".flv" ||  //http://mrs.suzu841.com/mini_memo/numero_23.html
+                    extentionStr == ".mp4" ||
                     extentionStr == ".ogv"
                     ) {
                     contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#333333;" + '"' + " onLoad=" + '"' + "myOnLoad()" + '"' + ">\n";
@@ -4584,6 +4699,8 @@ AddType video/MP2T .ts
                    extentionStr == ".f4v" ||
                    extentionStr == ".swf"
                    ) {
+                    //  https://so-zou.jp/web-app/tech/html/sample/video.htm
+                    //  https://tridentwebdesign.blog.fc2.com/blog-entry-279.html
                     Uri urlObj = new Uri(fileName);
                     if (urlObj.IsFile) {             //Uriオブジェクトがファイルを表していることを確認する
                         fileName = urlObj.AbsoluteUri;                 //Windows形式のパス表現に変換する
@@ -4592,13 +4709,21 @@ AddType video/MP2T .ts
                     dbMsg += ",assemblyPath=" + assemblyPath;
                     string[] urlStrs = assemblyPath.Split(Path.DirectorySeparatorChar);
                     assemblyName = urlStrs[urlStrs.Length - 1];
-                    playerUrl = assemblyPath.Replace(assemblyName, "fladance.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
-                                                                                          //		string nextMove = assemblyPath.Replace( assemblyName, "tonext.htm" );
-                    dbMsg += ",assemblyName=" + assemblyName;
-                    dbMsg += ",playerUrl=" + playerUrl;//,playerUrl=C:\Users\博臣\source\repos\file_tree_clock_web1\file_tree_clock_web1\bin\Debug\fladance.swf 
+                    dbMsg += ">>" + assemblyName;
+                    playerUrl = @assemblyPath.Replace(assemblyName, "fladance.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
+                                                                                           //		string nextMove = assemblyPath.Replace( assemblyName, "tonext.htm" );
+                    dbMsg += ",playerUrl=" + playerUrl;
+                    //,playerUrl=C:\Users\博臣\source\repos\file_tree_clock_web1\file_tree_clock_web1\bin\Debug\fladance.swf 
+                    if (File.Exists(playerUrl)) {
+                        dbMsg += ",Exists=true";
+                    } else {
+                        dbMsg += ",Exists=false";
+                    }
+
+
                     clsId = "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000";       //ブラウザーの ActiveX コントロール
-                    codeBase = "http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0";
-                    string pluginspage = "http://www.macromedia.com/go/getflashplayer";
+                    codeBase = @"http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0";
+                    string pluginspage = @"http://www.macromedia.com/go/getflashplayer";
                     dbMsg += "[" + webWidth + "×" + webHeight + "]";        //4/3=1.3		1478/957=1.53  801/392=2.04
                     /*		if (4 / 3 < webWidth / webHeight) {
                                 webWidth = webHeight/3*4;		.
@@ -4606,8 +4731,9 @@ AddType video/MP2T .ts
                                 webWidth = webHeight / 3 * 4;
                             }
                             dbMsg += ">>[" + webWidth + "×" + webHeight + "]";*/
-                    string flashVvars = "fms_app=&video_file=" + fileName + "&" +       // & amp;		"link_url ="+ nextMove + "&" +
+                    string flashVvars = @"fms_app=&video_file=" + fileName + "&" +       // & amp;		"link_url ="+ nextMove + "&" +
                                              "image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10" + '"';
+                    //常にバーを表示する
                     contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#333333;" + '"' + ">\n";
                     contlolPart += "\t\t<div class=" + '"' + "middle" + '"' + " style =" + '"' + "padding: 0px; " + '"' + " >\n";
 
@@ -4616,22 +4742,39 @@ AddType video/MP2T .ts
                                     " codebase=" + '"' + codeBase + '"' +
                                     " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
                                      ">\n";
-                    contlolPart += "\t\t\t<param name=" + '"' + "FlashVars" + '"' + " value=" + '"' + flashVvars + '"' + "/>\n";                        //常にバーを表示する
-                    contlolPart += "\t\t\t<param name= " + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>\n";
-                    contlolPart += "\t\t\t<param name =" + '"' + "movie" + '"' + " value=" + '"' + playerUrl + '"' + "/>\n";
+                    contlolPart += "\t\t\t\t<param name=" + '"' + "FlashVars" + '"' + " value=" + '"' + flashVvars + "/>\n";   // + '"'  
+                    contlolPart += "\t\t\t\t<param name= " + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>\n";
+                    contlolPart += "\t\t\t\t<param name =" + '"' + "movie" + '"' + " value=" + '"' + playerUrl + '"' + "/>\n";
                     contlolPart += "\t\t\t\t<embed name=" + '"' + wiPlayerID + '"' +
-                                                " src=" + '"' + playerUrl + '"' +            // "file://" + fileName
-                                                                                             //		"left=-10 width=100% height= auto" +            // '"' + webWidth + '"'
-                                                " width=" + '"' + webWidth + '"' + " height= " + '"' + webHeight + '"' +            // '"' + webWidth + '"'
+                                                " src=" + '"' + playerUrl + '"' + "\n" +            // "file://" + fileName
+                                                                                                    //		"left=-10 width=100% height= auto" +         // '"' + webWidth + '"'
+                                     "\t\t\t\t\t width=" + '"' + webWidth + '"' + " height= " + '"' + webHeight + '"' +            // '"' + webWidth + '"'
                                                 " type=" + '"' + mineTypeStr + '"' +
-                                                " allowfullscreen=" + '"' + " true= " + '"' +
-                                                " flashvars=" + '"' + flashVvars + '"' +
+                                                " allowfullscreen=" + '"' + "true" + '"' + "\n" +
+                                                "\t\t\t\t\t flashvars=" + '"' + flashVvars +          //+ '"' 
                                                 " type=" + '"' + "application/x-shockwave-flash" + '"' +
-                                                " pluginspage=" + '"' + pluginspage + '"' +
-                                       "/>\n";
+                                                //"\n\t\t\t\t\t pluginspage=" + '"' + pluginspage + '"' +
+                                                "/>\n";
 
-                    //              comentStr = souceName + " ; プレイヤーには「ふらだんす」http://www.streaming.jp/fladance/　を使っています。" + dbWorning;
+                    // 「ふらだんす」http://www.streaming.jp/fladance/　を使っています。" + dbWorning;
+                    /*
+                     
+                      <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" 
+                                codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" 
+                                width="横幅" height="高さ">
+                        <param name = "flashvars" value = "fms_app=FMSアプリケーションディレクトリのパス&video_file=動画ファイルのパス&image_file=サムネイル画像のパス&link_url=リンク先のURL&autoplay=オートプレイのON・OFF&mute=ミュートのON・OFF&volume=音量&controller=操作パネルの表示・非表示&buffertime=バッファ時間" />
+                        <param name="allowFullScreen" value="フルスクリーン化を可能にするかどうか" />
+                        <param name="movie" value="ふらだんすswfファイルのパス" />
 
+                            <embed src="ふらだんすswfファイルのパス" width="横幅" height="高さ" allowFullScreen="フルスクリーン化を可能にするかどうか" flashvars="fms_app=FMSアプリケーションディレクトリのパス&video_file=動画ファイルのパス&image_file=サムネイル画像のパス&link_url=リンク先のURL&autoplay=オートプレイのON・OFF&mute=ミュートのON・OFF&volume=音量&controller=操作パネルの表示・非表示&buffertime=バッファ時間" 
+                                type="application/x-shockwave-flash" 
+                                pluginspage="http://www.macromedia.com/go/getflashplayer" />
+                    </object>
+                     
+                     
+                     
+                     
+                     */
                     /*				playerUrl = assemblyPath.Replace(assemblyName, "flvplayer-305.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
                                                                                                                //	string flashVvars = "fms_app=&video_file=" + fileName + "&" +       // & amp;
                                     contlolPart += "<object id=" + '"' + wiPlayerID + '"' +

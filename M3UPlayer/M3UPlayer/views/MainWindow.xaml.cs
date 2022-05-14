@@ -43,7 +43,6 @@ namespace M3UPlayer.Views {
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
-
 		}
 
 		/// <summary>

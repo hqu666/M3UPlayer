@@ -20,10 +20,30 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.25.0" />
+    <PackageReference Include="CrystalReports.ShockwaveFlashObjects" Version="13.0.4001" />
+    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.27.0" />
     <PackageReference Include="Microsoft.VisualStudio.Services.Client" Version="16.170.0" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1150.38" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1210.39" />
     <PackageReference Include="WindowsAPICodePack" Version="1.1.2" />
+    <PackageReference Include="WMPLib" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="AxInterop.ShockwaveFlashObjects">
+      <HintPath>H:\develop\dnet\AWFC2\AxInterop.ShockwaveFlashObjects.dll</HintPath>
+    </Reference>
+    <Reference Include="AxInterop.WMPLib">
+      <HintPath>H:\develop\dnet\AWFC2\AxInterop.WMPLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.ShockwaveFlashObjects">
+      <HintPath>H:\develop\dnet\AWFC2\Interop.ShockwaveFlashObjects.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.WMPLib">
+      <HintPath>H:\develop\dnet\AWFC2\Interop.WMPLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

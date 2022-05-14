@@ -40,9 +40,13 @@
         "net6.0-windows7.0": {
           "targetAlias": "net6.0-windows",
           "dependencies": {
+            "CrystalReports.ShockwaveFlashObjects": {
+              "target": "Package",
+              "version": "[13.0.4001, )"
+            },
             "Microsoft.Azure.Cosmos": {
               "target": "Package",
-              "version": "[3.25.0, )"
+              "version": "[3.27.0, )"
             },
             "Microsoft.VisualStudio.Services.Client": {
               "target": "Package",
@@ -50,7 +54,13 @@
             },
             "Microsoft.Web.WebView2": {
               "target": "Package",
-              "version": "[1.0.1150.38, )"
+              "version": "[1.0.1210.39, )"
+            },
+            "WMPLib": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.0.0, )"
             },
             "WindowsAPICodePack": {
               "target": "Package",
