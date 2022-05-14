@@ -3,12 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-      xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
-      xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
-      xmlns:igEditors="http://infragistics.com/Editors"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+        xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
+        xmlns:igEditors="http://infragistics.com/Editors"
 		xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
-	   xmlns:local="clr-namespace:M3UPlayer"
+	    xmlns:local="clr-namespace:M3UPlayer"
 		xmlns:v="clr-namespace:M3UPlayer.Views"
 		xmlns:vm="clr-namespace:M3UPlayer.ViewModels" 
         xmlns:Wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf" 
@@ -289,7 +289,7 @@
                     </behaviors:Interaction.Triggers>-->
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="URL"
-                                            Binding="{Binding GranDir}" 
+                                            Binding="{Binding UrlStr}" 
                                             Width="*"
                                             >
                             <DataGridTextColumn.ElementStyle>
@@ -427,28 +427,16 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <!--ここで動画再生-->
-                <Grid x:Name="FrameGrid">
+                <Grid x:Name="FrameGrid"
+                      >
                     <!--<Frame x:Name="frame" Background="#555" />-->
                     <Wpf:WebView2  Name="webView"
   					    Source="{Binding TargetURI, Mode=TwoWay}" 
                         HorizontalAlignment="Stretch" 
                         VerticalAlignment="Stretch"
-                     />
-                    <!--
-                                            NavigationCompleted="WebView_NavigationCompleted"
-
-                    Navigating="Frame_Navigating"    NavigationUIVisibility="Hidden" 
-                        
-					    NavigationStarting="WebView_NavigationStarting" 
-					    SourceUpdated="WebView_SourceUpdated" 
-					    ContentLoading="WebView_ContentLoading" 
-					    WebMessageReceived="WebView_WebMessageReceived" 
-					    RequestBringIntoView="WebView_RequestBringIntoView" 
-					    TargetUpdated="WebView_TargetUpdated" 
-					    MouseUp="WebView_MouseUp" 
-					    GotMouseCapture="WebView_GotMouseCapture" 
-					    MouseLeftButtonDown="WebView_MouseLeftButtonDown" 
-                    -->
+                    />
+                    <!--Width="{Binding FreamWidth, Mode=TwoWay}" 
+                        Height="{Binding FreamHeigh, Mode=TwoWay}"-->
                 </Grid>
 
                 <Grid x:Name="PlayerContlolGR" 
@@ -484,6 +472,12 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition  Width="*" />
                             </Grid.ColumnDefinitions>
+                            <TextBlock  Grid.Column="0"
+                                        Margin="0,0,6,0" 
+                                       Background="Transparent" 
+                                       Text="{Binding infoStr, Mode=TwoWay}"
+                                       FontSize="24" 
+                                       Foreground="White"/>
                             <StackPanel  Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                                 <TextBlock Grid.Column="0"
                                         Margin="0,0,0,0" 
@@ -853,7 +847,7 @@
                                       MinWidth="50" 
                                       Margin="10,0,5,0"
                                       >
-                            <!--
+                                <!--
                                        SelectedValuePath="Key" 
                                       DisplayMemberPath="Value"
                                           SelectedIndex="{Binding ForwardCBSelectedIndex, Mode=TwoWay}"

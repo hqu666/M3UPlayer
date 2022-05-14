@@ -4,14 +4,22 @@
 		<meta charset=utf-8>
 		<meta http - equiv = "X - UA - Compatible" content = "IE = edge,chrome = 1" />
 	</head>
-	<body style = "background-color: #000000;color:#333333;">
+	<body style = "background-color: #000000;color:#333333;" onLoad="myOnLoad()">
 		<div class="middle" style ="padding: 0px; " >
-			<object id="wiPlayer" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" width="1000" height="1000">
-			<param name="FlashVars" value="fms_app=&video_file=file:///P:/%E5%86%8D%E7%94%9F/FLV/bvyu4tbrnks8xleniv84zhgrbhtb4urlvb738anwx83%20uyt7wvyt4aiwy3ndy4renkty7sbt/1.flv&image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10""/>
-			<param name= "allowFullScreen" value="true"/>
-			<param name ="movie" value="H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\fladance.swf"/>
-				<embed name="wiPlayer" src="H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\fladance.swf" width="1000" height= "1000" type="application/x-shockwave-flash" allowfullscreen=" true= " flashvars="fms_app=&video_file=file:///P:/%E5%86%8D%E7%94%9F/FLV/bvyu4tbrnks8xleniv84zhgrbhtb4urlvb738anwx83%20uyt7wvyt4aiwy3ndy4renkty7sbt/1.flv&image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10"" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"/>
-		</object>
+			<video id="wiPlayer" controls style = "width:-webkit-fill-available ;height:-webkit-fill-available;text-align: center;">
+				<source src="file://P:\DL\3\japanese amateur homemade\4_20min.mp4" type="video/mp4">
+			</video>
 		</div>
+		<script type="text/javascript">
+			var v = document.getElementById("wiPlayer");
+			function myOnLoad() {
+				v.addEventListener("timeupdate", function(){
+					window.chrome.webview.postMessage(v.currentTime+"");
+				}, false);
+				v.addEventListener("ended", function(){
+					window.chrome.webview.postMessage("ended");
+				});
+			}
+		</script>
 	</body>
 </html>

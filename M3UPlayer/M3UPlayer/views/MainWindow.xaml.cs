@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using M3UPlayer.Models;
 using M3UPlayer.ViewModels;
 
@@ -84,6 +85,15 @@ namespace M3UPlayer.Views {
 				if (Double.Parse(ListColumnDefinition.Width.ToString()) < 600) {
 					ListColumnDefinition.Width = new GridLength(600);
 				}
+				Dispatcher.BeginInvoke(new Action(() => {
+					VM.FreamWidth = webView.ActualWidth;
+					VM.FreamHeigh = webView.ActualHeight;
+				}),
+				DispatcherPriority.Loaded);
+				SizeChanged += (sender, args) => {
+					VM.FreamWidth = webView.ActualWidth;
+					VM.FreamHeigh = webView.ActualHeight;
+				};
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
@@ -144,7 +154,7 @@ namespace M3UPlayer.Views {
 				VM.BeforeClose();
 				dbMsg += "、WindowState=" + WindowState;
 				if (WindowState == WindowState.Normal) {
-					dbMsg += "(" + Left + "," + Top + ")[" + Width + "," + Height + "]";                    
+					dbMsg += "(" + Left + "," + Top + ")[" + Width + "," + Height + "]";
 					// ウィンドウの値を Settings に格納
 					Properties.Settings.Default.WindowLeft = Left;
 					Properties.Settings.Default.WindowTop = Top;

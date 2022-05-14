@@ -9,9 +9,6 @@ using System.Windows.Controls;
 using System.Windows.Threading;
 using System.Threading;
 using M3UPlayer.Views;
-//using ShockwaveFlashObjects;
-
-
 // H:\develop\dnet\AWFC2\M3UPlayer\M3UPlayer
 // H:\develop\2021\kyokutou1\uitest\Tab\TabCon\TabCon
 using System.IO;
@@ -44,6 +41,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows.Data;
 //using AxShockwaveFlashObjects;
+//using ShockwaveFlashObjects;
 
 namespace M3UPlayer.ViewModels {
     public class MainViewModel : INotifyPropertyChanged {
@@ -312,6 +310,10 @@ namespace M3UPlayer.ViewModels {
                 }
             }
         }
+
+        public double FreamWidth { get; set; }
+        public double FreamHeigh { get; set; }
+
 
         public BitmapImage playImage;
         public BitmapImage pouseImage;
