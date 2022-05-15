@@ -75,3 +75,7 @@ C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\obj\
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\obj\Debug\net6.0-windows\M3UPlayer.pdb
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\obj\Debug\net6.0-windows\M3UPlayer.genruntimeconfig.cache
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\obj\Debug\net6.0-windows\ref\M3UPlayer.dll
+C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\EmbedFlash.swf
+C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\fladance.swf
+C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\flaver.swf
+C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\flvplayer-305.swf
