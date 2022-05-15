@@ -5,6 +5,7 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,16 +34,18 @@
 
   <ItemGroup>
     <Reference Include="AxInterop.ShockwaveFlashObjects">
-      <HintPath>H:\develop\dnet\AWFC2\AxInterop.ShockwaveFlashObjects.dll</HintPath>
+      <HintPath>..\..\..\..\dnet\AWFC2\AxInterop.ShockwaveFlashObjects.dll</HintPath>
+      <CopyLocal>True</CopyLocal>
     </Reference>
     <Reference Include="AxInterop.WMPLib">
-      <HintPath>H:\develop\dnet\AWFC2\AxInterop.WMPLib.dll</HintPath>
+      <HintPath>..\..\..\..\dnet\AWFC2\AxInterop.WMPLib.dll</HintPath>
     </Reference>
     <Reference Include="Interop.ShockwaveFlashObjects">
-      <HintPath>H:\develop\dnet\AWFC2\Interop.ShockwaveFlashObjects.dll</HintPath>
+      <HintPath>..\..\..\..\dnet\AWFC2\Interop.ShockwaveFlashObjects.dll</HintPath>
+      <CopyLocal>True</CopyLocal>
     </Reference>
     <Reference Include="Interop.WMPLib">
-      <HintPath>H:\develop\dnet\AWFC2\Interop.WMPLib.dll</HintPath>
+      <HintPath>..\..\..\..\dnet\AWFC2\Interop.WMPLib.dll</HintPath>
     </Reference>
   </ItemGroup>
 
@@ -67,6 +70,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="AxInterop.ShockwaveFlashObjects.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

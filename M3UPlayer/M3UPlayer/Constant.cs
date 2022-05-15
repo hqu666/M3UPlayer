@@ -12,7 +12,7 @@ namespace M3UPlayer {
 		public static bool errorCheckNow = true;
 		public static int MyFontSize = 12;
 
-		public static string WebStratUrl = "https://www.yahoo.co.jp/?fr=top_ga1_ext1_bookmark";         //webViewのデフォルト表示ページ
+        public static string WebStratUrl = "https://www.yahoo.co.jp/?fr=top_ga1_ext1_bookmark";         //webViewのデフォルト表示ページ
 		public static string CurrentFolder = "";                    //現在の対象フォルダ
 		public static string RootFolderURL;
 		public static double SoundValue = 0.5;
@@ -37,10 +37,10 @@ namespace M3UPlayer {
 		//public static string CliantId = "912719822179-n9hvcs7tr9pqgn8mns7pdl5njo54gpe1.apps.googleusercontent.com";    //クライアント ID
 		//public static string CliantSeacret = "aGVZ_mfTKJq8WFf5spDOOiHi";    //クライアント シークレット
 		//      public static string DriveId;
-		public static string GoogleLogInPage = @"https://accounts.google.com/signin/v2/identifier?service=mail&flowName=GlifWebSignIn&flowEntry=ServiceLogin";
-		public static string GoogleAcountMSG = "";          //"YourGoogleAcount@gmail.com";
+		public static string GoogleLogInPage =@"https://accounts.google.com/signin/v2/identifier?service=mail&flowName=GlifWebSignIn&flowEntry=ServiceLogin";
+		public static string GoogleAcountMSG = "";			//"YourGoogleAcount@gmail.com";
 
-		//      public static UserCredential MyCalendarCredential;
+  //      public static UserCredential MyCalendarCredential;
 		//public static CalendarService MyCalendarService;
 		//public static UserCredential MyDriveCredential;
 		//public static DriveService MyDriveService;
@@ -50,10 +50,10 @@ namespace M3UPlayer {
 		public static string CalenderSummary = "abcbdffghaiklnm@gmail.com";   //Googleアカウント
 		public static string CalenderOtherView = "https://calendar.google.com/calendar/r/";            //週別/日別への切替
 
-		public static string HierarchyFileName = "MyHierarchy";            //アイテムの階層管理スプレッドシート
-		public static string HierarchyFileID = "";                           //アイテムの階層管理スプレッドシート
-		public static string RootFolderName = "ProductionSchedule";            //保存先サーバのルートフォルダ
-		public static string RootFolderID = "";
+        public static string HierarchyFileName = "MyHierarchy";            //アイテムの階層管理スプレッドシート
+        public static string HierarchyFileID = "";                           //アイテムの階層管理スプレッドシート
+        public static string RootFolderName = "ProductionSchedule";            //保存先サーバのルートフォルダ
+        public static string RootFolderID = "";
 		public static string TopFolderName = "ProductionSchedule";                                        //	最上位フォルダ KSクラウド
 		public static string TopFolderID = "";
 		public static string MakeFolderName = null;         //作成するファイルの格納フォルダ
@@ -105,7 +105,8 @@ namespace M3UPlayer {
 			public string parent;
 			public bool isFolder;
 
-			public LocalFile(string fullPass, string name, string parent, bool isFolder) {
+			public LocalFile(string fullPass, string name, string parent, bool isFolder)
+			{
 				this.fullPass = fullPass;
 				this.name = name;
 				this.parent = parent;
