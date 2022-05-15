@@ -1034,6 +1034,7 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += "、AddFlieName=" + AddFlieName;
                 //登録済みのPlayリストと照合
                 dbMsg += "、登録済み=" + PlayListStr;
+                ////20220515:PlayListStr=nullでコケる
                 //セパレータの入れ直し
                 Regex reg = new Regex(".m3u");
                 PlayListStr = reg.Replace(PlayListStr, ".m3u,");

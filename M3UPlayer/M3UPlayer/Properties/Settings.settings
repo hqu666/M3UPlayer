@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="PlayListStr" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">test2.m3u8</Value>
     </Setting>
     <Setting Name="CurrentPlayListFileName" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
