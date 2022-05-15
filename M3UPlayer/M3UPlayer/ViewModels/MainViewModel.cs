@@ -1034,6 +1034,10 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += "、AddFlieName=" + AddFlieName;
                 //登録済みのPlayリストと照合
                 dbMsg += "、登録済み=" + PlayListStr;
+				if (PlayListStr.Equals("") || PlayListStr == null) {
+                    PlayListStr = Properties.Settings.Default.PlayListStr;
+                    dbMsg += ">>" + PlayListStr;
+                }
                 ////20220515:PlayListStr=nullでコケる
                 //セパレータの入れ直し
                 Regex reg = new Regex(".m3u");
