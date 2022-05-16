@@ -1469,10 +1469,10 @@ namespace M3UPlayer.ViewModels {
                     if (axWmp != null) {
                         axWmp.close();
                         axWmp = null;
-                        //}else if (flash != null) {
-                        //    flash.Dispose();
-                        //    flash = null;
-                    }
+					} else if (flash != null) {
+						flash.Dispose();
+						flash = null;
+					}
                     MyView.FrameGrid.Children.RemoveAt(1);
                 }
                 //if (myview.mainframe.source != null) {
@@ -1494,8 +1494,8 @@ namespace M3UPlayer.ViewModels {
                 //Frame frame = new Frame();
                 dbMsg += "、[" + FreamWidth + "×" + FreamHeigh + "]";
                 if (extention.Equals(".mp4") ||
-                    extention.Equals(".flv") ||
-                     extention.Equals(".wmv")
+					extention.Equals(".flv") ||
+					 extention.Equals(".wmv")
                    ) {
                     host = new System.Windows.Forms.Integration.WindowsFormsHost();
                     //       host.HorizontalAlignment= "Stretch"
@@ -1504,7 +1504,10 @@ namespace M3UPlayer.ViewModels {
                 }
                 dbMsg += "、Web=" + toWeb;
                 if (MyView == null) {
-                } else if (toWeb) {
+                } else if (toWeb
+                    || extention.Equals(".webm")
+                    //|| extention.Equals(".flv")
+                    ) {
                     MyView.webView.Visibility = Visibility.Visible;
                     //WebView2のロード完了時のイベント
                     MyView.webView.NavigationCompleted += WebView_NavigationCompleted; PlayListSaveBTVisble = "Hidden";
