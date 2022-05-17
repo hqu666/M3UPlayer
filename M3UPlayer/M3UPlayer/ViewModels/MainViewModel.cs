@@ -456,18 +456,38 @@ namespace M3UPlayer.ViewModels {
                     RaisePropertyChanged("IsMute");
                     dbMsg += ">>IsMute=" + IsMute;
                     if (IsMute) {
-                        if (toWeb) {
-                            MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").volume=" + 0 + ";");
-                        } else if (axWmp != null) {
-                            axWmp.settings.volume = 0;
+                        switch (movieType) {
+                            case 0:
+                                MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").volume=" + 0 + ";");
+                                break;
+                            case 1:
+                                if (axWmp != null) {
+                                    axWmp.settings.volume = 0;
+                                }
+                                break;
+                            case 2:
+                                if (flash != null) {
+                    //                flash.();
+                                }
+                                break;
                         }
                         MyView.MuteBtImage.Source = MuteOnImage;
                     } else {
                         dbMsg += ",SoundValue=" + SoundValue;
-                        if (toWeb) {
-                            MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").volume=" + SoundValue + ";");
-                        } else if (axWmp != null) {
-                            axWmp.settings.volume = (int)Math.Round(SoundValue * 100);
+                        switch (movieType) {
+                            case 0:
+                                MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").volume=" + SoundValue + ";");
+                                break;
+                            case 1:
+                                if (axWmp != null) {
+                                    axWmp.settings.volume = (int)Math.Round(SoundValue * 100);
+                                }
+                                break;
+                            case 2:
+                                if (flash != null) {
+                                    //                flash.();
+                                }
+                                break;
                         }
                         MyView.MuteBtImage.Source = MuteOffImage;
                     }
@@ -3564,12 +3584,22 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += ",SoundValue=" + SoundValue;
                 //double setVolVal = (double)SoundValue/100;
                 //dbMsg += ">>" + setVolVal;
-                if (toWeb) {
-                    await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").volume=" + SoundValue + ";");
-                } else if (axWmp != null) {
-                    dbMsg += ",volume=" + axWmp.settings.volume;
-                    axWmp.settings.volume = (int)Math.Round(SoundValue * 100);
-                    dbMsg += ">>" + axWmp.settings.volume;
+                switch (movieType) {
+                    case 0:
+                        await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").volume=" + SoundValue + ";");
+                        break;
+                    case 1:
+                        if (axWmp != null) {
+                            dbMsg += ",volume=" + axWmp.settings.volume;
+                            axWmp.settings.volume = (int)Math.Round(SoundValue * 100);
+                            dbMsg += ">>" + axWmp.settings.volume;
+                        }
+                        break;
+                    case 2:
+                        if (flash != null) {
+                            //                flash.();
+                        }
+                        break;
                 }
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
