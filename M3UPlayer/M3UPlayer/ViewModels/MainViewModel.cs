@@ -639,7 +639,12 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += ",assemblyPath=" + assemblyPath;
                 dbMsg += ",CurrentPlayListFileName=" + CurrentPlayListFileName;
                 PLComboSource = new Dictionary<string, string>();
-                //       PLComboSelectedItem = new List<string>();
+                dbMsg += "\r\nPlayListStr=" + PlayListStr;
+				if (0<CurrentPlayListFileName.Length && PlayListStr == null) {
+                    Properties.Settings.Default.PlayListStr = CurrentPlayListFileName;
+                    Properties.Settings.Default.Save();
+                    dbMsg += ">>" + PlayListStr;
+                }
                 AddPlayListCombo("");
                 MakePlayListComboMenu();
                 dbMsg += "[" + VWidth + "×" + VHeight + "]";
@@ -1020,6 +1025,27 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
+        /// <summary>
+        /// 設問してプレイリスト作成に入る
+        /// </summary>
+        public void PlayListInfo() {
+            string TAG = "PlayListInfo";
+            string dbMsg = "";
+            try {
+				string titolStr = "プレイリストコンボボックスの作成";
+				string msgStr = "読み込めるプレイリストがありません\r\nプレイリストを作成しますか？";
+				MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
+                dbMsg += ",result=" + result;
+                if (result == MessageBoxResult.Yes) {
+                    MakeNewPlayListFile();
+                } else {
+                    return;
+                }
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
 
         /// <summary>
@@ -1035,10 +1061,16 @@ namespace M3UPlayer.ViewModels {
                 //登録済みのPlayリストと照合
                 dbMsg += "、登録済み=" + PlayListStr;
 				if (PlayListStr.Equals("") || PlayListStr == null) {
+                    if (CurrentPlayListFileName!= null) {
+                        Properties.Settings.Default.PlayListStr = CurrentPlayListFileName;
+                        Properties.Settings.Default.Save();
+					} else {
+                        PlayListInfo();
+                    }
                     PlayListStr = Properties.Settings.Default.PlayListStr;
                     dbMsg += ">>" + PlayListStr;
-                }
-                ////20220515:PlayListStr=nullでコケる
+					////20220515:PlayListStr=nullでコケる
+				} 
                 //セパレータの入れ直し
                 Regex reg = new Regex(".m3u");
                 PlayListStr = reg.Replace(PlayListStr, ".m3u,");
@@ -1539,6 +1571,10 @@ namespace M3UPlayer.ViewModels {
                             ) {
                     //       System.Windows.Forms.Integration.WindowsFormsHost host = new System.Windows.Forms.Integration.WindowsFormsHost();
                     axWmp = new AxWindowsMediaPlayer();
+					if (axWmp == null) {
+                        dbMsg += "、axWmp == null" ;
+                        return;
+					}
                     host.Child = axWmp;
                     MyView.FrameGrid.Children.Add(host);
                     axWmp.stretchToFit = true;
