@@ -585,6 +585,8 @@ namespace M3UPlayer.ViewModels {
                                                 ".dvr-ms",".ivf",".wax",".wmv", ".wvx",  ".wm",  ".wmx",  ".wmz",
                                              };
         public string[] WebVideo = new string[] { ".webm", ".3gp", ".rm", ".dvr-ms", ".ivf" };
+        public string[] WMPFiles = new string[] {  ".mp4",  ".asf","mpa",".mpe",".3gp",  ".3g2",  ".asf",  ".asx",
+                                                ".ivf",".wax",".wmv", ".wvx",  ".wm",  ".wmx",  ".wmz" };
         public string[] FlashVideo = new string[] { ".flv", ".f4v", ".swf" };
         #endregion
 
@@ -1525,10 +1527,9 @@ namespace M3UPlayer.ViewModels {
                 //}
                 //Frame frame = new Frame();
                 dbMsg += "、[" + FreamWidth + "×" + FreamHeigh + "]";
-                if (extention.Equals(".mp4") ||
-					extention.Equals(".flv") ||
-					 extention.Equals(".wmv")
-                   ) {
+                if (-1 < Array.IndexOf(WMPFiles, extention)
+                    || -1 < Array.IndexOf(FlashVideo, extention)
+                    ) {
                     host = new System.Windows.Forms.Integration.WindowsFormsHost();
                     //       host.HorizontalAlignment= "Stretch"
                     toWeb = false;
@@ -1536,10 +1537,7 @@ namespace M3UPlayer.ViewModels {
                 }
                 dbMsg += "、Web=" + toWeb;
                 if (MyView == null) {
-                } else if (toWeb
-                    || extention.Equals(".webm")
-                    //|| extention.Equals(".flv")
-                    ) {
+                } else if ((0 <= Array.IndexOf(WebVideo, extention))) {
                     MyView.webView.Visibility = Visibility.Visible;
                     //WebView2のロード完了時のイベント
                     MyView.webView.NavigationCompleted += WebView_NavigationCompleted; PlayListSaveBTVisble = "Hidden";
@@ -1566,10 +1564,7 @@ namespace M3UPlayer.ViewModels {
                         MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
                     });
                     ClickPlayBt();
-                } else if (extention.Equals(".mp4") ||
-                             extention.Equals(".wmv")
-                            ) {
-                    //       System.Windows.Forms.Integration.WindowsFormsHost host = new System.Windows.Forms.Integration.WindowsFormsHost();
+                } else if ((0 <= Array.IndexOf(WMPFiles, extention))) {
                     axWmp = new AxWindowsMediaPlayer();
 					if (axWmp == null) {
                         dbMsg += "、axWmp == null" ;
@@ -1598,10 +1593,7 @@ namespace M3UPlayer.ViewModels {
                     // UIを無効化
                     axWmp.uiMode = "none";
                     infoStr = axWmp.currentMedia.name;
-                } else if (extention.Equals(".flv")) {
-
-                    //  https://csharp.hotexamples.com/jp/examples/AxShockwaveFlashObjects/AxShockwaveFlash/-/php-axshockwaveflash-class-examples.html
-
+                } else if ((0 <= Array.IndexOf(FlashVideo, extention))) {
                     if (flash == null) {
                         flash = new AxShockwaveFlash();
                     }
@@ -1640,19 +1632,11 @@ namespace M3UPlayer.ViewModels {
                     flash.MovieData = targetURLStr;
                     flash.LoadMovie(0, playerUrl);
                     flash.AllowScriptAccess = "always";
-                    //string playre = flash.Movie;
-
                     /*
-                     			<object id="wiPlayer" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" width="2813" height="1606">
-				<param name="FlashVars" value="fms_app=&video_file=file:///P:/%E5%86%8D%E7%94%9F/FLV/bvyu4tbrnks8xleniv84zhgrbhtb4urlvb738anwx83%20uyt7wvyt4aiwy3ndy4renkty7sbt/1.flv&image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10"/>
-				<param name= "allowFullScreen" value="true"/>
-				<param name ="movie" value="H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\fladance.swf"/>
-				<embed name="wiPlayer" src="H:\develop\2022\M3U\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\fladance.swf"
-					 width="2813" height= "1606" type="application/x-shockwave-flash" allowfullscreen="true"
-					 flashvars="fms_app=&video_file=file:///P:/%E5%86%8D%E7%94%9F/FLV/bvyu4tbrnks8xleniv84zhgrbhtb4urlvb738anwx83%20uyt7wvyt4aiwy3ndy4renkty7sbt/1.flv&image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10" type="application/x-shockwave-flash"/>
-		</object>
-                     
-                     */
+                         Flash 4 で新しくサポートされたスクリプトメソッド       http://kb2.adobe.com/jp/cps/228/228681.html
+                         https://csharp.hotexamples.com/jp/examples/AxShockwaveFlashObjects/AxShockwaveFlash/-/php-axshockwaveflash-class-examples.html
+                        */
+
                 }
 
                 RaisePropertyChanged("infoStr");
@@ -1776,53 +1760,6 @@ namespace M3UPlayer.ViewModels {
         private System.ComponentModel.IContainer components = null;
         //public WindowsMediaPlayer mediaPlayer;
         //	public AxWMPLib.AxWindowsMediaPlayer mediaPlayer;           //AxWMPLib
-        /*
-			 FLV・SWFファイルの再生 http://www.geocities.co.jp/NatureLand/2023/reference/Multimedia/movie02.html
-			 Flash 4 で新しくサポートされたスクリプトメソッド       http://kb2.adobe.com/jp/cps/228/228681.html
-			 */
-        /// <summary>
-        /// Flashのmoveプレイヤーで渡されたファイルを再生
-        /// 
-        /// error : video_fileが設定されていません。
-        /// </summary>
-        /// <param name="fileName">再生ファイル名</param>
-        private void MakeFlash(string fileName) {
-            string TAG = "[MakeFlash]" + fileName;
-            string dbMsg = TAG;
-            try {
-                ////		this.MediaPlayerPanel.Controls.RemoveAt(0);
-                //		this.SFPlayer = InitializeFLComponent();
-                //		try {
-                //			System.IO.FileInfo fi = new System.IO.FileInfo(fileName);
-                //			if (fi.Extension.Equals(".flv") || fi.Extension.Equals(".f4v")) {
-                //				LoadFLV(fileName, SFPlayer);
-                //	//			LoadFladance(fileName);
-                //			} else if (fi.Extension.Equals(".swf")) {
-                //				this.SFPlayer.LoadMovie(0, fileName); //でthis.SFPlayer.Movieにセットされるが再生はされない
-                //													  //   Movie   "M:\\sample\\EmbedFlash.swf" 
-                //			}
-                //			dbMsg += ",Movie=" + this.SFPlayer.Movie;
-                //			dbMsg += ",MovieData=" + this.SFPlayer.MovieData;
-                //			dbMsg += ",FlashVars=" + this.SFPlayer.FlashVars;
-
-
-                //			this.SFPlayer.FlashCall += new AxShockwaveFlashObjects._IShockwaveFlashEvents_FlashCallEventHandler(this.SFPlayer_FlashCall);
-                //			//          ((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).EndInit();                   //必須
-                //			this.SFPlayer.Play();
-                //		} catch {
-                //			string titolStr = "Flash";
-                //			string msgStr = "Flashがインストールされていないようです";
-                //			MessageBoxResult result = MessageShowWPF(titolStr, msgStr, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                //			dbMsg += ",result=" + result;
-                //		}
-
-
-                MyLog(TAG, dbMsg);
-            } catch (Exception er) {
-                MyErrorLog(TAG, dbMsg, er);
-            }
-        }
-
         /// <summary>
         /// ShockWaveObjewctを作成してGridに埋め込む
         /// </summary>
