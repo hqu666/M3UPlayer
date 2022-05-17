@@ -341,7 +341,18 @@ namespace M3UPlayer.ViewModels {
         public AxShockwaveFlash? flash;
 
         private WebView2 webView2;
-        //     public WsbViewModel WVM;
+        /// <summary>
+        /// 0:web,1:WMP,2;Flash をPlayListToPlayerで設定
+        /// </summary>
+        public int movieType = 0;
+        public string[] videoFiles = new string[] {  ".mp4",".flv",".f4v",".webm",  ".ogv",".3gp",  ".rm",  ".asf",   ".swf",
+                                              "mpa",".mpe",".webm",  ".ogv",".3gp",  ".3g2",  ".asf",  ".asx",
+                                                ".dvr-ms",".ivf",".wax",".wmv", ".wvx",  ".wm",  ".wmx",  ".wmz",
+                                             };
+        public string[] WebVideo = new string[] { ".webm", ".3gp", ".rm", ".dvr-ms", ".ivf" };
+        public string[] WMPFiles = new string[] {  ".mp4",  ".asf","mpa",".mpe",".3gp",  ".3g2",  ".asf",  ".asx",
+                                                ".ivf",".wax",".wmv", ".wvx",  ".wm",  ".wmx",  ".wmz" };
+        public string[] FlashVideo = new string[] { ".flv", ".f4v", ".swf" };
         private bool _IsPlaying;
         /// <summary>
         /// 再生中
@@ -359,17 +370,37 @@ namespace M3UPlayer.ViewModels {
                     RaisePropertyChanged("IsPlaying");
                     dbMsg += ">>IsPlaying==" + IsPlaying;
                     if (IsPlaying) {
-                        if (toWeb) {
-                            MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
-                        } else if (axWmp != null) {
-                            axWmp.Ctlcontrols.play();
+                        switch (movieType) {
+                            case 0:
+                                MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
+                                break;
+                            case 1:
+                                if (axWmp != null) {
+                                    axWmp.Ctlcontrols.play();
+                                }
+                                break;
+                            case 2:
+                                if (flash != null) {
+                                    flash.Play();
+                                }
+                                break;
                         }
                         MyView.PlayBtImage.Source = pouseImage;
                     } else {
-                        if (toWeb) {
-                            MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").pause();");
-                        } else if (axWmp != null) {
-                            axWmp.Ctlcontrols.pause();
+                        switch (movieType) {
+                            case 0:
+                                MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").pause();");
+                                break;
+                            case 1:
+                                if (axWmp != null) {
+                                    axWmp.Ctlcontrols.pause();
+                                }
+                                break;
+                            case 2:
+                                if (flash != null) {
+                                    flash.Stop();
+                                }
+                                break;
                         }
                         MyView.PlayBtImage.Source = playImage;
                     }
@@ -580,14 +611,6 @@ namespace M3UPlayer.ViewModels {
 
         //追加待ち///////////////////////////////////////////////////////////////////////////////////////////////////////////
         public int summaryCol = 2;
-        public string[] videoFiles = new string[] {  ".mp4",".flv",".f4v",".webm",  ".ogv",".3gp",  ".rm",  ".asf",   ".swf",
-                                              "mpa",".mpe",".webm",  ".ogv",".3gp",  ".3g2",  ".asf",  ".asx",
-                                                ".dvr-ms",".ivf",".wax",".wmv", ".wvx",  ".wm",  ".wmx",  ".wmz",
-                                             };
-        public string[] WebVideo = new string[] { ".webm", ".3gp", ".rm", ".dvr-ms", ".ivf" };
-        public string[] WMPFiles = new string[] {  ".mp4",  ".asf","mpa",".mpe",".3gp",  ".3g2",  ".asf",  ".asx",
-                                                ".ivf",".wax",".wmv", ".wvx",  ".wm",  ".wmx",  ".wmz" };
-        public string[] FlashVideo = new string[] { ".flv", ".f4v", ".swf" };
         #endregion
 
         public string FrameSource { get; set; }
@@ -1538,6 +1561,7 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += "、Web=" + toWeb;
                 if (MyView == null) {
                 } else if ((0 <= Array.IndexOf(WebVideo, extention))) {
+                    movieType = 0;
                     MyView.webView.Visibility = Visibility.Visible;
                     //WebView2のロード完了時のイベント
                     MyView.webView.NavigationCompleted += WebView_NavigationCompleted; PlayListSaveBTVisble = "Hidden";
@@ -1565,6 +1589,7 @@ namespace M3UPlayer.ViewModels {
                     });
                     ClickPlayBt();
                 } else if ((0 <= Array.IndexOf(WMPFiles, extention))) {
+                    movieType = 1;
                     axWmp = new AxWindowsMediaPlayer();
 					if (axWmp == null) {
                         dbMsg += "、axWmp == null" ;
@@ -1594,6 +1619,7 @@ namespace M3UPlayer.ViewModels {
                     axWmp.uiMode = "none";
                     infoStr = axWmp.currentMedia.name;
                 } else if ((0 <= Array.IndexOf(FlashVideo, extention))) {
+                    movieType = 1;
                     if (flash == null) {
                         flash = new AxShockwaveFlash();
                     }
