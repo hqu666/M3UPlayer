@@ -381,7 +381,8 @@ namespace M3UPlayer.ViewModels {
                                 break;
                             case 2:
                                 if (flash != null) {
-                                    flash.Play();
+                                    flash.SetVariable("isPlay", "true");
+                                    //flash.Play();
                                 }
                                 break;
                         }
@@ -398,7 +399,9 @@ namespace M3UPlayer.ViewModels {
                                 break;
                             case 2:
                                 if (flash != null) {
-                                    flash.Stop();
+                                    flash.SetVariable("isPlay", "false");
+
+                                    //       flash.Stop();
                                 }
                                 break;
                         }
@@ -467,7 +470,8 @@ namespace M3UPlayer.ViewModels {
                                 break;
                             case 2:
                                 if (flash != null) {
-                    //                flash.();
+                                    string flashVvars = "mute=true";
+                                    flash.FlashVars = flashVvars;
                                 }
                                 break;
                         }
@@ -485,7 +489,9 @@ namespace M3UPlayer.ViewModels {
                                 break;
                             case 2:
                                 if (flash != null) {
-                                    //                flash.();
+                                    string flashVvars = "mute=false";
+                                    //             string flashVvars = @"vol=" + SoundValue + '"';
+                                    flash.FlashVars = flashVvars;
                                 }
                                 break;
                         }
@@ -1541,6 +1547,7 @@ namespace M3UPlayer.ViewModels {
             string TAG = "PlayListToPlayer";
             string dbMsg = "";
             try {
+                IsHideControl = false;
                 if (1 < MyView.FrameGrid.Children.Count) {
                     dbMsg += ">delete既存=" + MyView.FrameGrid.Children.Count + "件";
                     if (axWmp != null) {
@@ -1659,9 +1666,11 @@ namespace M3UPlayer.ViewModels {
                     string[] urlStrs = assemblyPath.Split(Path.DirectorySeparatorChar);
                     assemblyName = urlStrs[urlStrs.Length - 1];
                     dbMsg += ">>" + assemblyName;
-                    playerUrl = @assemblyPath.Replace(assemblyName, "fladance.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
-                                                                                           //		string nextMove = assemblyPath.Replace( assemblyName, "tonext.htm" );
-                    dbMsg += ",playerUrl=" + playerUrl;
+					//          playerUrl = @assemblyPath.Replace(assemblyName, "flvplayer-305.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
+					playerUrl = @assemblyPath.Replace(assemblyName, "fladance.swf");   
+                    //☆デバッグ用を\bin\Debugにコピーしておく
+																						   //		string nextMove = assemblyPath.Replace( assemblyName, "tonext.htm" );
+					dbMsg += ",playerUrl=" + playerUrl;
                     //,playerUrl=C:\Users\博臣\source\repos\file_tree_clock_web1\file_tree_clock_web1\bin\Debug\fladance.swf 
                     if (File.Exists(playerUrl)) {
                         dbMsg += ",Exists=true";
@@ -1672,8 +1681,11 @@ namespace M3UPlayer.ViewModels {
                     ////clsId = "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000";       //ブラウザーの ActiveX コントロール
                     ////codeBase = @"http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0";
                     ////string pluginspage = @"http://www.macromedia.com/go/getflashplayer";
-                    string flashVvars = @"fms_app=&video_file=" + targetURLStr + "&" +       // & amp;		"link_url ="+ nextMove + "&" +
-                                                            "image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10" + '"';
+                    string flashVvars = @"fms_app=&video_file=" + targetURLStr +
+                                        "&vol=" + SoundValue +          //0 ～ 1
+                                        "&mute=false" +
+                                        // & amp;		"link_url ="+ nextMove + "&" +
+                                        "&image_file=&link_url=&autoplay=true&controllbar=true&buffertime=10" + '"';
                     flash.FlashVars = flashVvars;
                     flash.MovieData = targetURLStr;
                     flash.LoadMovie(0, playerUrl);
@@ -1682,7 +1694,7 @@ namespace M3UPlayer.ViewModels {
                          Flash 4 で新しくサポートされたスクリプトメソッド       http://kb2.adobe.com/jp/cps/228/228681.html
                          https://csharp.hotexamples.com/jp/examples/AxShockwaveFlashObjects/AxShockwaveFlash/-/php-axshockwaveflash-class-examples.html
                         */
-
+                    IsHideControl = true;
                 }
 
                 RaisePropertyChanged("infoStr");
@@ -1744,7 +1756,7 @@ namespace M3UPlayer.ViewModels {
 
                 }
                 //			RaisePropertyChanged();
-                MyLog(TAG, dbMsg);
+     //           MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
@@ -1804,76 +1816,6 @@ namespace M3UPlayer.ViewModels {
 
         //public AxShockwaveFlashObjects.AxShockwaveFlash SFPlayer;
         private System.ComponentModel.IContainer components = null;
-        //public WindowsMediaPlayer mediaPlayer;
-        //	public AxWMPLib.AxWindowsMediaPlayer mediaPlayer;           //AxWMPLib
-        /// <summary>
-        /// ShockWaveObjewctを作成してGridに埋め込む
-        /// </summary>
-        //		private AxShockwaveFlashObjects.AxShockwaveFlash InitializeFLComponent() {
-        //			string TAG = "[InitializeFLComponent]";
-        //			string dbMsg = TAG;
-        //			//System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));   //?
-        //			AxShockwaveFlashObjects.AxShockwaveFlash SFPlayer = new AxShockwaveFlashObjects.AxShockwaveFlash();
-        //			try {
-        //				((System.ComponentModel.ISupportInitialize)(SFPlayer)).BeginInit();   
-        //				//必須;http://bbs.wankuma.com/index.cgi?mode=al2&namber=9784&KLOG=22
-        //			//	this.SuspendLayout();           //必要？
-        //				SFPlayer.Dock = System.Windows.Forms.DockStyle.Fill;
-        //				SFPlayer.Enabled = true;
-        //	//0113		SFPlayer.Location = new System.Drawing.Point(0, 0);
-        //				SFPlayer.Name = "SFPlayer";
-        //				System.Windows.Forms.Panel MediaPlayerPanel = new System.Windows.Forms.Panel();
-        //				Frame frame = new Frame();
-        //				frame.Navigate(MediaPlayerPanel);
-        //				MyView.FrameGrid.Children.Add(frame);
-        //				//0115	VWidth = MyView.FrameGrid.ActualWidth;
-        //				//VHeight = MyView.FrameGrid.ActualHeight;
-        //				dbMsg += "[" + VWidth + "×" + VHeight + "]";
-        //			//	SFPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("this.SFPlayer.OcxState")));
-        //			// 'C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Windows.Forms\v4.0_4.0.0.0__b77a5c561934e089\System.Windows.Forms.dll' が読み込まれました。PDB ファイルを開けないか、ファイルが見つかりません。
-        //// 'C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Windows.Forms.resources\v4.0_4.0.0.0_ja_b77a5c561934e089\System.Windows.Forms.resources.dll' が読み込まれました。モジュールがシンボルなしでビルドされました。
-        //				SFPlayer.Width = (int)VWidth;
-        //				SFPlayer.Height = (int)VHeight;	
-        //				dbMsg += ">SFPlayer[" + this.SFPlayer.Width + "×" + this.SFPlayer.Height + "]";
-        //				SFPlayer.TabIndex = 0;
-        //				MediaPlayerPanel.Controls.Add(this.SFPlayer);
-        //				////this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form1_DragDrop);
-        //				////this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
-        //				SFPlayer.FSCommand += new AxShockwaveFlashObjects._IShockwaveFlashEvents_FSCommandEventHandler(this.SFPlayer_FSCommand);
-        //				SFPlayer.RegionChanged += new System.EventHandler(this.SFPlayer_RegionChanged);
-        //				SFPlayer.Move += new System.EventHandler(this.SFPlayer_Move);
-        //				((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).EndInit();                   //必須
-        //	//	0115	MyView.ResumeLayout(false);
-
-        //				SFPlayer=InitAxShockwaveFlash(SFPlayer);
-        //				MyLog(TAG, dbMsg);
-        //			} catch (Exception er) {
-        //				dbMsg += "<<以降でエラー発生>>" + er.Message;
-        //				MyLog(TAG, dbMsg);
-        //			}
-        //			return SFPlayer;
-
-        //		}
-
-        //private void SFPlayer_FSCommand(object sender, AxShockwaveFlashObjects._IShockwaveFlashEvents_FSCommandEvent e) {
-        //	string TAG = "[SFPlayer_FSCommand]";
-        //	string dbMsg = TAG;
-        //	try {
-        //		dbMsg += e.command + ";";
-        //		//switch (e.command)
-        //		//{
-        //		//    case 0:
-        //		//        dbMsg += "1";
-        //		//        //            PlayTitolLabel.Text = ("Undefined;WindowsMediaPlayerの状態が定義されていません");
-        //		//        break;
-        //		//}
-        //		MyLog(TAG, dbMsg);
-        //	} catch (Exception er) {
-        //		dbMsg += "<<以降でエラー発生>>" + er.Message;
-        //		MyLog(TAG, dbMsg);
-        //	}
-        //}
-
         private void SFPlayer_Move(object sender, EventArgs e) {
             string TAG = "[SFPlayer_Move]";
             string dbMsg = TAG;
@@ -1912,51 +1854,7 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
-        /// <summary>
-        /// AxShockwaveFlashの設定
-        /// </summary>
-        //	private AxShockwaveFlashObjects.AxShockwaveFlash InitAxShockwaveFlash(AxShockwaveFlashObjects.AxShockwaveFlash SFPlayer) {
-        //		string TAG = "[InitAxShockwaveFlash]";
-        //		string dbMsg = TAG;
-        //		try {
-        //			dbMsg += "開始[" + SFPlayer.Width + "×" + SFPlayer.Height + "]";
-        //			SFPlayer.AllowFullScreen = "false";
-        //			SFPlayer.BGColor = "000000";
-        //			SFPlayer.AllowNetworking = "all";
-        //			dbMsg += ",AllowNetworking";
 
-        ////0115			SFPlayer.CtlScale = "NoScale";
-        //			// 保護されているメモリに読み取りまたは書き込み操作を行おうとしました。他のメモリが壊れていることが考えられます。
-        //			//this.SFPlayer.CtlScale = "NoBorder ";
-        //			//this.SFPlayer.CtlScale = "ExactFit";
-        //			//this.SFPlayer.CtlScale = "ShowAll";
-
-        //			SFPlayer.DeviceFont = false;
-        //			SFPlayer.EmbedMovie = true;
-
-        //			SFPlayer.FrameNum = -1;
-        //			SFPlayer.Loop = true;
-        //			SFPlayer.Playing = true;
-        //			SFPlayer.Profile = true;
-        //			SFPlayer.Quality2 = "High";
-        //			SFPlayer.SAlign = "LT";
-        //			SFPlayer.WMode = "Window";
-        //			SFPlayer.Dock = DockStyle.Fill;
-        //			MyLog(TAG, dbMsg);
-        //		} catch (Exception er) {
-        //			dbMsg += "<<以降でエラー発生>>" + er.Message;
-        //			MyLog(TAG, dbMsg);
-        //		}
-        //		return SFPlayer;
-        //	}
-
-        /// <summary>
-        /// FLVファイルのロード
-        /// </summary>
-        /// <param name="videoPath"></param>
-        //private void LoadFLV(string videoPath , AxShockwaveFlashObjects.AxShockwaveFlash SFPlayer) {
-        //	SFPlayer.CallFunction("<invoke name=\"loadAndPlayVideo\" returntype=\"xml\"><arguments><string>" + videoPath + "</string></arguments></invoke>");
-        //}
         #endregion
 
 
@@ -2823,6 +2721,7 @@ namespace M3UPlayer.ViewModels {
                 }
 
                 NowSelectedFile = PLListSelectedItem.UrlStr;
+                //flasfでNull
                 dbMsg += "[" + SelectedPlayListIndex + "]" + NowSelectedFile;
                 string[] Strs = NowSelectedFile.Split('/');
                 if (NowSelectedFile.Contains('/')) {
@@ -3597,8 +3496,11 @@ namespace M3UPlayer.ViewModels {
                         break;
                     case 2:
                         if (flash != null) {
-                            //                flash.();
-                        }
+							//           flash.SetVariable("volume", SoundValue + "");
+
+							string flashVvars = "volume=" + SoundValue + '"';
+							flash.FlashVars = flashVvars;
+						}
                         break;
                 }
                 MyLog(TAG, dbMsg);
