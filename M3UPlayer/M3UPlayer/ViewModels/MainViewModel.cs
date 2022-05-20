@@ -2498,10 +2498,6 @@ namespace M3UPlayer.ViewModels {
                             SelectedPlayListFiles.Add(oneItem);
                             dbMsg += "\r\n[" + i + "]" + oneItem.UrlStr;
                         }
-                        //                  if (PLListSelectedItem == null) {
-                        //                      PLListSelectedItem = SelectedPlayListFiles[0];
-                        //                      RaisePropertyChanged("PLListSelectedItem");
-                        //}
                         if (1 == MyView.PlayList.SelectedItems.Count) {
                             PLListSelectedItem = (PlayListModel)MyView.PlayList.SelectedItems[0];
                         }
@@ -2896,29 +2892,23 @@ namespace M3UPlayer.ViewModels {
                     }
                     //usingを使わない例: File.AppendAllText(selectListFile, NowSelectedFile);
                     if (PLComboSource.ContainsKey(selectListFile)) {
-                        dbMsg += selectListFile + "はリストに追加済み";
-					} else {
+                        dbMsg += "追加済み;";
+                    } else {
                         PLComboSource.Add(selectListFile, Path.GetFileName(selectListFile));
-                        dbMsg += selectListFile + "をリストに追加";
+                        dbMsg +=  ":追加";
                     }
-
                     CurrentPlayListFileName = selectListFile;
+                    RaisePropertyChanged("NowSelectedPath");
                     dbMsg += ">>" + CurrentPlayListFileName;
+                    int listIndex = Array.IndexOf(PlayLists, CurrentPlayListFileName);
+                    dbMsg += "["+ listIndex + "]" + selectListFile;
+                    PLComboSelectedIndex = listIndex;
+
 					NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
 					dbMsg += ">>NowSelectedPath=" + NowSelectedPath;
 					RaisePropertyChanged("NowSelectedPath");
 					//設定ファイル更新
 					Properties.Settings.Default.Save();
-                    //string extention = System.IO.Path.GetExtension(NowSelectedFile);
-                    //if (extention.Contains("m3u")) {
-                    //    dbMsg += "PLListに追加";
-                    //    AddPlayListCombo(NowSelectedFile);
-                    //} else {
-                    //    dbMsg += "現在のプレイリストの先頭に追加";
-                    //    if (AddToPlayList(NowSelectedFile, 0)) {
-                    //        //				SavePlayList();
-                    //    }
-                    //}
                 } else {
                     dbMsg += "キャンセルされました";
                 }
