@@ -2660,7 +2660,7 @@ namespace M3UPlayer.ViewModels {
                 PlayListItemMove.Items.Add(PlayListItemMoveBottom);
 
                 PlayListItemMoveOtherList = new MenuItem();
-                PlayListItemMoveOtherList.Header = "他のリストへ移動";
+                PlayListItemMoveOtherList.Header = "他のリストへコピー";
                 PlayListItemMoveOtherList.Click += PlayListItemMoveOtherListm_Click;
                 PlayListItemMove.Items.Add(PlayListItemMoveOtherList);
                 //サブメニューに追加
@@ -2891,18 +2891,20 @@ namespace M3UPlayer.ViewModels {
                         writer.WriteLine(NowSelectedFile);
                     }
                     //usingを使わない例: File.AppendAllText(selectListFile, NowSelectedFile);
-                    if (PLComboSource.ContainsKey(selectListFile)) {
-                        dbMsg += "追加済み;";
-                    } else {
-                        PLComboSource.Add(selectListFile, Path.GetFileName(selectListFile));
-                        dbMsg +=  ":追加";
-                    }
+
                     CurrentPlayListFileName = selectListFile;
-                    RaisePropertyChanged("NowSelectedPath");
+                    RaisePropertyChanged("CurrentPlayListFileName");
                     dbMsg += ">>" + CurrentPlayListFileName;
                     int listIndex = Array.IndexOf(PlayLists, CurrentPlayListFileName);
-                    dbMsg += "["+ listIndex + "]" + selectListFile;
-                    PLComboSelectedIndex = listIndex;
+                    if (PLComboSource.ContainsKey(CurrentPlayListFileName)) {
+                        dbMsg += "追加済み;";
+                    } else {
+                        AddPlayListCombo(CurrentPlayListFileName);
+                        listIndex = 0;
+                        dbMsg +=  ":追加";
+                    }
+					dbMsg += "[" + listIndex + "]" + selectListFile;
+					PLComboSelectedIndex = listIndex;
 
 					NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
 					dbMsg += ">>NowSelectedPath=" + NowSelectedPath;
