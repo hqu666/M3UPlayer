@@ -2498,11 +2498,13 @@ namespace M3UPlayer.ViewModels {
                             SelectedPlayListFiles.Add(oneItem);
                             dbMsg += "\r\n[" + i + "]" + oneItem.UrlStr;
                         }
-                        if (PLListSelectedItem == null) {
-                            PLListSelectedItem = SelectedPlayListFiles[0];
-                            RaisePropertyChanged("PLListSelectedItem");
-						}
-
+                        //                  if (PLListSelectedItem == null) {
+                        //                      PLListSelectedItem = SelectedPlayListFiles[0];
+                        //                      RaisePropertyChanged("PLListSelectedItem");
+                        //}
+                        if (1 == MyView.PlayList.SelectedItems.Count) {
+                            PLListSelectedItem = (PlayListModel)MyView.PlayList.SelectedItems[0];
+                        }
 
                     } else {
                         isNotselect = false;
@@ -2523,7 +2525,7 @@ namespace M3UPlayer.ViewModels {
                     retBool = true;
                     if (doStr != null) {
 						//        doStr = SelectedPlayListFiles[0].fileName + doStr;
-						doStr = PLListSelectedItem.fileName + doStr;
+						doStr = PLListSelectedItem.UrlStr + doStr;
 						MessageBoxResult result = MessageShowWPF(titolStr, doStr, MessageBoxButton.OKCancel, MessageBoxImage.Exclamation);
                         dbMsg += ",result=" + result;
                         if (result.Equals(MessageBoxResult.Cancel)) {
@@ -2869,10 +2871,6 @@ namespace M3UPlayer.ViewModels {
                 }
                 NowSelectedFile = PLListSelectedItem.UrlStr;
                 dbMsg += "urlStr=" + NowSelectedFile;
-                //int oldIndex = PLList.IndexOf(PLListSelectedItem);
-                //dbMsg += ",oldIndex=" + oldIndex;
-                //PLList.Move(oldIndex, PLList.Count - 1);
-                //IsDoSavePlayList(false);
                 // ダイアログのインスタンスを生成
                 ofDialog = new OpenFileDialog();
                 // ファイルの種類を設定
@@ -2891,25 +2889,22 @@ namespace M3UPlayer.ViewModels {
                 //ダイアログを表示する
                 if (ofDialog.ShowDialog() == true) {
 					string selectListFile = ofDialog.FileName;
-					File.WriteAllText(selectListFile, NowSelectedFile);
+                    //usingで中の処理が終わったタイミングでファイルを保存する
+                    using (var writer=new StreamWriter(selectListFile,true)) {
+                        //末尾行に追記する
+                        writer.WriteLine(NowSelectedFile);
+                    }
+                    //usingを使わない例: File.AppendAllText(selectListFile, NowSelectedFile);
                     if (PLComboSource.ContainsKey(selectListFile)) {
                         dbMsg += selectListFile + "はリストに追加済み";
 					} else {
                         PLComboSource.Add(selectListFile, Path.GetFileName(selectListFile));
                         dbMsg += selectListFile + "をリストに追加";
                     }
-                    //              bool isInList = false;
-                    //              foreach ( pli in PLComboSource) {
-                    //if (pli.Equals(selectListFile)) {
-                    //                      isInList = true;
-
-                    //                  }
-
-                    //              }
 
                     CurrentPlayListFileName = selectListFile;
                     dbMsg += ">>" + CurrentPlayListFileName;
-					NowSelectedPath = System.IO.Path.GetDirectoryName(NowSelectedFile);
+					NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
 					dbMsg += ">>NowSelectedPath=" + NowSelectedPath;
 					RaisePropertyChanged("NowSelectedPath");
 					//設定ファイル更新
