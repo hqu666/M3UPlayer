@@ -78,31 +78,6 @@ namespace M3UPlayer.ViewModels {
         /// </summary>
         public List<PlayListModel> SelectedPlayListFiles { get; set; }
 
-        //private IList<PlayListModel> _SelectedPlayListFiles;
-        //public IList<PlayListModel>? SelectedPlayListFiles {
-        //	get => (List<PlayListModel>)_SelectedPlayListFiles;
-        //	set {
-        //		string TAG = "SelectedPlayListFiles(set)";
-        //		string dbMsg = "";
-        //		try {
-        //			if (_SelectedPlayListFiles == value)
-        //				return;
-        //			_SelectedPlayListFiles = value;
-        //                  RaisePropertyChanged("SelectedPlayListFiles");
-        //                  dbMsg += ",SelectedPlayListFiles=" + SelectedPlayListFiles;
-        //                  if (SelectedPlayListFiles != null) {
-        //                      dbMsg += SelectedPlayListFiles.Count() + "件";
-        //                      if (0< SelectedPlayListFiles.Count()) {
-        //                          dbMsg += SelectedPlayListFiles[0].Summary;
-        //                          dbMsg += "～" + SelectedPlayListFiles[SelectedPlayListFiles.Count()-1].Summary;
-        //                      }
-        //                  }
-        //			MyLog(TAG, dbMsg);
-        //		} catch (Exception er) {
-        //			MyErrorLog(TAG, dbMsg, er);
-        //		}
-        //	}
-        //}
 
         /// <summary>
         /// 複数行選択ならExtended、単行選択ならSingle
@@ -622,6 +597,23 @@ namespace M3UPlayer.ViewModels {
             get { return Properties.Settings.Default.NowSelectedPosition; }
             set { Properties.Settings.Default.NowSelectedPosition = value; }
         }
+
+
+        /// <summary>
+        /// 切り替える前のプレイリストのインデックス
+        /// </summary>
+        public int BeforSelectedPlayListIndex;
+
+        /// <summary>
+        /// 切り替える前のプレイリストのkey:URL
+        /// </summary>
+        public string BefortPlayListFileName;
+
+        /// <summary>
+        /// 切り替える前の再生アイテム
+        /// </summary>
+        public PlayListModel PLList_befor_SelectedItem;
+
         /// <summary>
         /// フルスクリーンで起動するか
         /// </summary>
@@ -1490,6 +1482,24 @@ namespace M3UPlayer.ViewModels {
             string TAG = "BackBeforeItem_Click";
             string dbMsg = "";
             try {
+                dbMsg += ",切り替える前は " + BefortPlayListFileName + " の " + PLList_befor_SelectedItem.UrlStr;
+                /// 切り替える前のプレイリストのkey:URL
+                PlayListComboSelected= BefortPlayListFileName;
+                /// 切り替える前の再生アイテム
+                PLListSelectedItem = new PlayListModel();
+                PLListSelectedItem=  PLList_befor_SelectedItem;
+
+                int listIndex = Array.IndexOf(PlayLists, CurrentPlayListFileName);
+                dbMsg += "[" + listIndex + "/" + PlayLists.Length + "]" + PLList[listIndex];
+                //元のコンボを再選択
+                PLComboSelectedIndex = listIndex;
+
+              //  SelectedPlayListIndex=BeforSelectedPlayListIndex;
+
+                SelectedPlayListIndex = PLList.IndexOf(PLListSelectedItem);
+                dbMsg += "[" + SelectedPlayListIndex + "/" + PLList.Count + "]" + PLListSelectedItem.UrlStr;
+                RaisePropertyChanged("SelectedPlayListIndex");
+
 
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
@@ -1970,34 +1980,7 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
-
         #endregion
-
-
-        //2008:C#でFLVファイルをお手軽再生   http://zecl.hatenablog.com/entry/20081119/p1///////////////////////////////
-        //private void SFPlayer_FlashCall(object sender, _IShockwaveFlashEvents_FlashCallEvent e) {
-        //	string TAG = "[SFPlayer_FlashCall]";
-        //	string dbMsg = TAG;
-        //	try {
-        //		var document = new XmlDocument();
-        //		document.LoadXml(e.request);
-
-        //		XmlNodeList list = document.GetElementsByTagName("arguments");
-        //		//ResizePlayer(Convert.ToInt32(list[0].FirstChild.InnerText), Convert.ToInt32(list[0].ChildNodes[1].InnerText));
-
-        //		var width = int.Parse(list[0].ChildNodes[0].InnerText);
-        //		var height = int.Parse(list[0].ChildNodes[1].InnerText);
-
-        //		//this.ClientSize = new System.Drawing.Size(width, height);
-        //		//this.SFPlayer.ClientSize = this.SFPlayer.Size;
-        //		MyLog(TAG, dbMsg);
-        //	} catch (Exception er) {
-        //		dbMsg += "<<以降でエラー発生>>" + er.Message;
-        //		MyLog(TAG, dbMsg);
-        //	}
-        //}
-
-
         ///Drag & Drop///////////////////////////////////////////////////////////////////////////
 
         /// <summary>
@@ -2005,7 +1988,6 @@ namespace M3UPlayer.ViewModels {
         /// </summary>
         public string DraggedItem_name { get; set; }
         public bool Drag_now = false;           // { get; set; }
-
 
         /// <summary>
         /// ドラッグ開始；正常に処理が開始されればtrueを返す。
@@ -2407,7 +2389,6 @@ namespace M3UPlayer.ViewModels {
         //    string dbMsg = "OutputMessage=" + OutputMessage;
         //    MyLog(TAG, dbMsg);
         //}
-
 
 
         #endregion
@@ -2924,7 +2905,7 @@ namespace M3UPlayer.ViewModels {
         }
 
         /// <summary>
-        /// 他のリストへ移動
+        /// 他のリストへコピー
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -2938,8 +2919,18 @@ namespace M3UPlayer.ViewModels {
                 if (!PlayListOpelate(titolStr, errorStr, doStr)) {
                     return;
                 }
+
+                //切り替える前のプレイリストのインデックス
+                BeforSelectedPlayListIndex = SelectedPlayListIndex;
+                /// 切り替える前のプレイリストのkey:URL
+                BefortPlayListFileName = PlayListComboSelected;
+                /// 切り替える前の再生アイテム
+                PLList_befor_SelectedItem = new PlayListModel();
+                PLList_befor_SelectedItem = PLListSelectedItem;
+                dbMsg += "," + BefortPlayListFileName + " の[ "+ BeforSelectedPlayListIndex + "]"+ PLList_befor_SelectedItem.UrlStr;
+
                 NowSelectedFile = PLListSelectedItem.UrlStr;
-                dbMsg += "urlStr=" + NowSelectedFile;
+                dbMsg += "=" + NowSelectedFile;
                 // ダイアログのインスタンスを生成
                 ofDialog = new OpenFileDialog();
                 // ファイルの種類を設定
@@ -2968,15 +2959,22 @@ namespace M3UPlayer.ViewModels {
                     CurrentPlayListFileName = selectListFile;
                     RaisePropertyChanged("CurrentPlayListFileName");
                     dbMsg += ">>" + CurrentPlayListFileName;
-                    int listIndex = Array.IndexOf(PlayLists, CurrentPlayListFileName);
                     if (PLComboSource.ContainsKey(CurrentPlayListFileName)) {
                         dbMsg += "追加済み;";
                     } else {
                         AddPlayListCombo(CurrentPlayListFileName);
-                        listIndex = 0;
+                        //         listIndex = 0;
+                        PlayListStr = "";
+						foreach (var PLComboItem in PLComboSource) {
+                            PlayListStr += PLComboItem.Key + ",";
+                        }
+                        PlayListStr = PlayListStr.Substring(0, PlayListStr.Length - 1);
+                        dbMsg += ",PlayListStr=" + PlayListStr;
+                        PlayLists = PlayListStr.Split(','); 
                         dbMsg +=  ":追加";
                     }
-					dbMsg += "[" + listIndex + "]" + selectListFile;
+                    int listIndex = Array.IndexOf(PlayLists, selectListFile);
+                    dbMsg += "[" + listIndex + "/" + PlayLists.Length + "]" + selectListFile + "=" + CurrentPlayListFileName;
 					PLComboSelectedIndex = listIndex;
 
 					NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
