@@ -1295,6 +1295,12 @@ namespace M3UPlayer.ViewModels {
         #region プレイリストコンボのメニュー
         public ContextMenu PlayListComboItemMenu { get; set; }
         public MenuItem PlayListComboItemDelete;
+        public MenuItem PlayListComboItemMove;
+        public MenuItem PlayListComboItemMoveUp;
+        public MenuItem PlayListComboItemMoveDown;
+        public MenuItem BackBeforeItem;
+        public MenuItem ComboMenuPlayListSave;
+        public MenuItem ComboMenuMakeNewPlayList;
         /// <summary>
         /// コンボボックスにコンテキストメニューを追加する
         /// </summary>
@@ -1304,10 +1310,41 @@ namespace M3UPlayer.ViewModels {
             try {
                 PlayListComboItemMenu = new ContextMenu();
                 PlayListComboItemDelete = new MenuItem();
-                PlayListComboItemDelete.Header = "削除";
+                PlayListComboItemDelete.Header = "コンボボックスから外す";
                 //コンテキストメニュー表示時に発生するイベントを追加
                 PlayListComboItemDelete.Click += PlayListComboItemDelete_Click;
                 PlayListComboItemMenu.Items.Add(PlayListComboItemDelete);
+
+                PlayListComboItemMove = new MenuItem();
+                PlayListComboItemMove.Header = "コンボ内の順番…";
+
+                PlayListComboItemMoveUp = new MenuItem();
+                PlayListComboItemMoveUp.Header = "上に移動";
+                PlayListComboItemMoveUp.Click += PlayListComboItemMoveUp_Click;
+                PlayListComboItemMove.Items.Add(PlayListComboItemMoveUp);
+
+                PlayListComboItemMoveDown = new MenuItem();
+                PlayListComboItemMoveDown.Header = "下に移動";
+                PlayListComboItemMoveDown.Click += PlayListComboItemMoveDown_Click;
+                PlayListComboItemMove.Items.Add(PlayListComboItemMoveDown);
+                PlayListComboItemMenu.Items.Add(PlayListComboItemMove);
+
+                ComboMenuPlayListSave = new MenuItem();
+                ComboMenuPlayListSave.Header = "このプレイリストを保存";
+                ComboMenuPlayListSave.Click += ComboMenuPlayListSave_Click;
+                PlayListComboItemMenu.Items.Add(ComboMenuPlayListSave);
+
+
+                ComboMenuMakeNewPlayList = new MenuItem();
+                ComboMenuMakeNewPlayList.Header = "新規プレイリスト作成";
+                ComboMenuMakeNewPlayList.Click += ComboMenuMakeNewPlayList_Click;
+                PlayListComboItemMenu.Items.Add(ComboMenuMakeNewPlayList);
+
+                BackBeforeItem = new MenuItem();
+                BackBeforeItem.Header = "前に再生していたアイテムに戻る";
+                BackBeforeItem.Click += BackBeforeItem_Click;
+                PlayListComboItemMenu.Items.Add(BackBeforeItem);
+
                 RaisePropertyChanged("PlayListComboItemMenu");
                 MyLog(TAG, dbMsg);
                 //  Messenger.Raise(new WindowActionMessage(WindowAction.Close, "Close"));
@@ -1380,6 +1417,85 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
+        /// <summary>
+        /// コンボ内の順番…上に移動
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PlayListComboItemMoveUp_Click(object sender, RoutedEventArgs e) {
+            string TAG = "PlayListComboItemMoveUp_Click";
+            string dbMsg = "";
+            try {
+
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+        /// <summary>
+        /// コンボ内の順番…下に移動
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PlayListComboItemMoveDown_Click(object sender, RoutedEventArgs e) {
+            string TAG = "PlayListComboItemMoveDown_Click";
+            string dbMsg = "";
+            try {
+
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+        /// <summary>
+        /// このプレイリストを保存
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ComboMenuPlayListSave_Click(object sender, RoutedEventArgs e) {
+            string TAG = "ComboMenuPlayListSave_Click";
+            string dbMsg = "";
+            try {
+                SavePlayList();
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+        /// <summary>
+        /// 新規プレイリスト作成
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ComboMenuMakeNewPlayList_Click(object sender, RoutedEventArgs e) {
+            string TAG = "ComboMenuMakeNewPlayList_Click";
+            string dbMsg = "";
+            try {
+                MakeNewPlayListFile();
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+        /// <summary>
+        /// 前に再生していたアイテムに戻る
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BackBeforeItem_Click(object sender, RoutedEventArgs e) {
+            string TAG = "BackBeforeItem_Click";
+            string dbMsg = "";
+            try {
+
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
         #endregion
 
         readonly CountdownEvent condition = new CountdownEvent(1);
@@ -2294,43 +2410,6 @@ namespace M3UPlayer.ViewModels {
 
 
 
-        //private ViewModelCommand _ViewModelConfirmFrom;
-        //public ViewModelCommand ViewModelConfirmFrom
-        //{
-        //    get {
-        //        string TAG = "ViewModelConfirmFrom";
-        //        string dbMsg = "";
-        //        try
-        //        {
-        //            if (_ViewModelConfirmFrom == null)
-        //            {
-        //                dbMsg += ">>起動時";
-        //                _ViewModelConfirmFrom = new ViewModelCommand(ConfirmFromViewModel);
-
-        //            }
-        //            MyLog(TAG, dbMsg);
-        //        }
-        //        catch (Exception er)
-        //        {
-        //            MyErrorLog(TAG, dbMsg, er);
-        //        }
-        //        return _FileNameInputShow;
-        //    }
-        //}
-
-        //public async void ConfirmFromViewModel()
-        //{
-        //    string TAG = "ConfirmFromView";
-        //    ConfirmationMessage message = new ConfirmationMessage("これはテスト用メッセージです。", "テスト", "MessageKey_Confirm")
-        //    {
-        //        Button = MessageBoxButton.OKCancel,
-        //    };
-        //    await Messenger.RaiseAsync(message);
-        //    string OutputMessage = $"{DateTime.Now}: ConfirmFromViewModel: {message.Response ?? false}";
-        //    string dbMsg = "OutputMessage=" + OutputMessage;
-        //    MyLog(TAG, dbMsg);
-        //}
-
         #endregion
 
         public string DResult { get; private set; }
@@ -2369,12 +2448,6 @@ namespace M3UPlayer.ViewModels {
                     ValidateNames = true,       // ファイル名がWin32に適合するか検査するかどうか。規定値はfalse。
                 };
                 if (SFDialog.ShowDialog() == true) {
-                    //TransitionMessage message = new TransitionMessage(VM, "FileNameInputShow");
-                    //await Messenger.RaiseAsync(message);
-                    //dbMsg += ",Response=" + message.Response;
-                    //dbMsg += ",Result=" + VM.DialogResult;
-                    //if (VM.DialogResult != null) {
-                    //    string nSelectedFile = VM.DialogResult;
                     string nSelectedFile = SFDialog.FileName;
                     dbMsg += ">>" + nSelectedFile;
                     if (File.Exists(nSelectedFile)) {
