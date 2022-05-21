@@ -1684,7 +1684,7 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += "、targetURLStr=" + targetURLStr;
                 string extention = System.IO.Path.GetExtension(targetURLStr);
                 dbMsg += "、拡張子=" + extention;
-                infoStr = targetItem.fileName;
+                infoStr = targetItem.GranDir + " ・ " + targetItem.ParentDir + " ・ " + targetItem.Summary + " ( " + targetItem.extentionStr + " ) ";
                 toWeb = true;  // false;
 
                 //if (-1 < Array.IndexOf(WebVideo, extention) ||
@@ -1760,7 +1760,7 @@ namespace M3UPlayer.ViewModels {
                     //    axWmp.PositionChange += axWindowsMediaPlayer_PositionChange;  //はシークなどの操作がされた時のみ発生  
                     // UIを無効化
                     axWmp.uiMode = "none";
-                    infoStr = axWmp.currentMedia.name;
+        //            infoStr = axWmp.currentMedia.name;
                 } else if ((0 <= Array.IndexOf(FlashVideo, extention))) {
                     movieType = 1;
                     if (flash == null) {
@@ -2420,7 +2420,7 @@ namespace M3UPlayer.ViewModels {
         /// </summary>
         public string PlayListSaveBTVisble { get; set; }
 
-        public ICommand FileNameInputShow => new DelegateCommand(MakeNewPlayListFile);
+   //     public ICommand FileNameInputShow => new DelegateCommand(MakeNewPlayListFile);
         /// <summary>
         /// 新規プレイリストを作成する
         /// </summary>
@@ -7554,50 +7554,6 @@ AddType video/MP2T .ts
         //            }
         //        }       //フォルダの中身をリストアップ
 
-        //        ///fileTreeの操作////////////////////////////////////////////////////////////////////////////
-        //        /// <summary>
-        //        /// FileTreeItemのクリック/セレクト動作
-        //        /// 呼出し元	FileTree_DoubleClick
-        //        /// </summary>
-        //        private void FileTreeItemSelect(TreeNode selectNode)
-        //        {
-        //            string TAG = "[FileTreeItemSelect]";
-        //            string dbMsg = TAG;
-        //            try
-        //            {
-        //                ftSelectNode = selectNode;
-        //                string selectItem = selectNode.Text;
-        //                dbMsg += ",selectItem=" + selectItem;
-        //                lsFullPathName = selectNode.FullPath;
-        //                dbMsg += ",fullPathName=" + lsFullPathName;
-        //                FileInfo fi = new FileInfo(lsFullPathName);
-        //                string fileAttributes = fi.Attributes.ToString();
-        //                dbMsg += ",Attributes=" + fileAttributes;
-        //                string fullName = fi.FullName;
-        //                string infoStr = ",絶対パス;" + fullName;
-        //                infoStr += fi.Exists;
-        //                infoStr += ",親ディレクトリ;" + fi.Directory;// 
-        //                string passNameStr = fi.DirectoryName + "";    //親ディレクトリ名
-        //                if (passNameStr == "")
-        //                {
-        //                    passNameStr = fullName;
-        //                }
-        //                infoStr += ">>" + passNameStr;
-        //                if (fileAttributes.Contains("Directory"))
-        //                {
-        //                    dbMsg += ",Directoryを選択";
-        //                    FolderItemListUp(fullName, selectNode);
-        //                    FileListVewDrow(fullName);
-        //                }
-        //                FileItemSelect(fullName);
-        //                MyLog(TAG, dbMsg);
-        //            }
-        //            catch (Exception er)
-        //            {
-        //                dbMsg += "<<以降でエラー発生>>" + er.Message;
-        //                MyLog(TAG, dbMsg);
-        //            }
-        //        }
 
         //        private void FileTree_Click(object sender, EventArgs e)
         //        {

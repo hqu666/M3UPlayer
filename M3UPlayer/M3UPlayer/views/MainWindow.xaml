@@ -14,7 +14,8 @@
         xmlns:Wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf" 
         x:Class="M3UPlayer.Views.MainWindow" 
         mc:Ignorable="d"
-        Title="MainWindow" Height="1080" Width="1920"
+        Title="{Binding infoStr, Mode=TwoWay}"
+        Height="1080" Width="1920"
         Top="10" Left="10" 
         Closing="Window_Closing"
         >
@@ -170,10 +171,10 @@
                             <ImageBrush ImageSource="/views/explore_icon.png" Stretch="UniformToFill"/>
                         </Button.Background>
                     </Button>
-                    <Button Content="新規プレイリスト"
+                    <!--<Button Content="新規プレイリスト"
                              Command="{Binding FileNameInputShow}"
   						    Grid.Column="3" Margin="5,5,5,5" Grid.RowSpan="2" 
-                          />
+                          />-->
 
                     <!--メッセージボックス；三択サンプル②-->
                     <!--<Button Content="三択" 
@@ -207,6 +208,11 @@
 
 
                     <StackPanel  Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Center" Grid.RowSpan="2">
+                        <!--<TextBlock  Margin="0,0,6,0" 
+                                       Background="Transparent" 
+                                       Text="{Binding infoStr, Mode=TwoWay}"
+                                    
+                                       FontSize="24"/>-->
                         <ComboBox 
                             SelectedValuePath="Key" 
                             DisplayMemberPath="Value"
