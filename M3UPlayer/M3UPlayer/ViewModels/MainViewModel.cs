@@ -1694,7 +1694,7 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += "、targetURLStr=" + targetURLStr;
                 string extention = System.IO.Path.GetExtension(targetURLStr);
                 dbMsg += "、拡張子=" + extention;
-                infoStr = targetItem.GranDir + " ・ " + targetItem.ParentDir + " ・ " + targetItem.Summary + " ( " + targetItem.extentionStr + " ) ";
+                infoStr = "[" + SelectedPlayListIndex + "/" + PLList.Count + "]" + targetItem.GranDir + " ・ " + targetItem.ParentDir + " ・ " + targetItem.Summary + " ( " + targetItem.extentionStr + " ) ";
                 toWeb = true;  // false;
 
                 //if (-1 < Array.IndexOf(WebVideo, extention) ||
