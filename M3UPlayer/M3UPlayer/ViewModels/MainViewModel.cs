@@ -73,11 +73,19 @@ namespace M3UPlayer.ViewModels {
         public PlayListModel PLListSelectedItem { get; set; }
 
         /// <summary>
+        /// 再生中のアイテム
+        /// </summary>
+        public SelectionModel NowSelect { get; set; }
+        /// <summary>
+        /// 前の再生アイテム
+        /// </summary>
+        public SelectionModel BeforSelect { get; set; }
+
+        /// <summary>
         /// 選択されているプレイリストアイテムの配列:SelectedItemsは読み取り専用でBindingできない
         /// SelectionUnit が　FullRow;行単位,CellOrRowHeader:セル単位だが、行で選択も可能,Cell;セル単位
         /// </summary>
         public List<PlayListModel> SelectedPlayListFiles { get; set; }
-
 
         /// <summary>
         /// 複数行選択ならExtended、単行選択ならSingle
@@ -150,7 +158,6 @@ namespace M3UPlayer.ViewModels {
             set { Properties.Settings.Default.NowSelectedFile = value; }
         }
 
-
         private bool _IsHideControl;
         /// <summary>
         /// プレイヤーコントロールの表示/非表示
@@ -183,7 +190,6 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
-
         /// <summary>
         /// 全長:duration
         /// </summary>
@@ -192,8 +198,6 @@ namespace M3UPlayer.ViewModels {
         /// 全長
         /// </summary>
         public string DurationStr {
-            //get { return GetDataBindItem<string>("Title").Value; }
-            //private set { GetDataBindItem<string>("Title").Value = value; }
             get => _DurationStr;
             set {
                 string TAG = "DurationStr(set)";
@@ -272,7 +276,6 @@ namespace M3UPlayer.ViewModels {
                 RaisePropertyChanged("infoStr");
             }
         }
-
 
         private double _SliderValue;
         /// <summary>
@@ -600,21 +603,6 @@ namespace M3UPlayer.ViewModels {
 
 
         /// <summary>
-        /// 切り替える前のプレイリストのインデックス
-        /// </summary>
-        public int BeforSelectedPlayListIndex;
-
-        /// <summary>
-        /// 切り替える前のプレイリストのkey:URL
-        /// </summary>
-        public string BefortPlayListFileName;
-
-        /// <summary>
-        /// 切り替える前の再生アイテム
-        /// </summary>
-        public PlayListModel PLList_befor_SelectedItem;
-
-        /// <summary>
         /// フルスクリーンで起動するか
         /// </summary>
         public bool IsFullScreen {
@@ -735,7 +723,10 @@ namespace M3UPlayer.ViewModels {
                 RewCBComboSelected = Properties.Settings.Default.RewCBComboSelected;
 
                 flash = new AxShockwaveFlash();
-
+                //_NowSelect = new SelectionModel();
+                //_BeforSelect = new SelectionModel();
+                NowSelect = new SelectionModel();
+                BeforSelect = new SelectionModel();
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
@@ -1482,24 +1473,24 @@ namespace M3UPlayer.ViewModels {
             string TAG = "BackBeforeItem_Click";
             string dbMsg = "";
             try {
-                dbMsg += ",切り替える前は " + BefortPlayListFileName + " の " + PLList_befor_SelectedItem.UrlStr;
-                /// 切り替える前のプレイリストのkey:URL
-                PlayListComboSelected= BefortPlayListFileName;
-                /// 切り替える前の再生アイテム
-                PLListSelectedItem = new PlayListModel();
-                PLListSelectedItem=  PLList_befor_SelectedItem;
-
+                CurrentPlayListFileName = BeforSelect.PlayListUrlStr;
+                PlayListComboSelected = BeforSelect.PlayListUrlStr;
                 int listIndex = Array.IndexOf(PlayLists, CurrentPlayListFileName);
-                dbMsg += "[" + listIndex + "/" + PlayLists.Length + "]" + PLList[listIndex];
+                dbMsg += ",切り替える前は[" + listIndex + "/" + PlayLists.Length + "]" + PlayLists[listIndex];
                 //元のコンボを再選択
                 PLComboSelectedIndex = listIndex;
 
-              //  SelectedPlayListIndex=BeforSelectedPlayListIndex;
-
+                /// 切り替える前の再生アイテム
+                PLListSelectedItem = new PlayListModel();
+                PLListSelectedItem = BeforSelect.ListItem;
                 SelectedPlayListIndex = PLList.IndexOf(PLListSelectedItem);
-                dbMsg += "[" + SelectedPlayListIndex + "/" + PLList.Count + "]" + PLListSelectedItem.UrlStr;
-                RaisePropertyChanged("SelectedPlayListIndex");
+				RaisePropertyChanged("SelectedPlayListIndex");
+				dbMsg += "の[" + SelectedPlayListIndex + "/" + PLList.Count + "]" + PLListSelectedItem.UrlStr;
 
+                var cellInfo = MyView.PlayList.SelectedCells.FirstOrDefault();
+                MyView.PlayList.Focus();
+                MyView.PlayList.CurrentCell = cellInfo; 
+                    //Select(MyView.PlayList.CurrentCell.RowNumber);
 
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
@@ -1673,28 +1664,41 @@ namespace M3UPlayer.ViewModels {
             string TAG = "PlayListToPlayer";
             string dbMsg = "";
             try {
+                string targetURLStr = targetItem.UrlStr;
+                dbMsg += "、targetURLStr=" + targetURLStr;
+                if (NowSelect.ListItem.UrlStr != null) {
+                    if (NowSelect.ListItem.UrlStr.Equals(targetURLStr)) {
+                        dbMsg += "は既に再生中";
+                        MyLog(TAG, dbMsg);
+                        return;
+                    }
+                }
+                string extention = System.IO.Path.GetExtension(targetURLStr);
+                dbMsg += "、拡張子=" + extention;
+                infoStr = "[" + SelectedPlayListIndex + "/" + PLList.Count + "]" + targetItem.GranDir + " ・ " + targetItem.ParentDir + " ・ " +targetItem.Summary + " ( " + targetItem.extentionStr + " ) ";
+
+				if (NowSelect != null) {
+                    BeforSelect = NowSelect;
+                    dbMsg += ">>BeforSelect:" + BeforSelect.PlayListUrlStr + "[" + BeforSelect.SelectedIndex + "]" + BeforSelect.ListItem.UrlStr;
+                }
+                NowSelect.PlayListUrlStr = PlayListComboSelected;
+                NowSelect.SelectedIndex = SelectedPlayListIndex;
+                NowSelect.ListItem = targetItem;
+                dbMsg += ">>NowSelect:" + NowSelect.PlayListUrlStr + "[" + NowSelect.SelectedIndex + "]" + NowSelect.ListItem.UrlStr;
+
                 IsHideControl = false;
                 if (1 < MyView.FrameGrid.Children.Count) {
                     dbMsg += ">delete既存=" + MyView.FrameGrid.Children.Count + "件";
                     if (axWmp != null) {
                         axWmp.close();
                         axWmp = null;
-					} else if (flash != null) {
-						flash.Dispose();
-						flash = null;
-					}
+                    } else if (flash != null) {
+                        flash.Dispose();
+                        flash = null;
+                    }
                     MyView.FrameGrid.Children.RemoveAt(1);
                 }
-                //if (myview.mainframe.source != null) {
-                //	myview.mainframe.source = null;
-                //	//dbmsg += "既存=" + myview.mainframe.children.count + "件";
-                //	//myview.mainframe.children.removeat(0);
-                //}
-                string targetURLStr = targetItem.UrlStr;
-                dbMsg += "、targetURLStr=" + targetURLStr;
-                string extention = System.IO.Path.GetExtension(targetURLStr);
-                dbMsg += "、拡張子=" + extention;
-                infoStr = "[" + SelectedPlayListIndex + "/" + PLList.Count + "]" + targetItem.GranDir + " ・ " + targetItem.ParentDir + " ・ " + targetItem.Summary + " ( " + targetItem.extentionStr + " ) ";
+
                 toWeb = true;  // false;
 
                 //if (-1 < Array.IndexOf(WebVideo, extention) ||
@@ -2309,7 +2313,6 @@ namespace M3UPlayer.ViewModels {
                     //	//get the target item
                     //	PlayListModel
                     targetItem = SelectedPlayListFiles[0];
-
                     //	if (targetItem == null) {           // || !ReferenceEquals(DraggedItem, targetItem)
 
                     //		//// create tempporary row
@@ -2919,15 +2922,9 @@ namespace M3UPlayer.ViewModels {
                 if (!PlayListOpelate(titolStr, errorStr, doStr)) {
                     return;
                 }
-
-                //切り替える前のプレイリストのインデックス
-                BeforSelectedPlayListIndex = SelectedPlayListIndex;
-                /// 切り替える前のプレイリストのkey:URL
-                BefortPlayListFileName = PlayListComboSelected;
-                /// 切り替える前の再生アイテム
-                PLList_befor_SelectedItem = new PlayListModel();
-                PLList_befor_SelectedItem = PLListSelectedItem;
-                dbMsg += "," + BefortPlayListFileName + " の[ "+ BeforSelectedPlayListIndex + "]"+ PLList_befor_SelectedItem.UrlStr;
+                //切り替える前
+                BeforSelect = NowSelect;
+                dbMsg += "," + BeforSelect.PlayListUrlStr + " の[ "+ BeforSelect.SelectedIndex + "]"+ BeforSelect.ListItem.UrlStr;
 
                 NowSelectedFile = PLListSelectedItem.UrlStr;
                 dbMsg += "=" + NowSelectedFile;
