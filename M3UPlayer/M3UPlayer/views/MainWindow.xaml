@@ -263,6 +263,15 @@
                            MouseDown="PlayList_MouseDown" 
                            MouseUp="PlayList_MouseUp" Margin="0,0,5,0" 
 						>
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="Navy" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.RowStyle>
                     <!--
     						   SelectionMode="Extended"
                PlayListSelectionMode="Extended"
