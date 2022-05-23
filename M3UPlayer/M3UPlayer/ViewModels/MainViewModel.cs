@@ -852,8 +852,13 @@ namespace M3UPlayer.ViewModels {
                         if (IsWright) {
                             PlayListModel playListModel = MakeOneItem(url);
                             if (playListModel.UrlStr != null) {
+                                if (-1 < Array.IndexOf(WMPFiles, playListModel.extentionStr)
+                                    || -1 < Array.IndexOf(FlashVideo, playListModel.extentionStr)
+                                    || -1 < Array.IndexOf(WebVideo, playListModel.extentionStr)
+                                    ) {
+                                    PLList.Add(playListModel);
+                                }
 
-                                PLList.Add(playListModel);
                                 //PDVM.PrgStatus = playListModel.Summary + "";
                                 //PDVM.PrgVal = PLList.Count();
                                 PDVM.DoProgress(PLList.Count(), playListModel.Summary + "");
@@ -931,10 +936,15 @@ namespace M3UPlayer.ViewModels {
                     if (File.Exists(url)) {
                         PlayListModel playListModel = MakeOneItem(url);
                         if (playListModel.UrlStr != null) {
-                            if (InsertTo == -1) {
-                                PLList.Add(playListModel);
-                            } else {
-                                PLList.Insert(InsertTo, playListModel);
+                            if (-1 < Array.IndexOf(WMPFiles, playListModel.extentionStr)
+                                || -1 < Array.IndexOf(FlashVideo, playListModel.extentionStr)
+                                || -1 < Array.IndexOf(WebVideo, playListModel.extentionStr)
+                                ) {
+                                if (InsertTo == -1) {
+                                    PLList.Add(playListModel);
+                                } else {
+                                    PLList.Insert(InsertTo, playListModel);
+                                }
                             }
                         }
                     } else if (Directory.Exists(url)) {
@@ -974,15 +984,16 @@ namespace M3UPlayer.ViewModels {
                     //}
                     dbMsg += "[" + InsertTo + "/" + ListItemCount + "番目]" + url;
                     PlayListModel playListModel = MakeOneItem(url);
-                    if (InsertTo == -1) {
-                        PLList.Add(playListModel);
-                    } else {
-                        PLList.Insert(InsertTo, playListModel);
+                    if (-1 < Array.IndexOf(WMPFiles, playListModel.extentionStr)
+                        || -1 < Array.IndexOf(FlashVideo, playListModel.extentionStr)
+                        || -1 < Array.IndexOf(WebVideo, playListModel.extentionStr)
+                        ) {
+                        if (InsertTo == -1) {
+                            PLList.Add(playListModel);
+                        } else {
+                            PLList.Insert(InsertTo, playListModel);
+                        }
                     }
-
-                    //if (playListModel.UrlStr != null) {
-                    //	PLList.Insert(InsertTo, playListModel);
-                    //}
                     RaisePropertyChanged("PLList");
                     ListItemCount = PLList.Count();
                     RaisePropertyChanged("ListItemCount");
