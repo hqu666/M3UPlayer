@@ -36,6 +36,7 @@ using AxShockwaveFlashObjects;
 using ShockwaveFlashObjects;
 using AxWMPLib;
 using Microsoft.Web.WebView2.Wpf;
+using System.Diagnostics;
 
 namespace M3UPlayer.ViewModels {
     public class MainViewModel : INotifyPropertyChanged {
@@ -2814,7 +2815,11 @@ namespace M3UPlayer.ViewModels {
                 pathStr = pathStr.Replace("//", "/");
                 pathStr = pathStr.Replace('/', Path.DirectorySeparatorChar);
                 dbMsg += ">>" + pathStr + " の " + fileNameStr;
-                //		System.Diagnostics.Process.Start("EXPLORER.EXE", pathStr);
+
+                Process.Start("EXPLORER.EXE", pathStr);
+
+                /*
+
                 // ダイアログのインスタンスを生成
                 cofDialog = new CommonOpenFileDialog("ファイルの操作") {
                     IsFolderPicker = false,             //フォルダ選択
@@ -2857,6 +2862,7 @@ namespace M3UPlayer.ViewModels {
                     PLList.RemoveAt(SelectedPlayListIndex);
                     SavePlayList();
                 }
+                 */
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
