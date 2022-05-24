@@ -3580,53 +3580,28 @@ namespace M3UPlayer.ViewModels {
         /// </summary>
         public bool isPSLDrag=false;
 
-        /// <summary>
-        /// 再生ポジションスライダーのMouseDown
-        /// </summary>
-     //   public ICommand PSLMouseDown => new DelegateCommand(PositionSLiderMouseDown);
-        public void PositionSLiderMouseDown(double newPosition) {
-            string TAG = "PositionSLiderMouseDown";
-            string dbMsg = "";
-            try {
-                dbMsg += ",SliderValue=" + SliderValue + ">>" + newPosition;
-                isPSLDrag =true;
-                //dbMsg += ",newPosition=" + newPosition;
-                //SliderValue = newPosition;
-                //RaisePropertyChanged("SliderValue");
-                ////await Task.Run(() => {の中では設定できなかった
-                //await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
-                //IsPlaying = true;
-                //RaisePropertyChanged("IsPlaying");
-
-                //       await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
-                MyLog(TAG, dbMsg);
-            } catch (Exception er) {
-                MyErrorLog(TAG, dbMsg, er);
-            }
-        }
-
-        /// <summary>
-        /// 再生ポジションスライダーのMouseUp
-        /// </summary>
-   //     public ICommand PSLMouseUp => new DelegateCommand(PositionSLiderMouseUp);
-        public void PositionSLiderMouseUp(double newPosition) {
-            string TAG = "PositionSLiderMouseUp";
-            string dbMsg = "";
-            try {
-                dbMsg += ",SliderValue=" + SliderValue + ">>" + newPosition;
-                //dbMsg += ",newPosition=" + newPosition;
-                //SliderValue = newPosition;
-                //RaisePropertyChanged("SliderValue");
-                ////await Task.Run(() => {の中では設定できなかった
-                //await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
-                //IsPlaying = true;
-                //RaisePropertyChanged("IsPlaying");
-                isPSLDrag = false;
-                MyLog(TAG, dbMsg);
-            } catch (Exception er) {
-                MyErrorLog(TAG, dbMsg, er);
-            }
-        }
+        //     /// <summary>
+        //     /// 再生ポジションスライダーのMouseUp
+        ////     public ICommand PSLMouseUp => new DelegateCommand(PositionSLiderMouseUp);　だとクラッシュする
+        //     /// </summary>
+        //     public void PositionSLiderMouseUp(double newPosition) {
+        //         string TAG = "PositionSLiderMouseUp";
+        //         string dbMsg = "";
+        //         try {
+        //             dbMsg += ",SliderValue=" + SliderValue + ">>" + newPosition;
+        //             //dbMsg += ",newPosition=" + newPosition;
+        //             //SliderValue = newPosition;
+        //             //RaisePropertyChanged("SliderValue");
+        //             ////await Task.Run(() => {の中では設定できなかった
+        //             //await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
+        //             //IsPlaying = true;
+        //             //RaisePropertyChanged("IsPlaying");
+        //             isPSLDrag = false;
+        //             MyLog(TAG, dbMsg);
+        //         } catch (Exception er) {
+        //             MyErrorLog(TAG, dbMsg, er);
+        //         }
+        //     }
 
         /// <summary>
         /// 再生ポジションスライダーの Thumb 位置変更

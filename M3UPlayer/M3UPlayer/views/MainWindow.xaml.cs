@@ -987,24 +987,13 @@ namespace M3UPlayer.Views {
 			}
 		}
 
-		private void PositionSL_MouseDown(object sender, MouseButtonEventArgs e) {
-			string TAG = "PositionSL_MouseDown";
-			string dbMsg = TAG;
-			try {
-				Slider slider = (Slider)sender;
-				double newValue = slider.Value;
-				dbMsg += "newValue=" + newValue;
-				VM.PositionSliderValueChang(newValue);
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				dbMsg += "<<以降でエラー発生>>" + er.Message;
-				MyLog(TAG, dbMsg);
-			}
-
-		}
-
+		/// <summary>
+		/// 再生ポジションスライダーのクリック
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void PositionSL_MouseUp(object sender, MouseButtonEventArgs e) {
-			string TAG = "PositionSL_MouseUp";
+			string TAG = "positionsl_mouseup";
 			string dbMsg = TAG;
 			try {
 				Slider slider = (Slider)sender;
@@ -1017,7 +1006,6 @@ namespace M3UPlayer.Views {
 				MyLog(TAG, dbMsg);
 			}
 		}
-
 
 		/// <summary>
 		/// 音量調整スライダー

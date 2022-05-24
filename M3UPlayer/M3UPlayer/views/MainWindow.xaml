@@ -557,19 +557,16 @@
                                     LargeChange="10"
                                     IsSnapToTickEnabled="True"
                                     IsMoveToPointEnabled="True"
+                                    MouseUp="PositionSL_MouseUp" 
                                     AutoToolTipPlacement="TopLeft"
                                     Thumb.DragStarted="PositionSL_DragStarted"
                                     Thumb.DragCompleted="PositionSL_DragCompleted"
-                                    MouseDown="PositionSL_MouseDown"
-                                    MouseUp="PositionSL_MouseUp" 
                                     Maximum="{Binding SliderMaximum, Mode=OneWay}"
                                     Value="{Binding SliderValue, Mode=TwoWay}"
                                     Style="{DynamicResource MySliderStyle}"
                                     
                                     >
                                 <!--
-                                      MouseDown="{Binding PSLMouseDown}" 
-                                    MouseUp="{Binding PSLMouseUp}" 
                                    ValueChanged="Slider_ValueChanged"
                                                                    ValueChanged="{Binding PositionSliderValueChanged}"
 
