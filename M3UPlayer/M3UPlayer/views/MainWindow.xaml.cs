@@ -987,6 +987,37 @@ namespace M3UPlayer.Views {
 			}
 		}
 
+		private void PositionSL_MouseDown(object sender, MouseButtonEventArgs e) {
+			string TAG = "PositionSL_MouseDown";
+			string dbMsg = TAG;
+			try {
+				Slider slider = (Slider)sender;
+				double newValue = slider.Value;
+				dbMsg += "newValue=" + newValue;
+				VM.PositionSliderValueChang(newValue);
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(TAG, dbMsg);
+			}
+
+		}
+
+		private void PositionSL_MouseUp(object sender, MouseButtonEventArgs e) {
+			string TAG = "PositionSL_MouseUp";
+			string dbMsg = TAG;
+			try {
+				Slider slider = (Slider)sender;
+				double newValue = slider.Value;
+				dbMsg += "newValue=" + newValue;
+				VM.PositionSliderValueChang(newValue);
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(TAG, dbMsg);
+			}
+		}
+
 
 		/// <summary>
 		/// 音量調整スライダー
@@ -1046,5 +1077,6 @@ namespace M3UPlayer.Views {
 			CS_Util Util = new CS_Util();
 			return Util.MessageShowWPF(msgStr, titolStr, buttns, icon);
 		}
+
 	}
 }

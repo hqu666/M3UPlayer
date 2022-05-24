@@ -1720,8 +1720,8 @@ namespace M3UPlayer.ViewModels {
                 //Frame frame = new Frame();
                 dbMsg += "、[" + FreamWidth + "×" + FreamHeigh + "]";
                 if (-1 < Array.IndexOf(WMPFiles, extention)
-                    || -1 < Array.IndexOf(FlashVideo, extention)
-                    ) {
+					|| -1 < Array.IndexOf(FlashVideo, extention)
+					) {
                     host = new System.Windows.Forms.Integration.WindowsFormsHost();
                     //       host.HorizontalAlignment= "Stretch"
                     toWeb = false;
@@ -1858,7 +1858,12 @@ namespace M3UPlayer.ViewModels {
         }
 
 
-        // タイマメソッド
+        /// <summary>
+        /// タイマメソッド
+        /// WMPはここで再生ポジションを取得する
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MyTimerMethod(object sender, EventArgs e) {
             string TAG = "MyTimerMethod";
             string dbMsg = "";
@@ -2287,18 +2292,6 @@ namespace M3UPlayer.ViewModels {
         //	}
         //}
         //#endregion
-
-        //#region PlayListアイテムでマウスアップ
-        //     public ICommand PlayList_MouseUp => new DelegateCommand(PLMouseUp);
-        //private ViewModelCommand _PlayListMouseUp;
-        //public ViewModelCommand PlayListMouseUp {
-        //	get {
-        //		if (_PlayListMouseUp == null) {
-        //			_PlayListMouseUp = new ViewModelCommand(PLMouseUp);
-        //		}
-        //		return _PlayListMouseUp;
-        //	}
-        //}
 
         /// <summary>
         /// プレイリストでのマウスアップ                    Completes a drag/drop operation.
@@ -3558,14 +3551,77 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += " / " + SliderMaximum;
                 IsPlaying = false;
                 RaisePropertyChanged("IsPlaying");
-                if (toWeb) {
-                    await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
-                } else if (axWmp != null) {
-                    axWmp.Ctlcontrols.currentPosition = newPosition;
+                switch (movieType) {
+                    case 0:
+                        await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
+                        break;
+                    case 1:
+                        if (axWmp != null) {
+                            axWmp.Ctlcontrols.currentPosition = newPosition;
+                        }
+                        break;
+                    case 2:
+                        if (flash != null) {
+                            //flash.SetVariable("isPlay", "true");
+                            //flash.Play();
+                        }
+                        break;
                 }
-                //await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
                 IsPlaying = true;
                 RaisePropertyChanged("IsPlaying");
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+        /// <summary>
+        /// 再生ポジションスライダー操作中
+        /// </summary>
+        public bool isPSLDrag=false;
+
+        /// <summary>
+        /// 再生ポジションスライダーのMouseDown
+        /// </summary>
+     //   public ICommand PSLMouseDown => new DelegateCommand(PositionSLiderMouseDown);
+        public void PositionSLiderMouseDown(double newPosition) {
+            string TAG = "PositionSLiderMouseDown";
+            string dbMsg = "";
+            try {
+                dbMsg += ",SliderValue=" + SliderValue + ">>" + newPosition;
+                isPSLDrag =true;
+                //dbMsg += ",newPosition=" + newPosition;
+                //SliderValue = newPosition;
+                //RaisePropertyChanged("SliderValue");
+                ////await Task.Run(() => {の中では設定できなかった
+                //await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
+                //IsPlaying = true;
+                //RaisePropertyChanged("IsPlaying");
+
+                //       await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+        /// <summary>
+        /// 再生ポジションスライダーのMouseUp
+        /// </summary>
+   //     public ICommand PSLMouseUp => new DelegateCommand(PositionSLiderMouseUp);
+        public void PositionSLiderMouseUp(double newPosition) {
+            string TAG = "PositionSLiderMouseUp";
+            string dbMsg = "";
+            try {
+                dbMsg += ",SliderValue=" + SliderValue + ">>" + newPosition;
+                //dbMsg += ",newPosition=" + newPosition;
+                //SliderValue = newPosition;
+                //RaisePropertyChanged("SliderValue");
+                ////await Task.Run(() => {の中では設定できなかった
+                //await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
+                //IsPlaying = true;
+                //RaisePropertyChanged("IsPlaying");
+                isPSLDrag = false;
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
@@ -3583,12 +3639,27 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += ",newPosition=" + newPosition;
                 SliderValue = newPosition;
                 RaisePropertyChanged("SliderValue");
-                //await Task.Run(() => {の中では設定できなかった
-                await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
+                switch (movieType) {
+                    case 0:
+                        //await Task.Run(() => {の中では設定できなかった
+                        await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
+                        break;
+                    case 1:
+                        if (axWmp != null) {
+                            axWmp.Ctlcontrols.currentPosition = newPosition;
+                        }
+                        break;
+                    case 2:
+                        if (flash != null) {
+                            //flash.SetVariable("isPlay", "true");
+                            //flash.Play();
+                        }
+                        break;
+                }
+
                 IsPlaying = true;
                 RaisePropertyChanged("IsPlaying");
 
-                //       await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);

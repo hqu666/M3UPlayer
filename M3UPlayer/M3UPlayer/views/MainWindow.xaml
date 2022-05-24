@@ -553,16 +553,24 @@
                                     VerticalContentAlignment="Stretch"
                                     HorizontalContentAlignment="Stretch" 
                                     Margin="0,6,0,0"
-                                    SmallChange="1" LargeChange="10"
+                                    SmallChange="1" 
+                                    LargeChange="10"
                                     IsSnapToTickEnabled="True"
+                                    IsMoveToPointEnabled="True"
                                     AutoToolTipPlacement="TopLeft"
                                     Thumb.DragStarted="PositionSL_DragStarted"
                                     Thumb.DragCompleted="PositionSL_DragCompleted"
+                                    MouseDown="PositionSL_MouseDown"
+                                    MouseUp="PositionSL_MouseUp" 
                                     Maximum="{Binding SliderMaximum, Mode=OneWay}"
                                     Value="{Binding SliderValue, Mode=TwoWay}"
-                                    Style="{DynamicResource MySliderStyle}">
+                                    Style="{DynamicResource MySliderStyle}"
+                                    
+                                    >
                                 <!--
-                                     ValueChanged="Slider_ValueChanged"
+                                      MouseDown="{Binding PSLMouseDown}" 
+                                    MouseUp="{Binding PSLMouseUp}" 
+                                   ValueChanged="Slider_ValueChanged"
                                                                    ValueChanged="{Binding PositionSliderValueChanged}"
 
                                 センターライン；TrackBackground　/　ハンドル；Thumb-->
