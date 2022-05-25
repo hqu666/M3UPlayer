@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -881,6 +882,39 @@ namespace M3UPlayer.Views {
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
+		}
+
+		/// <summary>
+		/// ソート機能があるDataGridのHeaderをクリック
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void PlayList_Sorting(object sender, DataGridSortingEventArgs e) {
+			string TAG = "PlayList_Sorting";
+			string dbMsg = "";
+			try {
+				// 既存のソート処理が行われなくなる。これをしないとカスタムソートが効かない。
+				e.Handled = true;
+				DataGrid DG = (DataGrid)sender;
+				int ColCount = DG.Columns.Count();
+				// クリックされたヘッダー
+				DataGridColumn Cols = e.Column;
+				ListSortDirection isDescending = (Cols.SortDirection != ListSortDirection.Ascending) ? ListSortDirection.Ascending : ListSortDirection.Descending;
+
+				int selCol = 0;
+				for (selCol = 0; selCol< ColCount; selCol++) {
+					dbMsg += "[" + selCol + "/" + ColCount + "]" + DG.Columns[selCol].Header;
+					if (DG.Columns[selCol].Header.Equals(Cols.Header)) {
+						break;
+					}
+				}
+				dbMsg += ",index= "+ selCol + " を選択" + isDescending;
+				VM.PlayListSort(selCol, (string)Cols.Header, isDescending);
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				MyErrorLog(TAG, dbMsg, er);
+			}
+
 		}
 
 

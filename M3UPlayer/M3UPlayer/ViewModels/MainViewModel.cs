@@ -1511,6 +1511,21 @@ namespace M3UPlayer.ViewModels {
         }
         #endregion
 
+        public void PlayListSort(int sortIndex, string headerName , System.ComponentModel.ListSortDirection? isDescending) {
+            string TAG = "PlayListSort";
+            string dbMsg = "";
+            string retStr = "";
+            try {
+                dbMsg += "[" + sortIndex + "]" + headerName + ",降順" + isDescending;
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+
+
+
         readonly CountdownEvent condition = new CountdownEvent(1);
 
         /// <summary>
