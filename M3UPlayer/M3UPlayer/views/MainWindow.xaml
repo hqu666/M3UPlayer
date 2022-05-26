@@ -307,7 +307,7 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="URL"
                                             Binding="{Binding UrlStr}" 
-                                            Width="*"
+                                            Width="Auto"
                                             >
                             <DataGridTextColumn.ElementStyle>
                                 <Style>
@@ -317,11 +317,11 @@
                         </DataGridTextColumn>
                         <DataGridTextColumn Header="folder" 
                                             Binding="{Binding ParentDir}" 
-                                            Width="Auto"
+                                            Width="*"
                                              />
                         <DataGridTextColumn Header="file" 
                                             Binding="{Binding Summary}" 
-                                            Width="Auto"
+                                            Width="*"
                                              />
                         <DataGridTextColumn Header="ext" 
                                             Binding="{Binding extentionStr}" 

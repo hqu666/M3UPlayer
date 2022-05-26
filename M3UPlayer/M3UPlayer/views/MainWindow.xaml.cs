@@ -884,6 +884,8 @@ namespace M3UPlayer.Views {
 			}
 		}
 
+
+		private ListSortDirection? _isDescending = ListSortDirection.Descending;
 		/// <summary>
 		/// ソート機能があるDataGridのHeaderをクリック
 		/// </summary>
@@ -899,16 +901,30 @@ namespace M3UPlayer.Views {
 				int ColCount = DG.Columns.Count();
 				// クリックされたヘッダー
 				DataGridColumn Cols = e.Column;
-				ListSortDirection isDescending = (Cols.SortDirection != ListSortDirection.Ascending) ? ListSortDirection.Ascending : ListSortDirection.Descending;
+
+				ListSortDirection? isDescending = Cols.SortDirection;
+				//isDescending = (Cols.SortDirection != ListSortDirection.Ascending) ? ListSortDirection.Ascending : ListSortDirection.Descending;
 
 				int selCol = 0;
 				for (selCol = 0; selCol< ColCount; selCol++) {
 					dbMsg += "[" + selCol + "/" + ColCount + "]" + DG.Columns[selCol].Header;
 					if (DG.Columns[selCol].Header.Equals(Cols.Header)) {
+						isDescending = DG.Columns[selCol].SortDirection;
 						break;
 					}
 				}
-				dbMsg += ",index= "+ selCol + " を選択" + isDescending;
+				dbMsg += ",index= "+ selCol + " を選択";
+				dbMsg += ",sort= " + isDescending;
+				if (isDescending == null) {
+					if (_isDescending == ListSortDirection.Descending) {
+						isDescending = ListSortDirection.Ascending;
+					} else {
+						isDescending = ListSortDirection.Descending;
+					}
+					dbMsg += ">> " + isDescending;
+				}
+				_isDescending = isDescending;
+
 				VM.PlayListSort(selCol, (string)Cols.Header, isDescending);
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {

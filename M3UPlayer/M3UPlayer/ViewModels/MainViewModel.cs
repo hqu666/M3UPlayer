@@ -1517,7 +1517,49 @@ namespace M3UPlayer.ViewModels {
             string retStr = "";
             try {
                 dbMsg += "[" + sortIndex + "]" + headerName + ",降順" + isDescending;
-				MyLog(TAG, dbMsg);
+				if (isDescending== ListSortDirection.Ascending) {
+                    switch (sortIndex) {
+                        case 0:
+                            PLList = new ObservableCollection<PlayListModel>(PLList.OrderBy(n => n.UrlStr));
+                            break;
+                        case 1:
+                            PLList = new ObservableCollection<PlayListModel>(PLList.OrderBy(n => n.ParentDir));
+                            break;
+                        case 2:
+                            PLList = new ObservableCollection<PlayListModel>(PLList.OrderBy(n => n.Summary));
+                            break;
+                        case 3:
+                            PLList = new ObservableCollection<PlayListModel>(PLList.OrderBy(n => n.extentionStr));
+                            break;
+                        default:
+                            PLList = new ObservableCollection<PlayListModel>(PLList.OrderBy(n => n.UrlStr));
+                            break;
+                    }
+				} else {
+                    switch (sortIndex) {
+                        case 0:
+                            PLList = new ObservableCollection<PlayListModel>(PLList.OrderByDescending(n => n.UrlStr));
+                            break;
+                        case 1:
+                            PLList = new ObservableCollection<PlayListModel>(PLList.OrderByDescending(n => n.ParentDir));
+                            break;
+                        case 2:
+                            PLList = new ObservableCollection<PlayListModel>(PLList.OrderByDescending(n => n.Summary));
+                            break;
+                        case 3:
+                            PLList = new ObservableCollection<PlayListModel>(PLList.OrderByDescending(n => n.extentionStr));
+                            break;
+                        default:
+                            PLList = new ObservableCollection<PlayListModel>(PLList.OrderByDescending(n => n.UrlStr));
+                            break;
+                    }
+                }
+
+
+
+                RaisePropertyChanged("PLList");
+
+                MyLog(TAG, dbMsg);
 			} catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
