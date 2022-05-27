@@ -5,6 +5,13 @@ C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Cosmos.CRTCompat.dll
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\M3UPlayer.exe
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\AxInterop.ShockwaveFlashObjects.dll
+C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\AxInterop.WMPLib.dll
+C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\EmbedFlash.swf
+C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\fladance.swf
+C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\flaver.swf
+C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\flvplayer-305.swf
+C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Interop.ShockwaveFlashObjects.dll
+C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Interop.WMPLib.dll
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Resources\fladance.swf
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Resources\Interop.Acrobat.dll
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Resources\Interop.FlashBrokerLib.dll
@@ -41,8 +48,6 @@ C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Microsoft.WindowsAPICodePack.Shell.dll
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Microsoft.WindowsAPICodePack.ShellExtensions.dll
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Microsoft.WindowsAPICodePack.dll
-C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\AxInterop.WMPLib.dll
-C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Interop.WMPLib.dll
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\runtimes\win-x64\native\Cosmos.CRTCompat.dll
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\runtimes\win-x64\native\Microsoft.Azure.Cosmos.ServiceInterop.dll
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\runtimes\win-arm64\native\sni.dll
@@ -50,7 +55,6 @@ C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\runtimes\win-x86\native\sni.dll
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\runtimes\unix\lib\netstandard2.0\System.Data.SqlClient.dll
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\runtimes\win\lib\netstandard2.0\System.Data.SqlClient.dll
-C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\Interop.ShockwaveFlashObjects.dll
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\obj\Debug\net6.0-windows\M3UPlayer.csproj.AssemblyReference.cache
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\obj\Debug\net6.0-windows\views\WebWindow.baml
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\obj\Debug\net6.0-windows\views\MainWindow.g.cs
@@ -75,7 +79,3 @@ C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\obj\
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\obj\Debug\net6.0-windows\M3UPlayer.pdb
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\obj\Debug\net6.0-windows\M3UPlayer.genruntimeconfig.cache
 C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\obj\Debug\net6.0-windows\ref\M3UPlayer.dll
-C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\EmbedFlash.swf
-C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\fladance.swf
-C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\flaver.swf
-C:\Users\hqu66\AppData\Local\Atlassian\hqu666\M3UPlayer\M3UPlayer\M3UPlayer\bin\Debug\net6.0-windows\flvplayer-305.swf

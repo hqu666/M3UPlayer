@@ -389,6 +389,7 @@
                             Width="200" Height="20"
                             Margin="0,0,20,0"
                             Maximum="1"
+                            AutoToolTipPrecision="2"
                             AutoToolTipPlacement="TopLeft"
                             Value="{Binding SoundValue, Mode=TwoWay}"
                             Thumb.DragCompleted="SoundSlider_DragCompleted"
@@ -486,7 +487,7 @@
                         </Grid.RowDefinitions>
                         <Grid  VerticalAlignment="Bottom">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition  Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock  Grid.Column="0"
@@ -499,6 +500,7 @@
                                 <TextBlock Grid.Column="0"
                                         Margin="0,0,0,0" 
                                        Background="Transparent" 
+                                           x:Name="PositionTB"
                                        Text="{Binding PositionStr}" 
                                        FontSize="28" 
                                        Foreground="White" />
@@ -559,17 +561,21 @@
                                     LargeChange="10"
                                     IsSnapToTickEnabled="True"
                                     IsMoveToPointEnabled="True"
-                                    MouseUp="PositionSL_MouseUp" 
+                                    MouseUp="PositionSL_MouseUp"
+                                    ToolTip="{Binding PositionStr , Mode=OneWay}" 
                                     AutoToolTipPlacement="TopLeft"
                                     Thumb.DragStarted="PositionSL_DragStarted"
                                     Thumb.DragCompleted="PositionSL_DragCompleted"
                                     Maximum="{Binding SliderMaximum, Mode=OneWay}"
                                     Value="{Binding SliderValue, Mode=TwoWay}"
                                     Style="{DynamicResource MySliderStyle}"
-                                    
-                                    >
+                                   >
                                 <!--
-                                   ValueChanged="Slider_ValueChanged"
+                                                                   ToolTip="{Binding PositionStr , Mode=OneWay}" 
+
+                                PositionStr     
+                                     ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Value}" 
+                                  ValueChanged="Slider_ValueChanged"
                                                                    ValueChanged="{Binding PositionSliderValueChanged}"
 
                                 センターライン；TrackBackground　/　ハンドル；Thumb-->

@@ -1200,93 +1200,6 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
-
-        //        /// <summary>
-        //        /// プレイリスト選択
-        //        /// </summary>
-        //        /// <param name="sender"></param>
-        //        /// <param name="e"></param>
-        //        private void PlaylistComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        //        {
-        //            string TAG = "[PlaylistComboBox_SelectedIndexChanged]";
-        //            string dbMsg = TAG;
-        //            try
-        //            {
-        //                if (PlaylistComboBox.SelectedItem != null)
-        //                {
-        //                    nowLPlayList = PlaylistComboBox.SelectedItem.ToString();//    "M:\\DL\\2013.m3u"  object { string}
-        //                    dbMsg += ",selePLName=" + nowLPlayList;
-        //                    if (nowLPlayList.Contains(".m3u"))
-        //                    {
-        //                        ReadPlayList(nowLPlayList);
-        //                        appSettings.CurrentList = nowLPlayList;
-        //                    }
-        //                    else if (0 == PlaylistComboBox.SelectedIndex)
-        //                    {
-        //                        string setType = "video";
-        //                        if (typeName.Text == "audio")
-        //                        {
-        //                            setType = typeName.Text;
-        //                        }
-        //                        dbMsg += ",setType=" + setType;
-        //                        continuousPlayCheckBox.Checked = true;
-        //                        SetPlayListItems(nowLPlayList, setType);
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    dbMsg += ",SelectedItem=" + PlaylistComboBox.SelectedItem;
-        //                }
-        //                MyLog(TAG, dbMsg);
-        //            }
-        //            catch (Exception er)
-        //            {
-        //                dbMsg += "<<以降でエラー発生>>" + er.Message;
-        //                MyLog(TAG, dbMsg);
-        //            }
-
-        //        }
-
-
-        //        /// <summary>
-        //        /// プレイリストDataSource
-        //        /// 参照　　　https://www.ipentec.com/document/document.aspx?page=csharp-listbox-use-original-datasource
-        //        /// </summary>
-        //        class PlayListItems
-        //        {
-        //            string notationName;            //表記名
-        //            string fullPathStr;             //フルパス名
-
-        //            public PlayListItems()
-        //            {
-        //            }
-        //            public PlayListItems(string notation, string pathStr)
-        //            {
-        //                notationName = notation;
-        //                fullPathStr = pathStr;
-        //            }
-
-        //            public string NotationName
-        //            {
-        //                set {
-        //                    notationName = value;
-        //                }
-        //                get {
-        //                    return notationName;
-        //                }
-        //            }
-
-        //            public string FullPathStr
-        //            {
-        //                set {
-        //                    fullPathStr = value;
-        //                }
-        //                get {
-        //                    return fullPathStr;
-        //                }
-        //            }
-        //        }
-
         #region プレイリストコンボのメニュー
         public ContextMenu PlayListComboItemMenu { get; set; }
         public MenuItem PlayListComboItemDelete;
@@ -1511,6 +1424,12 @@ namespace M3UPlayer.ViewModels {
         }
         #endregion
 
+        /// <summary>
+        /// プレイリストのソート
+        /// </summary>
+        /// <param name="sortIndex"></param>
+        /// <param name="headerName"></param>
+        /// <param name="isDescending"></param>
         public void PlayListSort(int sortIndex, string headerName , System.ComponentModel.ListSortDirection? isDescending) {
             string TAG = "PlayListSort";
             string dbMsg = "";
@@ -1520,6 +1439,8 @@ namespace M3UPlayer.ViewModels {
 				if (isDescending== ListSortDirection.Ascending) {
                     switch (sortIndex) {
                         case 0:
+                            PLList = new ObservableCollection<PlayListModel>(PLList.OrderBy(n => n.Summary));
+                            PLList = new ObservableCollection<PlayListModel>(PLList.OrderBy(n => n.ParentDir));
                             PLList = new ObservableCollection<PlayListModel>(PLList.OrderBy(n => n.UrlStr));
                             break;
                         case 1:
@@ -1538,6 +1459,8 @@ namespace M3UPlayer.ViewModels {
 				} else {
                     switch (sortIndex) {
                         case 0:
+                            PLList = new ObservableCollection<PlayListModel>(PLList.OrderByDescending(n => n.Summary));
+                            PLList = new ObservableCollection<PlayListModel>(PLList.OrderByDescending(n => n.ParentDir));
                             PLList = new ObservableCollection<PlayListModel>(PLList.OrderByDescending(n => n.UrlStr));
                             break;
                         case 1:
@@ -1554,19 +1477,12 @@ namespace M3UPlayer.ViewModels {
                             break;
                     }
                 }
-
-
-
                 RaisePropertyChanged("PLList");
-
                 MyLog(TAG, dbMsg);
 			} catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
-
-
-
 
         readonly CountdownEvent condition = new CountdownEvent(1);
 
