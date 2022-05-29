@@ -305,6 +305,13 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
+        /// <summary>
+        /// スライダーのToolTip文字
+        /// </summary>
+        public string PositionSLTTText { get; set; }
+        
+
+
         public BitmapImage playImage;
         public BitmapImage pouseImage;
         public BitmapImage MuteOnImage;
@@ -2202,69 +2209,41 @@ namespace M3UPlayer.ViewModels {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
-        //#endregion
 
-        //#region PlayListアイテムでマウスムーブ
-        //private RelayCommand<DataGrid> _PlayListMouseMove;
+        //public ICommand PlayListClick => new DelegateCommand(PlayListKeyUp);
+        /// <summary>
+        /// キーショートカットの割付
+        /// </summary>
+        /// <param name="targetKey"></param>
+        public void WindowKeyUp(Key targetKey) {
+            string TAG = "WindowKeyUp";
+            string dbMsg = "";
+            try {
 
-        //public ICommand PlayListMouseMove {
-        //	get {
-        //		if (_PlayListMouseMove == null) {
-        //			_PlayListMouseMove = new RelayCommand<DataGrid>(PLMouseMove);
-        //		}
-        //		return _PlayListMouseMove;
-        //	}
-        //}
-        ///// <summary>
-        ///// Updates the popup's position in case of a drag/drop operation.
-        ///// </summary>
-        //private void PLMouseMove(DataGrid PL) {
-        //	string TAG = "[PLMouseMove]";
-        //	string dbMsg = "";
-        //	try {
-        //		if (DraggedItem != null) {
-        //			dbMsg += ",UrlStr=" + PLListSelectedItem.UrlStr;
-        //			int NowIndex = PLList.IndexOf(PLListSelectedItem);
-        //			dbMsg += "[" + NowIndex + "]" + PLListSelectedItem.Summary;
-        //			dbMsg += "SelectedIndex=" + PL.CurrentCell.Column.DisplayIndex;
-        //			_isDragging = true;
-        //			//	if (!_isDragging || e.LeftButton != MouseButtonState.Pressed) return;
+                dbMsg += "targetKey=" + targetKey;
+				Key KeyReturn = default;
+				if (targetKey == Key.Return) {
+                    ClickPlayBt();
+                    //dbMsg += ",IsPlaying=" + IsPlaying;
+                    //if (IsPlaying) {
+                    //    IsPlaying = false;
+                    //} else {
+                    //    PLMouseUp();
+                    //}
+                } else if (targetKey == Key.Right) {
+                    ClickForwardAsync();
+                } else if (targetKey == Key.Left) {
+                    ClickRewAsync();
+                }
 
-        //			//display the popup if it hasn't been opened yet
-        //			if (!PopupIsOpen) {
-        //				//switch to read-only mode
-        //				//	PlayList.IsReadOnly = true;
 
-        //				//make sure the popup is visible
-        //				PopupIsOpen = true;
-        //				RaisePropertyChanged("PopupIsOpen");
-        //			}
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
 
-        //			System.Windows.Size popupSize = new System.Windows.Size(PopupWidth, PopupHeight);
-        //			if (popupSize.Width == 0 || popupSize.Height == 0) {
-        //				PopupWidth = 20;
-        //				PopupHeight = 20;
-        //				dbMsg += "Popup[" + PopupWidth + "×" + PopupHeight + "]";
-        //				RaisePropertyChanged("PopupWidth");
-        //				RaisePropertyChanged("PopupHeight");
-        //			}
-        //			//			PopupPlacementRectangle = new Rect(e.GetPosition(this), popupSize);
-        //			////Size popupSize = new Size(popup1.ActualWidth, popup1.ActualHeight);
-        //			////popup1.PlacementRectangle = new Rect(e.GetPosition(this), popupSize);
 
-        //			////make sure the row under the grid is being selected
-        //			//Point position = e.GetPosition(PlayList);
-        //			////	var row = UIHelpers.TryFindFromPoint<DataGridRow>(PlayList, position);
-        //			////	if (row != null) PlayList.SelectedItem = droplist.SelectedItem;
-        //			MyLog(TAG, dbMsg);
-        //		} else {
-        //			dbMsg += "選択値無し";
-        //		}
-        //	} catch (Exception er) {
-        //		MyErrorLog(TAG, dbMsg, er);
-        //	}
-        //}
-        //#endregion
 
         /// <summary>
         /// プレイリストでのマウスアップ                    Completes a drag/drop operation.
@@ -3604,7 +3583,9 @@ namespace M3UPlayer.ViewModels {
                         }
                         break;
                 }
-
+                PositionSLTTText = GetHMS(newPosition.ToString());
+                dbMsg += ">>" + PositionSLTTText;
+                RaisePropertyChanged("PositionSLTTText");
                 IsPlaying = true;
                 RaisePropertyChanged("IsPlaying");
 

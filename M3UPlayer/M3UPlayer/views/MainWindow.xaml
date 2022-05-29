@@ -18,7 +18,8 @@
         Height="1080" Width="1920"
         Top="10" Left="10" 
         Closing="Window_Closing"
-        >
+        Keyboard.KeyUp="Window_KeyUp"
+       >
     <!--xmlns:Controls="clr-namespace:Microsoft.Toolkit.Wpf.UI.Controls;assembly=Microsoft.Toolkit.Wpf.UI.Controls.WebView"
     		Topmost="true"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"  
@@ -214,6 +215,7 @@
                                     
                                        FontSize="24"/>-->
                         <ComboBox 
+                            x:Name="PLCombo"
                             SelectedValuePath="Key" 
                             DisplayMemberPath="Value"
                             SelectedIndex="{Binding PLComboSelectedIndex, Mode=TwoWay}"
@@ -265,6 +267,8 @@
                            Sorting="PlayList_Sorting"
                            Margin="0,0,5,0" 
 						>
+                    <!--Keyboard.KeyUp="PlayList_KeyUp"-->
+
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
                             <Style.Triggers>
@@ -274,6 +278,7 @@
                             </Style.Triggers>
                         </Style>
                     </DataGrid.RowStyle>
+                    <!--<KeyBinding Key="Return" Command="PlayListClick" />は通らない-->
                     <!--
     						   SelectionMode="Extended"
                PlayListSelectionMode="Extended"
@@ -400,7 +405,8 @@
                             Width="40" Height="40" 
                             MinWidth="30" 
                             RenderTransformOrigin="0.5,0.5"
-                            Foreground="White" FontSize="18" FontWeight="Bold" BorderBrush="#00000000" BorderThickness="0,0,0,0" Padding="0,0,0,0" HorizontalContentAlignment="Center"
+                            Foreground="White" FontSize="18" FontWeight="Bold" BorderBrush="#00000000" BorderThickness="0,0,0,0" 
+                            Padding="0,0,0,0" HorizontalContentAlignment="Center"
                             >
                         <Button.RenderTransform>
                             <TransformGroup>
@@ -485,7 +491,7 @@
                             <RowDefinition Height="*" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <Grid  VerticalAlignment="Bottom">
+                        <Grid  VerticalAlignment="Top" Margin="0,23,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition  Width="*" />
@@ -528,6 +534,7 @@
                             </Grid.ColumnDefinitions>
 
                             <Button Grid.Column="0"
+                                    x:Name="RewBt"
                                     Command="{Binding RewBtClick}" 
                                     BorderBrush="#00000000" 
                                     BorderThickness="0,0,0,0" 
@@ -562,16 +569,17 @@
                                     IsSnapToTickEnabled="True"
                                     IsMoveToPointEnabled="True"
                                     MouseUp="PositionSL_MouseUp"
-                                    ToolTip="{Binding PositionStr , Mode=OneWay}" 
-                                    AutoToolTipPlacement="TopLeft"
                                     Thumb.DragStarted="PositionSL_DragStarted"
                                     Thumb.DragCompleted="PositionSL_DragCompleted"
                                     Maximum="{Binding SliderMaximum, Mode=OneWay}"
+                                    ToolTip="{Binding PositionStr , Mode=OneWay}" 
+                                    AutoToolTipPlacement="TopLeft"
                                     Value="{Binding SliderValue, Mode=TwoWay}"
                                     Style="{DynamicResource MySliderStyle}"
                                    >
                                 <!--
-                                                                   ToolTip="{Binding PositionStr , Mode=OneWay}" 
+                                    ToolTip="{Binding PositionStr , Mode=OneWay}" 
+                                    ToolTipService.ToolTip="{Binding PositionSLTTText , Mode=OneWay}" 
 
                                 PositionStr     
                                      ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Value}" 
@@ -861,6 +869,18 @@
                                         </Style.Triggers>
                                     </Style>
                                 </Slider.Resources>
+ 
+                                <!--<Slider.ToolTip>
+                                    <ToolTip>
+                                        <StackPanel Orientation="Vertical">
+                                            --><!--<Image Source="anthem.jpg" Height="100" />--><!--
+                                            <TextBlock Text="{Binding PositionSLTTText , Mode=OneWay}" />
+                                        </StackPanel>
+                                    </ToolTip>
+                                </Slider.ToolTip>-->
+
+
+
                             </Slider>
                             <ComboBox x:Name="ForwardCB"
                                       Grid.Column="3"

@@ -884,6 +884,19 @@ namespace M3UPlayer.Views {
 			}
 		}
 
+		//private void PlayList_KeyUp(object sender, KeyEventArgs e) {
+		//	string TAG = "PlayList_KeyUp";
+		//	string dbMsg = "";
+		//	try {
+		//		Key targetKey = e.Key;
+		//		//dbMsg = "Key" + e.Key;
+		//		//MyLog(TAG, dbMsg);
+		//		VM.PlayListKeyUp(targetKey);
+		//	} catch (Exception er) {
+		//		MyErrorLog(TAG, dbMsg, er);
+		//	}
+
+		//}
 
 		private ListSortDirection? _isDescending = ListSortDirection.Descending;
 		/// <summary>
@@ -1030,6 +1043,8 @@ namespace M3UPlayer.Views {
 				double newValue = slider.Value;
 				dbMsg += "newValue=" + newValue;
 				VM.PositionSliderValueChang(newValue);
+				//slider.ToolTip = VM.GetHMS(newValue.ToString());
+				//dbMsg += ">>" + slider.ToolTip;
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
@@ -1088,6 +1103,35 @@ namespace M3UPlayer.Views {
 				//	dbMsg += contentName +"へ" + targetUrl;
 				//}
 				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				MyErrorLog(TAG, dbMsg, er);
+			}
+		}
+
+		private void Window_KeyUp(object sender, KeyEventArgs e) {
+			string TAG = "Window_KeyUp";
+			string dbMsg = "";
+			try {
+				Key targetKey = e.Key;
+				//dbMsg = "Key" + e.Key;
+				if (targetKey == Key.Return) {
+					PlayBt.Focus();
+				}else if (targetKey == Key.Left) {
+					ForwardBT.Focus();
+				} else if (targetKey == Key.Right) {
+					RewBt.Focus();
+				} else if (targetKey == Key.Up
+						|| targetKey == Key.Down
+						|| targetKey == Key.Delete
+					) {
+					PlayList.Focus();
+				} else if (targetKey == Key.PageUp
+						|| targetKey == Key.PageDown
+					) {
+					PLCombo.Focus();
+				}
+				//MyLog(TAG, dbMsg);
+				VM.WindowKeyUp(targetKey);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
