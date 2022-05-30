@@ -1397,6 +1397,34 @@ namespace M3UPlayer.ViewModels {
         }
 
         /// <summary>
+        /// コンボボックスの選択変更
+        /// </summary>
+        /// <param name="adderIndex"></param>
+        public void PlayListComboSelect(int adderIndex) {
+            string TAG = "PlayListComboSelect";
+            string dbMsg = "";
+            try {
+                int listIndex = Array.IndexOf(PlayLists, CurrentPlayListFileName);
+                int IndexEnd = PlayLists.Length-1;
+                dbMsg += ",[ " + listIndex + " / " + IndexEnd + "]" + CurrentPlayListFileName;
+                listIndex += adderIndex;
+                if (listIndex < 0) {
+                    listIndex = IndexEnd;
+                }else if (IndexEnd <=  listIndex) {
+                    listIndex = 0;
+                }
+                CurrentPlayListFileName=PlayLists[listIndex];   
+                RaisePropertyChanged("CurrentPlayListFileName");
+                MyView.PLCombo.SelectedIndex=listIndex; 
+                dbMsg += ">>[ " + listIndex + " / " + IndexEnd + "]" + CurrentPlayListFileName;
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+
+        /// <summary>
         /// 前に再生していたアイテムに戻る
         /// </summary>
         /// <param name="sender"></param>
@@ -2230,10 +2258,18 @@ namespace M3UPlayer.ViewModels {
                     //} else {
                     //    PLMouseUp();
                     //}
+                } else if (targetKey == Key.Up) {
+                    RewindList();
+                } else if (targetKey == Key.Down) {
+                    ForwardList();
                 } else if (targetKey == Key.Right) {
                     ClickForwardAsync();
                 } else if (targetKey == Key.Left) {
                     ClickRewAsync();
+                } else if (targetKey == Key.PageUp) {
+                    PlayListComboSelect(-1);
+                } else if (targetKey == Key.PageDown) {
+                    PlayListComboSelect(1);
                 }
 
 
