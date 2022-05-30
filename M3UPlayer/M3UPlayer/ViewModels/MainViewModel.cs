@@ -2270,6 +2270,8 @@ namespace M3UPlayer.ViewModels {
                     PlayListComboSelect(-1);
                 } else if (targetKey == Key.PageDown) {
                     PlayListComboSelect(1);
+                } else if (targetKey == Key.Delete) {
+                    PlayListItemDelete();
                 }
 
 
