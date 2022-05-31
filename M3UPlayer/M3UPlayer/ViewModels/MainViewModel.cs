@@ -349,50 +349,59 @@ namespace M3UPlayer.ViewModels {
                 string TAG = "IsPlaying(set)";
                 string dbMsg = "";
                 try {
-                    dbMsg += "value=" + value;
-                    if (_IsPlaying == value)
-                        return;
-                    _IsPlaying = value;
-                    RaisePropertyChanged("IsPlaying");
-                    dbMsg += ">>IsPlaying==" + IsPlaying;
-                    if (IsPlaying) {
-                        switch (movieType) {
-                            case 0:
-                                MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
-                                break;
-                            case 1:
-                                if (axWmp != null) {
-                                    axWmp.Ctlcontrols.play();
-                                }
-                                break;
-                            case 2:
-                                if (flash != null) {
-                                    flash.SetVariable("isPlay", "true");
-                                    //flash.Play();
-                                }
-                                break;
-                        }
-                        MyView.PlayBtImage.Source = pouseImage;
-                    } else {
-                        switch (movieType) {
-                            case 0:
-                                MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").pause();");
-                                break;
-                            case 1:
-                                if (axWmp != null) {
-                                    axWmp.Ctlcontrols.pause();
-                                }
-                                break;
-                            case 2:
-                                if (flash != null) {
-                                    flash.SetVariable("isPlay", "false");
-
-                                    //       flash.Stop();
-                                }
-                                break;
-                        }
-                        MyView.PlayBtImage.Source = playImage;
+                    //        dbMsg += "value=" + value;
+                    dbMsg += ">>IsPlaying=" + _IsPlaying;
+                    if (_IsPlaying == true) { 
+                        _IsPlaying = false;
+					} else if (_IsPlaying == false) {
+                        _IsPlaying = true;
                     }
+                    dbMsg += ">>" + _IsPlaying;
+					if (MyView != null) {
+                        if (_IsPlaying) {
+                            switch (movieType) {
+                                case 0:
+                                    if (MyView.webView != null) {
+                                        MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").play();");
+                                    }
+                                    break;
+                                case 1:
+                                    if (axWmp != null) {
+                                        axWmp.Ctlcontrols.play();
+                                    }
+                                    break;
+                                case 2:
+                                    if (flash != null) {
+                                        flash.SetVariable("isPlay", "true");
+                                        //flash.Play();
+                                    }
+                                    break;
+                            }
+                            MyView.PlayBtImage.Source = pouseImage;
+                        } else {
+                            switch (movieType) {
+                                case 0:
+                                    if (MyView.webView != null) {
+                                        MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").pause();");
+                                    }
+                                    break;
+                                case 1:
+                                    if (axWmp != null) {
+                                        axWmp.Ctlcontrols.pause();
+                                    }
+                                    break;
+                                case 2:
+                                    if (flash != null) {
+                                        flash.SetVariable("isPlay", "false");
+
+                                        //       flash.Stop();
+                                    }
+                                    break;
+                            }
+                            MyView.PlayBtImage.Source = playImage;
+                        }
+                    }
+                    //              RaisePropertyChanged("IsPlaying");
                     //RaisePropertyChanged("PlayBtImageSource");
                     //         dbMsg += ">>PlayBtImageSource==" + PlayBtImageSource.ToString();
                     MyLog(TAG, dbMsg);
@@ -2251,14 +2260,8 @@ namespace M3UPlayer.ViewModels {
                 dbMsg += "targetKey=" + targetKey;
 				Key KeyReturn = default;
 				if (targetKey == Key.Return) {
-                    ClickPlayBt();
-                    //dbMsg += ",IsPlaying=" + IsPlaying;
-                    //if (IsPlaying) {
-                    //    IsPlaying = false;
-                    //} else {
-                    //    PLMouseUp();
-                    //}
-                } else if (targetKey == Key.Up) {
+					ClickPlayBt();
+				} else if (targetKey == Key.Up) {
                     RewindList();
                 } else if (targetKey == Key.Down) {
                     ForwardList();

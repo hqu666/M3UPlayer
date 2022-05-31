@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Automation.Peers;
+using System.Windows.Automation.Provider;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -884,19 +886,6 @@ namespace M3UPlayer.Views {
 			}
 		}
 
-		//private void PlayList_KeyUp(object sender, KeyEventArgs e) {
-		//	string TAG = "PlayList_KeyUp";
-		//	string dbMsg = "";
-		//	try {
-		//		Key targetKey = e.Key;
-		//		//dbMsg = "Key" + e.Key;
-		//		//MyLog(TAG, dbMsg);
-		//		VM.PlayListKeyUp(targetKey);
-		//	} catch (Exception er) {
-		//		MyErrorLog(TAG, dbMsg, er);
-		//	}
-
-		//}
 
 		private ListSortDirection? _isDescending = ListSortDirection.Descending;
 		/// <summary>
@@ -1115,8 +1104,15 @@ namespace M3UPlayer.Views {
 				Key targetKey = e.Key;
 				//dbMsg = "Key" + e.Key;
 				if (targetKey == Key.Return) {
-					PlayBt.Focus();
-				}else if (targetKey == Key.Left) {
+			//		PlayBt.Focus();だとクリックが二重に発生する
+			//WPFでボタンクリックを発生させる////////////////////////////
+					//if (PlayBt == null)
+					//	throw new ArgumentNullException("PlayBt");
+
+					//var provider = new ButtonAutomationPeer(PlayBt) as IInvokeProvider;
+					//provider.Invoke();
+					//return;
+				} else if (targetKey == Key.Left) {
 					ForwardBT.Focus();
 				} else if (targetKey == Key.Right) {
 					RewBt.Focus();
@@ -1132,6 +1128,8 @@ namespace M3UPlayer.Views {
 				}
 				//MyLog(TAG, dbMsg);
 				VM.WindowKeyUp(targetKey);
+				//動作後は一番問題ないところへフォーカスを逃がす
+				PlayList.Focus();
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
