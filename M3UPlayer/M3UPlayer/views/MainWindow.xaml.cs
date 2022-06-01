@@ -1104,8 +1104,9 @@ namespace M3UPlayer.Views {
 				Key targetKey = e.Key;
 				//dbMsg = "Key" + e.Key;
 				if (targetKey == Key.Return) {
-			//		PlayBt.Focus();だとクリックが二重に発生する
-			//WPFでボタンクリックを発生させる////////////////////////////
+					//		PlayBt.Focus();だとクリックが二重に発生する
+					// 他のエレメントにフォーカスが当たっているとそのアイテムのクリック＝returnになる
+					//WPFでボタンクリックを発生させる////////////////////////////
 					//if (PlayBt == null)
 					//	throw new ArgumentNullException("PlayBt");
 

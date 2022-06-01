@@ -223,6 +223,7 @@
                             SelectedValue="{Binding PlayListComboSelected, Mode=TwoWay}"
                             ContextMenu="{Binding PlayListComboItemMenu}"
 						    Height="26" Width="Auto"
+                            ToolTip="PageUp/PageDown"
 						/>
                         <!--
                                   SelectedValuePath="Key" 
@@ -362,7 +363,10 @@
                     <Button  Content="↑"
                              Command="{Binding ListRewind}" 
                              Width="40" Height="40" MinWidth="30" RenderTransformOrigin="0.5,0.5"
-                             Foreground="White" FontSize="18" FontWeight="Bold" BorderBrush="#00000000" BorderThickness="0,0,0,0" Padding="0,0,0,0" HorizontalContentAlignment="Center"
+                             Foreground="White" FontSize="18" FontWeight="Bold" BorderBrush="#00000000" BorderThickness="0,0,0,0" 
+                             Padding="0,0,0,0" 
+                             HorizontalContentAlignment="Center"
+                             ToolTip="↑"
                             >
                         <Button.RenderTransform>
                             <TransformGroup>
@@ -405,8 +409,14 @@
                             Width="40" Height="40" 
                             MinWidth="30" 
                             RenderTransformOrigin="0.5,0.5"
-                            Foreground="White" FontSize="18" FontWeight="Bold" BorderBrush="#00000000" BorderThickness="0,0,0,0" 
-                            Padding="0,0,0,0" HorizontalContentAlignment="Center"
+                            Foreground="White" 
+                            FontSize="18" 
+                            FontWeight="Bold" 
+                            BorderBrush="#00000000" 
+                            BorderThickness="0,0,0,0" 
+                            Padding="0,0,0,0" 
+                            HorizontalContentAlignment="Center"
+                            ToolTip="↓"
                             >
                         <Button.RenderTransform>
                             <TransformGroup>
@@ -480,6 +490,7 @@
                         BorderThickness="0,0,0,0" 
                         Width="98" Height="98" 
                         Foreground="#00000000"
+                        ToolTip="Return"
                         >
                         <Image x:Name="PlayBtImage" Source="/views/pl_r_btn.png" Width="86" Height="86" />
 
@@ -540,6 +551,7 @@
                                     BorderThickness="0,0,0,0" 
                                     MinWidth="32" 
                                     Margin="5,5,0,5"
+                                    ToolTip="←"
                                     >
                                 <Button.Background>
                                     <ImageBrush ImageSource="/views/rewbtn.png" Stretch="Fill"/>
@@ -912,6 +924,7 @@
                                     BorderBrush="#00000000" 
                                     BorderThickness="0,0,0,0" 
                                     Margin="0,5,5,5"
+                                    ToolTip="→"
                                     >
 
                                 <Button.Background>
