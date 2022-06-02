@@ -396,16 +396,17 @@ namespace M3UPlayer.Views {
 						}
 
 					}
-					var dataGrid = sender as DataGrid;
-					var point = e.GetPosition(dataGrid);
-					var row = GetDataGridObject<DataGridRow>(dataGrid, point);
-					if (row == null) {
-						return;
-					}
-					// 行オブジェクトから行インデックス(0起算)を取得します。
-					int dropRow = row.GetIndex();
-					dbMsg += ",dropRow=" + dropRow + "" + dropPlayListFiles.Count + "件";
-					VM.PlayListItemMoveTo(dropRow, dropPlayListFiles);
+					DataGrid dataGrid = sender as DataGrid;
+					Point point = e.GetPosition(dataGrid);
+					DropFileAdder(dataGrid, point, dropPlayListFiles);
+					//var row = GetDataGridObject<DataGridRow>(dataGrid, point);
+					//if (row == null) {
+					//	return;
+					//}
+					//// 行オブジェクトから行インデックス(0起算)を取得します。
+					//int dropRow = row.GetIndex();
+					//dbMsg += ",dropRow=" + dropRow + "" + dropPlayListFiles.Count + "件";
+					//VM.PlayListItemMoveTo(dropRow, dropPlayListFiles);
 					IsDragging = false;
 				}
 				MyLog(TAG, dbMsg);
@@ -474,7 +475,33 @@ namespace M3UPlayer.Views {
 		}
 
 		/// <summary>
-		/// ファイルのドロップ
+		/// VMのリスト追加へ継続
+		/// </summary>
+		/// <param name="dataGrid">対象となるDataGrid</param>
+		/// <param name="point">DataGrid上のDrop位置</param>
+		/// <param name="dropPlayListFiles">ファイル配列</param>
+		private void DropFileAdder(DataGrid dataGrid, Point point, List<PlayListModel> dropPlayListFiles) {
+			string TAG = "DropFileAdder";
+			string dbMsg = "";
+			try {
+				DataGridRow row = GetDataGridObject<DataGridRow>(dataGrid, point);
+				if (row == null) {
+					dbMsg += "行が拾えない";
+				} else {
+					// 行オブジェクトから行インデックス(0起算)を取得します。
+					int dropRow = row.GetIndex();
+					dbMsg += ",dropRow=" + dropRow + "行目に" + dropPlayListFiles.Count + "件";
+					VM.PlayListItemMoveTo(dropRow, dropPlayListFiles);
+					IsDragging = false;
+				}
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				MyErrorLog(TAG, dbMsg, er);
+			}
+		}
+
+		/// <summary>
+		/// Dropで割り付けたリスナー
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
@@ -487,7 +514,6 @@ namespace M3UPlayer.Views {
 					// If the DataObject contains string data, extract it.
 					if (e.Data.GetDataPresent(DataFormats.StringFormat)) {
 						string dataString = (string)e.Data.GetData(DataFormats.StringFormat);
-
 						// If the string can be converted into a Brush,
 						// convert it and apply it to the ellipse.
 						BrushConverter converter = new BrushConverter();
@@ -498,38 +524,21 @@ namespace M3UPlayer.Views {
 					}
 				} else {
 					dbMsg += ",ellipse = null";
+					if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
+						List<PlayListModel> dropPlayListFiles = new List<PlayListModel>();
+						var fileNames = (string[])e.Data.GetData(DataFormats.FileDrop);
+						foreach (var fName in fileNames) {
+							PlayListModel plm = new PlayListModel();
+							plm.UrlStr = fName;
+							dropPlayListFiles.Add(plm);
+							dbMsg += "\r\n[" + dropPlayListFiles.Count + "]" + plm.UrlStr;
+						}
+						dbMsg += "," + dropPlayListFiles.Count + "件" ;
+						DataGrid dataGrid = sender as DataGrid;
+						Point point = e.GetPosition(dataGrid);
+						DropFileAdder( dataGrid,  point, dropPlayListFiles);
+					}
 				}
-				////DataGrid DG = (DataGrid)sender;
-				////// ドロップ先(dataGridView2)のクライアント位置からDataGridViewの位置情報を取得します。
-				////var point = DG.po.PointToClient(new Point(e.X, e.Y));
-				////var hitTest = DG.HitTest(point.X, point.Y);
-				//int InsertTo = 0;   //挿入位置は先頭固定
-				//// ファイルのドラッグアンドドロップのみを受け付けるようにしています。
-				//if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
-				//	// ドロップされたファイルは、アプリケーション側に内容がコピーされるものとします。
-				//	//	e.Effect = DragDropEffects.Copy;
-				//}
-				//// ドラッグアンドドロップされたファイルのパス情報を取得します。
-
-				//foreach (String filename in (string[])e.Data.GetData(DataFormats.FileDrop)) {
-				//	dbMsg += "\r\n" + filename;
-				//}
-
-				//string[] rFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
-				//if (0 < rFiles.Count()) {
-				//	foreach (string url in rFiles) {
-				//		dbMsg += "\r\n" + url;
-				//		if (File.Exists(url)) {
-				//			if (VM.AddToPlayList(url, 0)) {
-				//				dbMsg += ">>格納";
-				//			}
-				//		} else if (Directory.Exists(url)) {
-				//			//フォルダなら中身の全ファイルで再起する
-				//			string[] r2files = System.IO.Directory.GetFiles(url, "*", SearchOption.AllDirectories);
-				//			VM.FilesAdd(r2files, InsertTo);
-				//		}
-				//	}
-				//}
 				IsDragging = false;
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
@@ -547,6 +556,13 @@ namespace M3UPlayer.Views {
 			string TAG = "[PlayListBox_DragOver]";// + fileName;
 			string dbMsg = "";
 			try {
+				// https://araramistudio.jimdo.com/2021/02/15/c-%E3%81%AEwpf%E3%81%A7%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E5%90%8D%E3%82%92%E3%83%89%E3%83%A9%E3%83%83%E3%82%B0-%E3%83%89%E3%83%AD%E3%83%83%E3%83%97%E3%81%A7%E5%8F%97%E3%81%91%E5%8F%96%E3%82%8B/
+				if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
+					e.Effects = DragDropEffects.All;
+				} else {
+					e.Effects = DragDropEffects.None;
+				}
+				e.Handled = true;
 				//		https://dobon.net/vb/dotnet/control/draganddrop.html
 				//dbMsg += "dragFrom=" + dragFrom;
 				//dbMsg += ",dragSouceUrl=" + dragSouceUrl;
@@ -570,7 +586,7 @@ namespace M3UPlayer.Views {
 				//} else {
 				//	e.Effect = DragDropEffects.All;
 				//}
-				MyLog(TAG, dbMsg);
+			//	MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
