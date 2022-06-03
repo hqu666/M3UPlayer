@@ -259,9 +259,6 @@
 						   RowDetailsVisibilityMode="Visible" 
 						   AutoGenerateColumns="False" 
                            IsReadOnly="True" 
-                           PreviewDragEnter="PlayList_PreviewDragOver"
-                           PreviewDrop="PlayList_PreviewDrop"
-                           DragEnter="PlayList_DragEnter" 
                            Drop="PlayList_Drop"
                            DragOver="PlayList_DragOver"
                            MouseDown="PlayList_MouseDown" 
@@ -269,7 +266,13 @@
                            Sorting="PlayList_Sorting"
                            Margin="0,0,5,0" 
 						>
-                    <!--Keyboard.KeyUp="PlayList_KeyUp"-->
+                    <!--Keyboard.KeyUp="PlayList_KeyUp"
+                            PreviewDrop="PlayList_PreviewDrop"
+                          PreviewDragEnter="PlayList_PreviewDragOver"
+                            DragEnter="PlayList_DragEnter" 
+                   
+                    
+                    -->
 
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
@@ -285,15 +288,6 @@
     						   SelectionMode="Extended"
                PlayListSelectionMode="Extended"
                                           SelectedItems="{Binding PLListSelectedItem}"
-     
-               DragEnter="PlayList_DragEnter" 
-                           DragLeave="PlayList_DragLeave" 
-                           DragOver="PlayList_DragOver" 
-                           Drop="PlayList_Drop" 
-                           PreviewDragEnter="PlayList_PreviewDragEnter" 
-                           PreviewDragLeave="PlayList_PreviewDragLeave" 
-                           PreviewDragOver="PlayList_PreviewDragOver" 
-                           PreviewDrop="PlayList_PreviewDrop" 
                     -->
                     <!--
                         MouseMoveで座標情報を拾う方法が不明

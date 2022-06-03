@@ -194,146 +194,8 @@ namespace M3UPlayer.Views {
 			get { return (PlayListModel)GetValue(DraggedItemProperty); }
 			set { SetValue(DraggedItemProperty, value); }
 		}
-
-		/// <summary>
-		/// State flag which indicates whether the grid is in edit
-		/// mode or not.
-		/// </summary>
-		//public void OnBeginEdit(object sender, DataGridBeginningEditEventArgs e) {
-		//	string TAG = "[OnBeginEdit]";
-		//	string dbMsg = "";
-		//	try {
-		//		_isEditing = true;
-		//		if (IsDragging) ResetDragDrop();
-		//		MyLog(TAG, dbMsg);
-		//	} catch (Exception er) {
-		//		MyErrorLog(TAG, dbMsg, er);
-		//	}
-		//}
-
-		//public void OnEndEdit(object sender, DataGridCellEditEndingEventArgs e) {
-		//	string TAG = "[OnEndEdit]";
-		//	string dbMsg = "";
-		//	try {
-		//		_isEditing = false;
-		//		MyLog(TAG, dbMsg);
-		//	} catch (Exception er) {
-		//		MyErrorLog(TAG, dbMsg, er);
-		//	}
-		//}
-
-		///// <summary>
-		///// Initiates a drag action if the grid is not in edit mode.
-		///// </summary>
-		//private void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
-		//	string TAG = "[OnMouseLeftButtonDown]";
-		//	string dbMsg = "";
-		//	try {
-		//		DataGrid droplist = (DataGrid)sender;
-		//		dbMsg += ",AllowDrop=" + droplist.AllowDrop;
-		//		dbMsg += "[" + droplist.SelectedIndex + "]";
-		//		PlayListModel selectedItem = (PlayListModel)droplist.SelectedItem;
-		//		dbMsg += ",Summary=" + selectedItem.Summary;
-		//		dbMsg += ",UrlStr=" + selectedItem.UrlStr;
-		//		//if (_isEditing) return;
-
-		//		//				var row = UIHelpers.TryFindFromPoint<DataGridRow>((UIElement)sender, e.GetPosition(shareGrid));
-		//	//	if (row == null || row.IsEditing) return;
-
-		//		//set flag that indicates we're capturing mouse movements
-		//		IsDragging = true;
-		//		DraggedItem = (PlayListModel)droplist.SelectedItem;
-		//		//				DraggedItem = (PlayListModel)row.Item;
-		//		MyLog(TAG, dbMsg);
-		//	} catch (Exception er) {
-		//		MyErrorLog(TAG, dbMsg, er);
-		//	}
-		//}
-
-		/// <summary>
-		/// Completes a drag/drop operation.
-		/// </summary>
-		//private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
-		//	string TAG = "[OnMouseLeftButtonUp]";
-		//	string dbMsg = "";
-		//	try {
-		//		DataGrid droplist = (DataGrid)sender;
-		//		dbMsg += ",AllowDrop=" + droplist.AllowDrop;
-		//		dbMsg += "[" + droplist.SelectedIndex + "]";
-		//		PlayListModel selectedItem = (PlayListModel)droplist.SelectedItem;
-		//		dbMsg += ",Summary=" + selectedItem.Summary;
-		//		dbMsg += ",UrlStr=" + selectedItem.UrlStr;
-		//		if (!IsDragging || _isEditing) {
-		//			return;
-		//		}
-
-		//		//get the target item
-		//		PlayListModel targetItem = (PlayListModel)droplist.SelectedItem;
-
-		//		if (targetItem == null || !ReferenceEquals(DraggedItem, targetItem)) {
-
-		//			//// create tempporary row
-		//			//var temp = DraggedItem.Row.Table.NewRow();
-		//			//temp.ItemArray = DraggedItem.Row.ItemArray;
-		//			//int tempIndex = _shareTable.Rows.IndexOf(DraggedItem.Row);
-
-		//			////remove the source from the list
-		//			//_shareTable.Rows.Remove(DraggedItem.Row);
-
-		//			////get target index
-		//			//var targetIndex = _shareTable.Rows.IndexOf(targetItem.Row);
-
-		//			////insert temporary at the target's location
-		//			//_shareTable.Rows.InsertAt(temp, targetIndex);
-
-		//			////select the dropped item
-		//			//shareGrid.SelectedItem = shareGrid.Items[targetIndex];
-		//		}
-
-		//		//reset
-		//		ResetDragDrop();
-		//		MyLog(TAG, dbMsg);
-		//	} catch (Exception er) {
-		//		MyErrorLog(TAG, dbMsg, er);
-		//	}
-		//}
-
-		///// <summary>
-		///// Updates the popup's position in case of a drag/drop operation.
-		///// </summary>
-		//private void OnMouseMove(object sender, MouseEventArgs e) {
-		//	string TAG = "[OnMouseMove]";
-		//	string dbMsg = "";
-		//	try {
-		//		DataGrid droplist = (DataGrid)sender;
-		//		dbMsg += ",AllowDrop=" + droplist.AllowDrop;
-		//		dbMsg += "[" + droplist.SelectedIndex + "]";
-		//		PlayListModel selectedItem = (PlayListModel)droplist.SelectedItem;
-		//		dbMsg += ",Summary=" + selectedItem.Summary;
-		//		dbMsg += ",UrlStr=" + selectedItem.UrlStr;
-		//		if (!IsDragging || e.LeftButton != MouseButtonState.Pressed) return;
-
-		//		//display the popup if it hasn't been opened yet
-		//		if (!popup1.IsOpen) {
-		//			//switch to read-only mode
-		//		//	PlayList.IsReadOnly = true;
-
-		//			//make sure the popup is visible
-		//			popup1.IsOpen = true;
-		//		}
-
-		//		Size popupSize = new Size(popup1.ActualWidth, popup1.ActualHeight);
-		//		popup1.PlacementRectangle = new Rect(e.GetPosition(this), popupSize);
-
-		//		//make sure the row under the grid is being selected
-		//		Point position = e.GetPosition(PlayList);
-		//	//	var row = UIHelpers.TryFindFromPoint<DataGridRow>(PlayList, position);
-		//	//	if (row != null) PlayList.SelectedItem = droplist.SelectedItem;
-		//		MyLog(TAG, dbMsg);
-		//	} catch (Exception er) {
-		//		MyErrorLog(TAG, dbMsg, er);
-		//	}
-		//}
+		public List<PlayListModel> dropPlayListFiles;
+		private Brush _previousFill = null;
 
 		/// <summary>
 		/// Closes the popup and resets the grid to read-enabled mode.
@@ -352,127 +214,6 @@ namespace M3UPlayer.Views {
 			}
 		}
 
-
-		/// <summary>
-		/// ドラッグが開始された時のイベント処理
-		/// ファイルドラッグに反応
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void PlayList_PreviewDragOver(object sender, DragEventArgs e) {
-			string TAG = "PlayList_PreviewDragOver";
-			string dbMsg = "";
-			try {
-				//ファイルがドラッグされたとき、カーソルをドラッグ中のアイコンに変更し、そうでない場合は何もしない。
-				e.Effects = (e.Data.GetDataPresent(DataFormats.FileDrop)) ? DragDropEffects.Copy : e.Effects = DragDropEffects.None;
-				e.Handled = true;
-				//MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
-
-		/// <summary>
-		/// ファイルのドロップ
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void PlayList_PreviewDrop(object sender, DragEventArgs e) {
-			string TAG = "PlayList_PreviewDrop";
-			string dbMsg = "";
-			try {
-				if (e.Data.GetDataPresent(DataFormats.FileDrop)) // ドロップされたものがファイルかどうか確認する。
-				{
-					List<PlayListModel> dropPlayListFiles = new List<PlayListModel>();
-					string[] paths = ((string[])e.Data.GetData(DataFormats.FileDrop));
-					foreach (string path in paths) {
-						dbMsg += "\r\n" + path;
-						IEnumerable<string> files = Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories);
-						foreach (string file in files) {
-							PlayListModel plm = new PlayListModel();
-							plm.UrlStr = file;
-							dropPlayListFiles.Add(plm);
-							dbMsg += "\r\n[" + dropPlayListFiles.Count + "]" + plm.UrlStr;
-						}
-
-					}
-					DataGrid dataGrid = sender as DataGrid;
-					Point point = e.GetPosition(dataGrid);
-					DropFileAdder(dataGrid, point, dropPlayListFiles);
-					//var row = GetDataGridObject<DataGridRow>(dataGrid, point);
-					//if (row == null) {
-					//	return;
-					//}
-					//// 行オブジェクトから行インデックス(0起算)を取得します。
-					//int dropRow = row.GetIndex();
-					//dbMsg += ",dropRow=" + dropRow + "" + dropPlayListFiles.Count + "件";
-					//VM.PlayListItemMoveTo(dropRow, dropPlayListFiles);
-					IsDragging = false;
-				}
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
-
-		///////////////////////////////////////////////////////Drag: https://hilapon.hatenadiary.org/entry/20110209/1297247754 //////////////////
-		private Brush _previousFill = null;
-		/// <summary>
-		/// ドラッグオブジェクトがコントロールの境界内にドラッグされると発生
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void PlayList_DragEnter(object sender, DragEventArgs e) {
-			string TAG = "[PlayListBox_DragEnter]";
-			string dbMsg = "";
-			try {
-				Ellipse ellipse = sender as Ellipse;
-				if (ellipse != null) {
-					// Save the current Fill brush so that you can revert back to this value in DragLeave.
-					_previousFill = ellipse.Fill;
-
-					// If the DataObject contains string data, extract it.
-					if (e.Data.GetDataPresent(DataFormats.StringFormat)) {
-						string dataString = (string)e.Data.GetData(DataFormats.StringFormat);
-
-						// If the string can be converted into a Brush, convert it.
-						BrushConverter converter = new BrushConverter();
-						if (converter.IsValid(dataString)) {
-							Brush newFill = (Brush)converter.ConvertFromString(dataString);
-							ellipse.Fill = newFill;
-						}
-					}
-				} else {
-					dbMsg += ",ellipse = null";
-				}
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
-
-		/// <summary>
-		/// DragLeave	オブジェクトがコントロールの境界外にドラッグされたときに発生
-		/// //		https://dobon.net/vb/dotnet/control/draganddrop.html
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void PlayList_DragLeave(object sender, DragEventArgs e) {
-			string TAG = "[PlayList_DragLeave]";// + fileName;
-			string dbMsg = "";
-			try {
-				Ellipse? ellipse = sender as Ellipse;
-				if (ellipse != null) {
-					ellipse.Fill = _previousFill;
-				} else {
-					dbMsg += ",ellipse = null";
-				}
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-
-		}
 
 		/// <summary>
 		/// VMのリスト追加へ継続
@@ -525,18 +266,14 @@ namespace M3UPlayer.Views {
 				} else {
 					dbMsg += ",ellipse = null";
 					if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
-						List<PlayListModel> dropPlayListFiles = new List<PlayListModel>();
-						var fileNames = (string[])e.Data.GetData(DataFormats.FileDrop);
-						foreach (var fName in fileNames) {
-							PlayListModel plm = new PlayListModel();
-							plm.UrlStr = fName;
-							dropPlayListFiles.Add(plm);
-							dbMsg += "\r\n[" + dropPlayListFiles.Count + "]" + plm.UrlStr;
-						}
 						dbMsg += "," + dropPlayListFiles.Count + "件" ;
-						DataGrid dataGrid = sender as DataGrid;
-						Point point = e.GetPosition(dataGrid);
-						DropFileAdder( dataGrid,  point, dropPlayListFiles);
+						DataGrid? dataGrid = sender as DataGrid;
+						if (dataGrid != null) {
+							Point point = e.GetPosition(dataGrid);
+							DropFileAdder(dataGrid, point, dropPlayListFiles);
+						} else {
+							dbMsg += ",DataGridがnull";
+						}
 					}
 				}
 				IsDragging = false;
@@ -553,14 +290,59 @@ namespace M3UPlayer.Views {
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void PlayList_DragOver(object sender, DragEventArgs e) {
-			string TAG = "[PlayListBox_DragOver]";// + fileName;
+			string TAG = "PlayListBox_DragOver";// + fileName;
 			string dbMsg = "";
 			try {
 				// https://araramistudio.jimdo.com/2021/02/15/c-%E3%81%AEwpf%E3%81%A7%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E5%90%8D%E3%82%92%E3%83%89%E3%83%A9%E3%83%83%E3%82%B0-%E3%83%89%E3%83%AD%E3%83%83%E3%83%97%E3%81%A7%E5%8F%97%E3%81%91%E5%8F%96%E3%82%8B/
+				string dataString = "";
+				BrushConverter converter = new BrushConverter();
+				Ellipse? ellipse = sender as Ellipse;		//Fileでは発生しない
+				if (ellipse != null) {
+					// Save the current Fill brush so that you can revert back to this value in DragLeave.
+					_previousFill = ellipse.Fill;
+				}
 				if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
+					dbMsg += "File";
+					dropPlayListFiles = new List<PlayListModel>();
+					var fileNames = (string[])e.Data.GetData(DataFormats.FileDrop);
+					foreach (var fName in fileNames) {
+						PlayListModel plm = new PlayListModel();
+						plm.UrlStr = fName;
+						dropPlayListFiles.Add(plm);
+						dbMsg += "\r\n[" + dropPlayListFiles.Count + "]" + plm.UrlStr;
+						dataString += fName + "\r\n";
+					}
+					dbMsg += "," + dropPlayListFiles.Count + "件";
 					e.Effects = DragDropEffects.All;
+				} else if (e.Data.GetDataPresent(DataFormats.StringFormat)) {
+					dbMsg += "data";
+					if (ellipse != null) {
+						// If the DataObject contains string data, extract it.
+						if (e.Data.GetDataPresent(DataFormats.StringFormat)) {
+							dataString = (string)e.Data.GetData(DataFormats.StringFormat);
+
+							//// If the string can be converted into a Brush, convert it.
+							//if (converter.IsValid(dataString)) {
+							//	Brush newFill = (Brush)converter.ConvertFromString(dataString);
+							//	ellipse.Fill = newFill;
+							//}
+						}
+					} else {
+						dbMsg += ",ellipse = null";
+					}
+
 				} else {
+					dbMsg += ",Drag終了";
 					e.Effects = DragDropEffects.None;
+				}
+
+				if (!dataString.Equals("") && ellipse != null) {
+					dbMsg += ",dataString=" + dataString;
+					// If the string can be converted into a Brush, convert it.
+					if (converter.IsValid(dataString)) {
+						Brush newFill = (Brush)converter.ConvertFromString(dataString);
+						ellipse.Fill = newFill;
+					}
 				}
 				e.Handled = true;
 				//		https://dobon.net/vb/dotnet/control/draganddrop.html
@@ -586,7 +368,7 @@ namespace M3UPlayer.Views {
 				//} else {
 				//	e.Effect = DragDropEffects.All;
 				//}
-			//	MyLog(TAG, dbMsg);
+				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
@@ -701,25 +483,25 @@ namespace M3UPlayer.Views {
 		//        }
 
 
-		private void PlayList_PreviewDragEnter(object sender, DragEventArgs e) {
-			string TAG = "[PlayList_PreviewDragEnter]";
-			string dbMsg = "";
-			try {
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+		//private void PlayList_PreviewDragEnter(object sender, DragEventArgs e) {
+		//	string TAG = "[PlayList_PreviewDragEnter]";
+		//	string dbMsg = "";
+		//	try {
+		//		MyLog(TAG, dbMsg);
+		//	} catch (Exception er) {
+		//		MyErrorLog(TAG, dbMsg, er);
+		//	}
+		//}
 
-		private void PlayList_PreviewDragLeave(object sender, DragEventArgs e) {
-			string TAG = "[PlayList_PreviewDragLeave]";
-			string dbMsg = "";
-			try {
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				MyErrorLog(TAG, dbMsg, er);
-			}
-		}
+		//private void PlayList_PreviewDragLeave(object sender, DragEventArgs e) {
+		//	string TAG = "[PlayList_PreviewDragLeave]";
+		//	string dbMsg = "";
+		//	try {
+		//		MyLog(TAG, dbMsg);
+		//	} catch (Exception er) {
+		//		MyErrorLog(TAG, dbMsg, er);
+		//	}
+		//}
 
 		/// <summary>
 		/// 引数の位置のDataGridのオブジェクトを取得
