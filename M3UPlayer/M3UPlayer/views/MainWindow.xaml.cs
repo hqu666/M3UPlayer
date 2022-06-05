@@ -314,36 +314,36 @@ namespace M3UPlayer.Views {
 					}
 					dbMsg += "," + dropPlayListFiles.Count + "件";
 					e.Effects = DragDropEffects.All;
+					popup_text.Text = dataString;	
 				} else if (e.Data.GetDataPresent(DataFormats.StringFormat)) {
 					dbMsg += "data";
-					if (ellipse != null) {
+			//		if (ellipse != null) {
 						// If the DataObject contains string data, extract it.
 						if (e.Data.GetDataPresent(DataFormats.StringFormat)) {
 							dataString = (string)e.Data.GetData(DataFormats.StringFormat);
 
-							//// If the string can be converted into a Brush, convert it.
-							//if (converter.IsValid(dataString)) {
-							//	Brush newFill = (Brush)converter.ConvertFromString(dataString);
-							//	ellipse.Fill = newFill;
-							//}
+						// If the string can be converted into a Brush, convert it.
+						if (converter.IsValid(dataString)) {
+							Brush newFill = (Brush)converter.ConvertFromString(dataString);
+							ellipse.Fill = newFill;
 						}
-					} else {
-						dbMsg += ",ellipse = null";
 					}
-
+					//} else {
+					//	dbMsg += ",ellipse = null";
+					//}
 				} else {
 					dbMsg += ",Drag終了";
 					e.Effects = DragDropEffects.None;
 				}
 
-				if (!dataString.Equals("") && ellipse != null) {
-					dbMsg += ",dataString=" + dataString;
-					// If the string can be converted into a Brush, convert it.
-					if (converter.IsValid(dataString)) {
-						Brush newFill = (Brush)converter.ConvertFromString(dataString);
-						ellipse.Fill = newFill;
-					}
-				}
+				//if (!dataString.Equals("") && ellipse != null) {
+				//	dbMsg += ",dataString=" + dataString;
+				//	// If the string can be converted into a Brush, convert it.
+				//	if (converter.IsValid(dataString)) {
+				//		Brush newFill = (Brush)converter.ConvertFromString(dataString);
+				//		ellipse.Fill = newFill;
+				//	}
+				//}
 				e.Handled = true;
 				//		https://dobon.net/vb/dotnet/control/draganddrop.html
 				//dbMsg += "dragFrom=" + dragFrom;
@@ -374,134 +374,6 @@ namespace M3UPlayer.Views {
 			}
 		}
 
-
-		//        /// <summary>
-		//        /// ドラッグ アンド ドロップ操作が完了したときに発生
-		//        /// </summary>
-		//        /// <param name="sender"></param>
-		//        /// <param name="e"></param>
-		//        private void PlayListBox_DragDrop(object sender, DragEventArgs e)
-		//        {
-		//            string TAG = "[PlayListBox_DragDrop]";
-		//            string dbMsg = TAG;
-		//            try
-		//            {
-		//                dbMsg += "dragFrom=" + dragFrom;
-		//                dbMsg += ",dragSouceUrl=" + dragSouceUrl;
-		//                dbMsg += ",DDEfect=" + DDEfect;
-
-		//                /*
-		//								if (DragURLs.Count < 1) {
-		//									DragURLs = new List<string>();
-		//									foreach (string item in (string[])e.Data.GetData(DataFormats.FileDrop)) {
-		//										dbMsg += ",=" + item.ToString();
-		//										DragURLs.Add(item.ToString());
-		//									}
-		//									dbMsg += ",=" + DragURLs.Count + "件";
-		//									dragFrom = "other";
-		//									dragSouceUrl = DragURLs[0];
-		//									DDEfect = DragDropEffects.Copy;
-		//								}
-		//								*/
-		//                if (dragFrom != "" && dragSouceUrl != "")
-		//                {                                               //
-		//                    Point dropPoint = Control.MousePosition;                            //dropPoint取得☆最優先にしないと取れなくなる
-		//                    dropPoint = playListBox.PointToClient(dropPoint);                   //ドロップ時のマウスの位置をクライアント座標に変換
-		//                    dbMsg += "(dropPoint;" + dropPoint.X + "," + dropPoint.Y + ")";
-		//                    int dropPointIndex = playListBox.IndexFromPoint(dropPoint);         //マウス下のＬＢのインデックスを得る
-		//                    dbMsg += "(dropPointIndex;" + dropPointIndex + "/" + playListBox.Items.Count + ")";//
-
-		//                    ListBox droplist = (ListBox)sender;
-		//                    string dropSouceUrl = "";
-		//                    if (-1 < dropPointIndex)
-		//                    {
-		//                        dropSouceUrl = playListBox.Items[dropPointIndex].ToString();             //☆ (ListBox)senderで拾えない
-		//                    }
-		//                    else if (0 < playListBox.Items.Count)
-		//                    {
-		//                        dropSouceUrl = playListBox.Items[playListBox.Items.Count - 1].ToString();             //☆ (ListBox)senderで拾えない
-		//                        dropPointIndex = playListBox.Items.Count;
-		//                        dbMsg += ">>(dropPointIndex;" + dropPointIndex + ")";//
-		//                    }
-		//                    else
-		//                    {
-		//                        dropPointIndex = 0;
-		//                    }
-		//                    dbMsg += ",dropSouceUrl=" + dropSouceUrl;
-		//                    string playList = PlaylistComboBox.Text;
-		//                    dbMsg += ",playList=" + playList;
-		//                    if (e.Data.GetDataPresent(typeof(string)))
-		//                    {                                 //ドロップされたデータがstring型か調べる
-		//                        dragSouceUrl = (string)e.Data.GetData(typeof(string));                    //ドロップされたデータ(string型)を取得
-		//                        dbMsg += ",e.Data:dragSouceUrl=" + dragSouceUrl;
-		//                    }
-
-		//                    if (b_dragSouceUrl != dragSouceUrl)
-		//                    {                                           //二重動作回避？？発生原因不明
-		//                                                                //			if (dropPointIndex > -1 && dropPointIndex < playListBox.Items.Count) {      //dropPointがplayList内で取得出来たら
-		//                        b_dragSouceUrl = dragSouceUrl;                                                                   //	dropSouceUrl = e.Data.GetData(DataFormats.Text).ToString(); //ドラッグしてきたアイテムの文字列をstrに格納する☆他リストからは参照できない
-		//                        if (dragFrom == playListBox.Name)
-		//                        {                                     //プレイリスト内の移動なら		draglist == droplist
-		//                            if (dragSouceIDl != dropPointIndex)
-		//                            {
-		//                                dbMsg += "を;" + dropPointIndex + "に移動";
-		//                                DelFromPlayList(playList, dragSouceIDl);                        //一旦削除
-		//                                if (dragSouceIDl < dropPointIndex)
-		//                                {
-		//                                    dropPointIndex--;
-		//                                }
-		//                            }
-		//                        }
-		//                        dbMsg += ">>>" + dropSouceUrl;
-		//                        Files2PlayListIndex(playList, dragSouceUrl, dropPointIndex);
-		//                        dragSouceUrl = "";
-		//                        dbMsg += ",最終選択=" + dropPointIndex;
-		//                        droplist.SelectedIndex = dropPointIndex;          //選択先のインデックスを指定
-		//                        plaingItem = playListBox.SelectedValue.ToString();
-		//                        dbMsg += ";plaingItem=" + plaingItem;
-		//                        //					playListBox.Items[dragSouceIDP] = playListBox.Items[ind];
-		//                        //					playListBox.Items[ind] = str;
-		//                        //draglist.DoDragDrop("", DragDropEffects.None);//ドラッグスタート
-		//                        //			}
-		//                    }
-		//                    else
-		//                    {
-		//                        dbMsg += "<<二重発生回避>>";
-		//                    }
-		//                }
-		//                dragFrom = "";
-		//                //	dragSouceUrl = "";
-		//                dragSouceIDl = -1;
-		//                DDEfect = DragDropEffects.None;
-		//                MyLog(TAG, dbMsg);
-		//            }
-		//            catch (Exception er)
-		//            {
-		//                dbMsg += "<<以降でエラー発生>>" + er.Message;
-		//                MyLog(TAG, dbMsg);
-		//            }
-		//        }
-
-
-		//private void PlayList_PreviewDragEnter(object sender, DragEventArgs e) {
-		//	string TAG = "[PlayList_PreviewDragEnter]";
-		//	string dbMsg = "";
-		//	try {
-		//		MyLog(TAG, dbMsg);
-		//	} catch (Exception er) {
-		//		MyErrorLog(TAG, dbMsg, er);
-		//	}
-		//}
-
-		//private void PlayList_PreviewDragLeave(object sender, DragEventArgs e) {
-		//	string TAG = "[PlayList_PreviewDragLeave]";
-		//	string dbMsg = "";
-		//	try {
-		//		MyLog(TAG, dbMsg);
-		//	} catch (Exception er) {
-		//		MyErrorLog(TAG, dbMsg, er);
-		//	}
-		//}
 
 		/// <summary>
 		/// 引数の位置のDataGridのオブジェクトを取得
@@ -537,15 +409,6 @@ namespace M3UPlayer.Views {
 			string TAG = "[PlayList_MouseDown]";// + fileName;
 			string dbMsg = "";
 			try {
-				//	DataGrid droplist = (DataGrid)sender;
-				//	if (droplist != null) {
-				//		dbMsg += ",AllowDrop=" + droplist.AllowDrop;
-				//		dbMsg += "[" + droplist.SelectedIndex + "]";
-				//		DraggedItem = (PlayListModel)droplist.SelectedItem;
-				////		dbMsg += ",UrlStr=" + DraggedItem.UrlStr;
-				////20220320		IsDragging = true;
-				//	} else {
-				//		dbMsg += "droplist == null";
 				IsDragging = false;
 				MoveCount = 0;
 				//	}
@@ -594,6 +457,7 @@ namespace M3UPlayer.Views {
 					dbMsg += "している";
 					if (!IsDragging && 2 < MoveCount) {
 						dbMsg += "、まだドラッグしていない";
+						//			IsDragging = true;    だけでは表示されない
 						IsDragging = VM.PlayList_DragEnter();              //Drag_nowが返される
 																		   //display the popup if it hasn't been opened yet
 						if (!popup1.IsOpen) {
@@ -608,7 +472,7 @@ namespace M3UPlayer.Views {
 					//make sure the row under the grid is being selected
 					Point position = e.GetPosition(PlayList);
 
-					Ellipse ellipse = sender as Ellipse;        //楕円？
+					Ellipse? ellipse = sender as Ellipse;        //楕円？
 					if (ellipse != null && e.LeftButton == MouseButtonState.Pressed) {
 						DragDrop.DoDragDrop(ellipse,
 											 ellipse.Fill.ToString(),
@@ -732,6 +596,59 @@ namespace M3UPlayer.Views {
 			}
 
 		}
+
+
+		//public void PlayList2Explore(string pathStr) {
+		//	string TAG = "PlayList2Explore";
+		//	string dbMsg = "";
+		//	try {
+		//		dbMsg += ">>" + pathStr;
+
+
+		//		//https://dobon.net/vb/dotnet/process/openfile.html
+		//		//Processオブジェクトを作成する
+		//		System.Diagnostics.Process pEXPLORER = new System.Diagnostics.Process();
+		//		//起動するファイルを指定する
+		//		pEXPLORER.StartInfo.FileName = "EXPLORER.exe";
+		//		pEXPLORER.StartInfo.Arguments = pathStr;
+		//		//イベントハンドラがフォームを作成したスレッドで実行されるようにする
+		////pEXPLORER.SynchronizingObject = (ISynchronizeInvoke?)this;
+		//		//Unable to cast object of type 'M3UPlayer.Views.MainWindow' to type 'System.ComponentModel.ISynchronizeInvoke'.
+		//		//イベントハンドラの追加
+		//		pEXPLORER.Disposed += new EventHandler(EXPLORER_Exited);
+		//		//プロセスが終了したときに Exited イベントを発生させる
+		//		pEXPLORER.EnableRaisingEvents = true;
+		//		//起動する
+		//		pEXPLORER.Start();
+		//		//pEXPLORER = Process.Start("EXPLORER.EXE", pathStr);
+		//		dbMsg += ",pEXPLORER[" + pEXPLORER.Id + "]start" + pEXPLORER.StartTime.ToString("HH:mm:ss.fff") + ",Arguments=" + pEXPLORER.StartInfo.Arguments;
+		//		pEXPLORER.WaitForExit();
+		//		dbMsg += ">>Exit" + pEXPLORER.ExitTime.ToString("HH:mm:ss.fff") + ",Arguments=" + pEXPLORER.StartInfo.Arguments;
+		//		dbMsg += ">>ExitCode=" + pEXPLORER.ExitCode.ToString();
+		//		pEXPLORER.Kill();
+		//		MyLog(TAG, dbMsg);
+		//	} catch (Exception er) {
+		//		MyErrorLog(TAG, dbMsg, er);
+		//	}
+		//}
+
+		//private void EXPLORER_Exited(object sender, EventArgs e) {
+		//	string TAG = "EXPLORER_Exited";
+		//	string dbMsg = "";
+		//	try {
+		//		System.Diagnostics.Process process = (System.Diagnostics.Process)sender;
+		//		dbMsg += ">>Exit" + process.ExitTime.ToString("HH:mm:ss.fff") + ",Arguments=" + process.StartInfo.Arguments;
+		//		dbMsg += ">>ExitCode=" + process.ExitCode.ToString();
+
+		//		MyLog(TAG, dbMsg);
+		//	} catch (Exception er) {
+		//		MyErrorLog(TAG, dbMsg, er);
+		//	}
+		//}
+
+
+
+
 
 
 		////アイコン

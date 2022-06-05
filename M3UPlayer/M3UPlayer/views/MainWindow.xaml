@@ -266,13 +266,6 @@
                            Sorting="PlayList_Sorting"
                            Margin="0,0,5,0" 
 						>
-                    <!--Keyboard.KeyUp="PlayList_KeyUp"
-                            PreviewDrop="PlayList_PreviewDrop"
-                          PreviewDragEnter="PlayList_PreviewDragOver"
-                            DragEnter="PlayList_DragEnter" 
-                   
-                    
-                    -->
 
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
@@ -283,28 +276,6 @@
                             </Style.Triggers>
                         </Style>
                     </DataGrid.RowStyle>
-                    <!--<KeyBinding Key="Return" Command="PlayListClick" />は通らない-->
-                    <!--
-    						   SelectionMode="Extended"
-               PlayListSelectionMode="Extended"
-                                          SelectedItems="{Binding PLListSelectedItem}"
-                    -->
-                    <!--
-                        MouseMoveで座標情報を拾う方法が不明
-                        <behaviors:Interaction.Triggers>
-                        <behaviors:EventTrigger EventName="MouseDown">
-                            <behaviors:InvokeCommandAction Command="{Binding PlayListLeftClick}" 
-                                                           CommandParameter="{Binding ElementName=PlayList}"/>
-                        </behaviors:EventTrigger>
-                        <behaviors:EventTrigger EventName="MouseMove">
-                            <behaviors:InvokeCommandAction Command="{Binding PlayListMouseMove}" 
-                                                           CommandParameter="{Binding ElementName=PlayList}"/>
-                        </behaviors:EventTrigger>
-                        <behaviors:EventTrigger EventName="MouseUp">
-                            <behaviors:InvokeCommandAction Command="{Binding PlayListMouseUp}" 
-                                                           CommandParameter="{Binding ElementName=PlayList}"/>
-                        </behaviors:EventTrigger>
-                    </behaviors:Interaction.Triggers>-->
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="URL"
                                             Binding="{Binding UrlStr}" 

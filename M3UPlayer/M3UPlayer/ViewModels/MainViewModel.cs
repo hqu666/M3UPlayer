@@ -2033,29 +2033,34 @@ namespace M3UPlayer.ViewModels {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         public bool PlayList_DragEnter() {
-            string TAG = "PlayListBox_DragEnter";
+            string TAG = "PlayList_DragEnter";
             string dbMsg = "";
             try {
+
                 if (Drag_now) {
                     dbMsg += "既にDrag中";
                 } else {
                     string titolStr = "プレイリストアイテムファイルの操作";
                     string errorStr = "ドラッグ";
                     string? doStr = null;
-                    if (PlayListOpelate(titolStr, errorStr, doStr)) {
+                    if (SelectedPlayListFiles == null) {
+                        dbMsg += ".SelectedPlayListFiles == null";
+                    } else if (PlayListOpelate(titolStr, errorStr, doStr)) {
+                        dbMsg += ",選択" + SelectedPlayListFiles.Count + "件";
                         DraggedItem_name = "" + SelectedPlayListFiles[0].UrlStr;
                         RaisePropertyChanged("DraggedItem_name");
                         dbMsg += "Drag開始＝" + DraggedItem_name;
                         MyView.popup_text.Text = DraggedItem_name;
                         Drag_now = true;
-
+                        RaisePropertyChanged("Drag_now");
                         PlayListSelectionMode = "Single";
                         RaisePropertyChanged("PlayListSelectionMode");
 
                     } else {
                         Drag_now = false;
+                        RaisePropertyChanged("Drag_now");
                     }
-                    RaisePropertyChanged("Drag_now");
+                    dbMsg += ",Drag_now=" + Drag_now;
                     MyLog(TAG, dbMsg);
                 }
             } catch (Exception er) {
@@ -2801,65 +2806,55 @@ namespace M3UPlayer.ViewModels {
                 pathStr = pathStr.Replace("//", "/");
                 pathStr = pathStr.Replace('/', Path.DirectorySeparatorChar);
                 dbMsg += ">>" + pathStr + " の " + fileNameStr;
-
-                Process.Start("EXPLORER.EXE", pathStr);
-
-                /*
-
-                // ダイアログのインスタンスを生成
-                cofDialog = new CommonOpenFileDialog("ファイルの操作") {
-                    IsFolderPicker = false,             //フォルダ選択
-                    InitialDirectory = pathStr,
-                    DefaultDirectory = pathStr,         //初期ディレクトリ
-                    DefaultFileName = fileNameStr,  //ファイルの完全なパスを含む文字列
-                    EnsurePathExists = true,
-                    // FileNameは読み取り専用
-                };
-                if (cofDialog.ShowDialog() == CommonFileDialogResult.Ok) {
-                    //    MessageBox.Show(dialog.FileName);
-                    string NewSelectedPath = cofDialog.FileName;              //fbDialog.SelectedPath;
-                    dbMsg += ">>" + NewSelectedPath;
-                    if (!NewSelectedPath.Equals(NowSelectedFile)) {
-                        dbMsg += ">>変更有り";
-                        PlayListModel changeItem = new PlayListModel();
-                        changeItem.UrlStr = NewSelectedPath;
-                        if (File.Exists(NowSelectedFile)) {
-                            dbMsg += "元ファイルを残してコピー追加:次行へ";
-                            PLList.Insert(SelectedPlayListIndex + 1, changeItem);
-                        } else {
-                            int orgIndex = SelectedPlayListIndex;
-                            PLList.RemoveAt(SelectedPlayListIndex);
-                            if (File.Exists(NewSelectedPath)) {
-                                dbMsg += "元ファイル変更：同行を置き換え";
-                                PLList.Insert(orgIndex, changeItem);
-                                SelectedPlayListIndex = orgIndex;
-                            } else {
-                                dbMsg += "元ファイルを削除";
-                            }
-                        }
-                        SavePlayList();
-                    }
-                } else {
-                    dbMsg += "キャンセルされました";
-                }
-                if (File.Exists(NowSelectedFile)) {
-                } else {
-                    dbMsg += "(もしくは無いファイルを選択した)元ファイルを削除";
-                    PLList.RemoveAt(SelectedPlayListIndex);
-                    SavePlayList();
-                }
-                 */
-                MyLog(TAG, dbMsg);
-            } catch (Exception er) {
+				//       MyView.PlayList2Explore(pathStr);
+				//https://dobon.net/vb/dotnet/process/openfile.html
+				//Processオブジェクトを作成する
+				pEXPLORER = new System.Diagnostics.Process();
+				//起動するファイルを指定する
+				pEXPLORER.StartInfo.FileName = "EXPLORER.exe";
+				pEXPLORER.StartInfo.Arguments = pathStr;
+                //イベントハンドラがフォームを作成したスレッドで実行されるようにする
+                //         pEXPLORER.SynchronizingObject = (ISynchronizeInvoke?)this;
+                //		//Unable to cast object of type 'M3UPlayer.Views.MainWindow' to type 'System.ComponentModel.ISynchronizeInvoke'.
+                //イベントハンドラの追加
+                pEXPLORER.Disposed += new EventHandler(EXPLORER_Exited);
+				//プロセスが終了したときに Exited イベントを発生させる
+				pEXPLORER.EnableRaisingEvents = true;
+				//起動する
+				pEXPLORER.Start();
+				//pEXPLORER = Process.Start("EXPLORER.EXE", pathStr);
+				dbMsg += ",pEXPLORER[" + pEXPLORER.Id + "]start" + pEXPLORER.StartTime.ToString("HH:mm:ss.fff") + ",Arguments=" + pEXPLORER.StartInfo.Arguments;
+				pEXPLORER.WaitForExit();
+				dbMsg += ">>Exit" + pEXPLORER.ExitTime.ToString("HH:mm:ss.fff") + ",Arguments=" + pEXPLORER.StartInfo.Arguments;
+				dbMsg += ">>ExitCode=" + pEXPLORER.ExitCode.ToString();
+				pEXPLORER.Kill();
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
 
-        /// <summary>
-        /// 先頭へ移動
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+		private void EXPLORER_Exited(object sender, EventArgs e) {
+			string TAG = "EXPLORER_Exited";
+			string dbMsg = "";
+			try {
+				Process process = (Process)sender;
+				dbMsg += ">>Exit" + process.ExitTime.ToString("HH:mm:ss.fff") + ",Arguments=" + process.StartInfo.Arguments;
+				dbMsg += ">>ExitCode=" + process.ExitCode.ToString();
+
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				MyErrorLog(TAG, dbMsg, er);
+			}
+		}
+
+
+
+		/// <summary>
+		/// 先頭へ移動
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void PlayListItemMoveTop_Click(object sender, RoutedEventArgs e) {
             string TAG = "PlayListItemMoveTop_Click";
             string dbMsg = "";
@@ -3408,18 +3403,18 @@ namespace M3UPlayer.ViewModels {
         /// <summary>
         /// エクスプローラで作業対象フォルダを表示する
         /// </summary>
-        private void ShowExplore() {
-            string TAG = "ShowExplore";
-            string dbMsg = "";
-            try {
-                //最近表示した場所	をシェルなら
-                //	explorer.exe shell:::{ 22877A6D - 37A1 - 461A - 91B0 - DBDA5AAEBC99}
-                pEXPLORER = System.Diagnostics.Process.Start("EXPLORER.EXE", @"{ 22877A6D - 37A1 - 461A - 91B0 - DBDA5AAEBC99}");
-                MyLog(TAG, dbMsg);
-            } catch (Exception er) {
-                MyErrorLog(TAG, dbMsg, er);
-            }
-        }
+        //private void ShowExplore() {
+        //    string TAG = "ShowExplore";
+        //    string dbMsg = "";
+        //    try {
+        //        //最近表示した場所	をシェルなら
+        //        //	explorer.exe shell:::{ 22877A6D - 37A1 - 461A - 91B0 - DBDA5AAEBC99}
+        //        pEXPLORER = System.Diagnostics.Process.Start("EXPLORER.EXE", @"{ 22877A6D - 37A1 - 461A - 91B0 - DBDA5AAEBC99}");
+        //        MyLog(TAG, dbMsg);
+        //    } catch (Exception er) {
+        //        MyErrorLog(TAG, dbMsg, er);
+        //    }
+        //}
         #endregion
 
         /// <summary>
