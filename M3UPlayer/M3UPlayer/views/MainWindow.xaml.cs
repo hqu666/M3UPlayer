@@ -493,7 +493,7 @@ namespace M3UPlayer.Views {
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void PlayList_MouseUp(object sender, MouseButtonEventArgs e) {
-			string TAG = "[PlayList_MouseUp]";
+			string TAG = "PlayList_MouseUp";
 			string dbMsg = "";
 			try {
 				dbMsg += "IsDragging=" + IsDragging;

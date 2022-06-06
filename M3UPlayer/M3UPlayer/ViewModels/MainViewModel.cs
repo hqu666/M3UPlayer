@@ -1693,6 +1693,7 @@ namespace M3UPlayer.ViewModels {
             string TAG = "PlayListToPlayer";
             string dbMsg = "";
             try {
+                IsPlaying = false;
                 string targetURLStr = targetItem.UrlStr;
                 dbMsg += "、targetURLStr=" + targetURLStr;
                 if (NowSelect.ListItem.UrlStr != null) {
@@ -1855,8 +1856,8 @@ namespace M3UPlayer.ViewModels {
                         */
                     IsHideControl = true;
                 }
-
-                RaisePropertyChanged("infoStr");
+                IsPlaying = true;
+				RaisePropertyChanged("infoStr");
                 dbMsg += "、infoStr=" + infoStr;
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
@@ -1864,15 +1865,15 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
-        void axWindowsMediaPlayer_PositionChange(object sender, AxWMPLib._WMPOCXEvents_PositionChangeEvent e) {
-            //   SliderValue = axWmp.Ctlcontrols.currentPosition;                        //GetPlayPosition();
-            SliderValue = e.newPosition;
-            RaisePropertyChanged("SliderValue");
-            //	TimeSpan span = new TimeSpan(0, 0, (int)SliderValue);
-            PositionStr = GetHMS(SliderValue.ToString());             //.ToString(@"hh\:mm\:ss");
-            //axWmp.Ctlcontrols.currentPositionString;                   //
-            RaisePropertyChanged("PositionStr");
-        }
+        //void axWindowsMediaPlayer_PositionChange(object sender, AxWMPLib._WMPOCXEvents_PositionChangeEvent e) {
+        //    //   SliderValue = axWmp.Ctlcontrols.currentPosition;                        //GetPlayPosition();
+        //    SliderValue = e.newPosition;
+        //    RaisePropertyChanged("SliderValue");
+        //    //	TimeSpan span = new TimeSpan(0, 0, (int)SliderValue);
+        //    PositionStr = GetHMS(SliderValue.ToString());             //.ToString(@"hh\:mm\:ss");
+        //    //axWmp.Ctlcontrols.currentPositionString;                   //
+        //    RaisePropertyChanged("PositionStr");
+        //}
 
 
         /// <summary>
@@ -2342,7 +2343,7 @@ namespace M3UPlayer.ViewModels {
                     dbMsg += "選択値無し";
                 }
                 dbMsg += ",UrlStr=" + targetItem.UrlStr;
-                IsPlaying = false;
+                //IsPlaying = false;
                 PlayListToPlayer(targetItem);
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
@@ -3622,8 +3623,8 @@ namespace M3UPlayer.ViewModels {
                 PositionSLTTText = GetHMS(newPosition.ToString());
                 dbMsg += ">>" + PositionSLTTText;
                 RaisePropertyChanged("PositionSLTTText");
-                IsPlaying = true;
-                RaisePropertyChanged("IsPlaying");
+                //IsPlaying = true;
+                //RaisePropertyChanged("IsPlaying");
 
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
