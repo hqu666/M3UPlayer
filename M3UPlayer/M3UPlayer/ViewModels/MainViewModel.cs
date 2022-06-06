@@ -278,6 +278,12 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
+        /// <summary>
+        /// ポジションスライダーをドラッグ中
+        /// PositionSL_DragStartedでtrue/PositionSL_MouseUpでfalse
+        /// </summary>
+        public bool IsPositionSLDraging = false;
+
         private double _SliderValue;
         /// <summary>
         /// スライダー位置 
@@ -1886,7 +1892,7 @@ namespace M3UPlayer.ViewModels {
             string TAG = "MyTimerMethod";
             string dbMsg = "";
             try {
-                if (axWmp != null) {
+                if (axWmp != null || !IsPositionSLDraging) {
                     SliderValue = axWmp.Ctlcontrols.currentPosition;                        //GetPlayPosition();
                     RaisePropertyChanged("SliderValue");
                     PositionStr = GetHMS(SliderValue.ToString());             //.ToString(@"hh\:mm\:ss");
@@ -3567,30 +3573,8 @@ namespace M3UPlayer.ViewModels {
         /// <summary>
         /// 再生ポジションスライダー操作中
         /// </summary>
-        public bool isPSLDrag=false;
+   //     public bool isPSLDrag=false;
 
-        //     /// <summary>
-        //     /// 再生ポジションスライダーのMouseUp
-        ////     public ICommand PSLMouseUp => new DelegateCommand(PositionSLiderMouseUp);　だとクラッシュする
-        //     /// </summary>
-        //     public void PositionSLiderMouseUp(double newPosition) {
-        //         string TAG = "PositionSLiderMouseUp";
-        //         string dbMsg = "";
-        //         try {
-        //             dbMsg += ",SliderValue=" + SliderValue + ">>" + newPosition;
-        //             //dbMsg += ",newPosition=" + newPosition;
-        //             //SliderValue = newPosition;
-        //             //RaisePropertyChanged("SliderValue");
-        //             ////await Task.Run(() => {の中では設定できなかった
-        //             //await MyView.webView.ExecuteScriptAsync($"document.getElementById(" + "'" + Constant.PlayerName + "'" + ").currentTime=" + "'" + newPosition + "'" + ";");
-        //             //IsPlaying = true;
-        //             //RaisePropertyChanged("IsPlaying");
-        //             isPSLDrag = false;
-        //             MyLog(TAG, dbMsg);
-        //         } catch (Exception er) {
-        //             MyErrorLog(TAG, dbMsg, er);
-        //         }
-        //     }
 
         /// <summary>
         /// 再生ポジションスライダーの Thumb 位置変更

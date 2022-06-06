@@ -695,7 +695,8 @@ namespace M3UPlayer.Views {
 				Slider slider = (Slider)sender;
 				double newValue = slider.Value;
 				dbMsg += "newValue=" + newValue;
-				VM.PauseVideo();
+				VM.IsPositionSLDraging = true;
+				//VM.PauseVideo();
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
@@ -769,6 +770,7 @@ namespace M3UPlayer.Views {
 				double newValue = slider.Value;
 				dbMsg += "newValue=" + newValue;
 				VM.PositionSliderValueChang(newValue);
+				VM.IsPositionSLDraging = false;
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
