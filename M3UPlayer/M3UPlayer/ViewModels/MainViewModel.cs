@@ -1892,7 +1892,7 @@ namespace M3UPlayer.ViewModels {
             string TAG = "MyTimerMethod";
             string dbMsg = "";
             try {
-                if (axWmp != null || !IsPositionSLDraging) {
+                if (axWmp != null && !IsPositionSLDraging) {
                     SliderValue = axWmp.Ctlcontrols.currentPosition;                        //GetPlayPosition();
                     RaisePropertyChanged("SliderValue");
                     PositionStr = GetHMS(SliderValue.ToString());             //.ToString(@"hh\:mm\:ss");

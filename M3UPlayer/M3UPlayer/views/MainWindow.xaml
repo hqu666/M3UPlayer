@@ -250,9 +250,8 @@
 						   SelectionMode="{Binding PlayListSelectionMode, Mode=TwoWay}"
                            SelectedIndex="{Binding SelectedPlayListIndex, Mode=TwoWay}"
                            ContextMenu="{Binding PlayListMenu}"
-                           MouseMove="PlayList_MouseMove"
-                           GiveFeedback="PlayListBox_GiveFeedback"
                            AllowDrop="true"
+                           GiveFeedback="PlayListBox_GiveFeedback"
                            SelectionUnit="FullRow"
 						   CanUserAddRows="False" 
 						   CanUserDeleteRows="False"
@@ -261,7 +260,10 @@
                            IsReadOnly="True" 
                            Drop="PlayList_Drop"
                            DragOver="PlayList_DragOver"
+                           DragEnter="PlayList_DragEnter"
+                           DragLeave="PlayList_DragLeave"
                            MouseDown="PlayList_MouseDown" 
+                           MouseMove="PlayList_MouseMove"
                            MouseUp="PlayList_MouseUp"
                            Sorting="PlayList_Sorting"
                            Margin="0,0,5,0" 
@@ -279,7 +281,7 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="URL"
                                             Binding="{Binding UrlStr}" 
-                                            Width="Auto"
+                                            Width="*"
                                             >
                             <DataGridTextColumn.ElementStyle>
                                 <Style>

@@ -214,6 +214,26 @@ namespace M3UPlayer.Views {
 			}
 		}
 
+		private void PlayList_DragEnter(object sender, DragEventArgs e) {
+			string TAG = "PlayList_DragEnter";
+			string dbMsg = "";
+			try {
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				MyErrorLog(TAG, dbMsg, er);
+			}
+		}
+
+		private void PlayList_DragLeave(object sender, DragEventArgs e) {
+			string TAG = "PlayList_DragLeave";
+			string dbMsg = "";
+			try {
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				MyErrorLog(TAG, dbMsg, er);
+			}
+		}
+
 
 		/// <summary>
 		/// VMのリスト追加へ継続
@@ -243,6 +263,7 @@ namespace M3UPlayer.Views {
 
 		/// <summary>
 		/// Dropで割り付けたリスナー
+		/// アイテムは未関係
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
@@ -286,6 +307,7 @@ namespace M3UPlayer.Views {
 
 		/// <summary>
 		/// ファイルがコントロールの境界を越えてドラッグされると発生
+		/// アイテムは未関係
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
@@ -328,12 +350,16 @@ namespace M3UPlayer.Views {
 							ellipse.Fill = newFill;
 						}
 					}
-					//} else {
-					//	dbMsg += ",ellipse = null";
-					//}
+					popup_text.Text = dataString;
+					//popup1.IsOpen = true;
+					//IsDragging = true;
+
 				} else {
 					dbMsg += ",Drag終了";
 					e.Effects = DragDropEffects.None;
+					//popup1.IsOpen = false;
+					//IsDragging = false;
+
 				}
 
 				//if (!dataString.Equals("") && ellipse != null) {
@@ -409,9 +435,9 @@ namespace M3UPlayer.Views {
 			string TAG = "[PlayList_MouseDown]";// + fileName;
 			string dbMsg = "";
 			try {
+				popup_text.Text = "";
 				IsDragging = false;
 				MoveCount = 0;
-				//	}
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
@@ -454,13 +480,12 @@ namespace M3UPlayer.Views {
 					}
 					MoveCount = 0;
 				} else if (e.LeftButton == MouseButtonState.Pressed) {
-					dbMsg += "している";
-					if (!IsDragging && 2 < MoveCount) {
+					dbMsg += "している[" + PlayList.SelectedIndex + "]" + PlayList.IsFocused;
+					if (!IsDragging && 2 < MoveCount) {             // && !popup_text.Text.Equals("")
 						dbMsg += "、まだドラッグしていない";
-						//			IsDragging = true;    だけでは表示されない
 						IsDragging = VM.PlayList_DragEnter();              //Drag_nowが返される
 																		   //display the popup if it hasn't been opened yet
-						if (!popup1.IsOpen) {
+						if (!popup1.IsOpen && IsDragging) {
 							popup1.IsOpen = true;
 							dbMsg += "DataGrid内のpopアップを表示させる";
 						}
@@ -516,32 +541,6 @@ namespace M3UPlayer.Views {
 				}
 				IsDragging = false;
 				MoveCount = 0;
-				//DataGrid droplist = (DataGrid)sender;
-				//if (droplist != null) {
-				//	dbMsg += ",AllowDrop=" + droplist.AllowDrop;
-				//	dbMsg += "[" + droplist.SelectedIndex + "]";
-				//	PlayListModel targetItem = (PlayListModel)droplist.SelectedItem;
-				//	//get the target item
-				//	if (DraggedItem != null) {
-				//		dbMsg += "<<Dragged=" + DraggedItem.Summary;
-				//		if (DraggedItem == targetItem) {
-				//			VM.PlayListToPlayer(targetItem);
-				//		} else {
-				//			VM.PlayListItemMoveTo(DraggedItem, targetItem);
-				//		}
-				//	} else {
-
-				//	}
-
-				//	//　参考
-				//	if (targetItem == null || ReferenceEquals(DraggedItem, targetItem)) {
-				//		dbMsg += ">参考>ReferenceEquals";
-				//	}
-
-				//reset
-				//} else {
-				//	dbMsg += "droplist == null";
-				//}
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
@@ -598,64 +597,6 @@ namespace M3UPlayer.Views {
 		}
 
 
-		//public void PlayList2Explore(string pathStr) {
-		//	string TAG = "PlayList2Explore";
-		//	string dbMsg = "";
-		//	try {
-		//		dbMsg += ">>" + pathStr;
-
-
-		//		//https://dobon.net/vb/dotnet/process/openfile.html
-		//		//Processオブジェクトを作成する
-		//		System.Diagnostics.Process pEXPLORER = new System.Diagnostics.Process();
-		//		//起動するファイルを指定する
-		//		pEXPLORER.StartInfo.FileName = "EXPLORER.exe";
-		//		pEXPLORER.StartInfo.Arguments = pathStr;
-		//		//イベントハンドラがフォームを作成したスレッドで実行されるようにする
-		////pEXPLORER.SynchronizingObject = (ISynchronizeInvoke?)this;
-		//		//Unable to cast object of type 'M3UPlayer.Views.MainWindow' to type 'System.ComponentModel.ISynchronizeInvoke'.
-		//		//イベントハンドラの追加
-		//		pEXPLORER.Disposed += new EventHandler(EXPLORER_Exited);
-		//		//プロセスが終了したときに Exited イベントを発生させる
-		//		pEXPLORER.EnableRaisingEvents = true;
-		//		//起動する
-		//		pEXPLORER.Start();
-		//		//pEXPLORER = Process.Start("EXPLORER.EXE", pathStr);
-		//		dbMsg += ",pEXPLORER[" + pEXPLORER.Id + "]start" + pEXPLORER.StartTime.ToString("HH:mm:ss.fff") + ",Arguments=" + pEXPLORER.StartInfo.Arguments;
-		//		pEXPLORER.WaitForExit();
-		//		dbMsg += ">>Exit" + pEXPLORER.ExitTime.ToString("HH:mm:ss.fff") + ",Arguments=" + pEXPLORER.StartInfo.Arguments;
-		//		dbMsg += ">>ExitCode=" + pEXPLORER.ExitCode.ToString();
-		//		pEXPLORER.Kill();
-		//		MyLog(TAG, dbMsg);
-		//	} catch (Exception er) {
-		//		MyErrorLog(TAG, dbMsg, er);
-		//	}
-		//}
-
-		//private void EXPLORER_Exited(object sender, EventArgs e) {
-		//	string TAG = "EXPLORER_Exited";
-		//	string dbMsg = "";
-		//	try {
-		//		System.Diagnostics.Process process = (System.Diagnostics.Process)sender;
-		//		dbMsg += ">>Exit" + process.ExitTime.ToString("HH:mm:ss.fff") + ",Arguments=" + process.StartInfo.Arguments;
-		//		dbMsg += ">>ExitCode=" + process.ExitCode.ToString();
-
-		//		MyLog(TAG, dbMsg);
-		//	} catch (Exception er) {
-		//		MyErrorLog(TAG, dbMsg, er);
-		//	}
-		//}
-
-
-
-
-
-
-		////アイコン
-		//private Cursor noneCursor = new Cursor("none.cur");
-		//private Cursor moveCursor = new Cursor("move.cur");
-		//private Cursor copyCursor = new Cursor("copy.cur");
-		//private Cursor linkCursor = new Cursor("link.cur");
 
 		private void PlayListBox_GiveFeedback(object sender, GiveFeedbackEventArgs e) {
 			string TAG = "PlayListBox_GiveFeedback";
