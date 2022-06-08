@@ -2690,6 +2690,7 @@ namespace M3UPlayer.ViewModels {
         public MenuItem PlayListItemMove;
         public MenuItem PlayListItemMoveTop;
         public MenuItem PlayListItemMoveBottom;
+        public MenuItem PlayListItemCopyOtherList;
         public MenuItem PlayListItemMoveOtherList;
         public MenuItem PlayListDeleteCannotRead;
         public MenuItem PlayListDeleteDoubling;
@@ -2728,8 +2729,13 @@ namespace M3UPlayer.ViewModels {
                 PlayListItemMoveBottom.Click += PlayListItemMoveBottom_Click;
                 PlayListItemMove.Items.Add(PlayListItemMoveBottom);
 
+                PlayListItemCopyOtherList = new MenuItem();
+                PlayListItemCopyOtherList.Header = "他のリストへコピー";
+                PlayListItemCopyOtherList.Click += PlayListItemCopyOtherListm_Click;
+                PlayListItemMove.Items.Add(PlayListItemCopyOtherList);
+
                 PlayListItemMoveOtherList = new MenuItem();
-                PlayListItemMoveOtherList.Header = "他のリストへコピー";
+                PlayListItemMoveOtherList.Header = "他のリストへ移動";
                 PlayListItemMoveOtherList.Click += PlayListItemMoveOtherListm_Click;
                 PlayListItemMove.Items.Add(PlayListItemMoveOtherList);
                 //サブメニューに追加
@@ -2919,11 +2925,11 @@ namespace M3UPlayer.ViewModels {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void PlayListItemMoveOtherListm_Click(object sender, RoutedEventArgs e) {
-            string TAG = "PlayListItemMoveOtherListm_Click";
+        private void PlayListItemCopyOtherListm_Click(object sender, RoutedEventArgs e) {
+            string TAG = "PlayListItemCopyOtherListm_Click";
             string dbMsg = "";
             try {
-                string titolStr = "プレイリストのアイテム移動";
+                string titolStr = "プレイリストのアイテムコピー";
                 string errorStr = "移動";
                 string doStr = "を他のリストにコピーしますか？";
                 if (!PlayListOpelate(titolStr, errorStr, doStr)) {
@@ -2995,6 +3001,102 @@ namespace M3UPlayer.ViewModels {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
+
+        private void PlayListItemMoveOtherListm_Click(object sender, RoutedEventArgs e) {
+            string TAG = "PlayListItemMoveOtherListm_Click";
+            string dbMsg = "";
+            try {
+                string titolStr = "プレイリストのアイテム移動";
+                string errorStr = "移動";
+                string doStr = "を他のリストに移動しますか？";
+                if (!PlayListOpelate(titolStr, errorStr, doStr)) {
+                    return;
+                }
+                //切り替える前
+                BeforSelect = NowSelect;
+                int BeforSelectIndex = BeforSelect.SelectedIndex;
+                dbMsg += "," + BeforSelect.PlayListUrlStr + " の[ " + BeforSelectIndex + "]" + BeforSelect.ListItem.UrlStr;
+
+                NowSelectedFile = PLListSelectedItem.UrlStr;
+                dbMsg += "=" + NowSelectedFile;
+                // ダイアログのインスタンスを生成
+                ofDialog = new OpenFileDialog();
+                // ファイルの種類を設定
+                ofDialog.Filter = "プレイリスト (*.m3u*)|*.m3u*|全てのファイル (*.*)|*.*";
+                //② デフォルトのフォルダを指定する
+                if (CurrentPlayListFileName.Equals("")) {
+                    CurrentPlayListFileName = "C;";
+                }
+                if (NowSelectedPath == null || NowSelectedPath.Equals("")) {
+                    NowSelectedPath = Path.GetDirectoryName(CurrentPlayListFileName);
+                }
+                dbMsg += ",CurrentPlayListFileName=" + CurrentPlayListFileName;
+                ofDialog.InitialDirectory = Path.GetDirectoryName(CurrentPlayListFileName);
+                //③ダイアログのタイトルを指定する
+                ofDialog.Title = "ファイル選択";
+                //ダイアログを表示する
+                if (ofDialog.ShowDialog() == true) {
+                    string selectListFile = ofDialog.FileName;
+                    //usingで中の処理が終わったタイミングでファイルを保存する
+                    using (var writer = new StreamWriter(selectListFile, true)) {
+                        //末尾行に追記する
+                        writer.WriteLine(NowSelectedFile);
+                    }
+                    //usingを使わない例: File.AppendAllText(selectListFile, NowSelectedFile);
+                    CurrentPlayListFileName = selectListFile;
+                    RaisePropertyChanged("CurrentPlayListFileName");
+                    dbMsg += ">>" + CurrentPlayListFileName;
+                    if (PLComboSource.ContainsKey(CurrentPlayListFileName)) {
+                        dbMsg += "追加済み;";
+                    } else {
+                        AddPlayListCombo(CurrentPlayListFileName);
+                        //         listIndex = 0;
+                        PlayListStr = "";
+                        foreach (var PLComboItem in PLComboSource) {
+                            PlayListStr += PLComboItem.Key + ",";
+                        }
+                        PlayListStr = PlayListStr.Substring(0, PlayListStr.Length - 1);
+                        dbMsg += ",PlayListStr=" + PlayListStr;
+                        PlayLists = PlayListStr.Split(',');
+                        dbMsg += ":追加";
+                    }
+                    int listIndex = Array.IndexOf(PlayLists, selectListFile);
+                    dbMsg += "、[" + listIndex + "/" + PlayLists.Length + "]" + selectListFile + "=" + CurrentPlayListFileName;
+
+                    //ここから削除
+                    dbMsg += "\r\n削除前[" + BeforSelectIndex + "/" + PLList.Count + "]";
+                    PLList.RemoveAt(BeforSelectIndex);
+                    if (PLList.Count <= BeforSelectIndex) {
+                        SelectedPlayListIndex = PLList.Count;
+                    }
+                    dbMsg += ">削除後>[" + SelectedPlayListIndex + "/" + PlayLists.Length + "]";
+
+                    string text = "";
+                    foreach (PlayListModel One in PLList) {
+                        text += One.UrlStr + "\r\n";
+                    }
+                    StreamWriter sw = new StreamWriter(CurrentPlayListFileName, false, Encoding.UTF8);
+                    sw.Write(text);
+                    sw.Close();
+                    //削除ここまで
+                    PLListSelectedItem = PLList[SelectedPlayListIndex];
+                    CurrentPlayListFileName = PLListSelectedItem.UrlStr;
+                    dbMsg += CurrentPlayListFileName;
+                    //NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
+                    //dbMsg += ">>NowSelectedPath=" + NowSelectedPath;
+                    //RaisePropertyChanged("NowSelectedPath");
+                    //設定ファイル更新
+                    Properties.Settings.Default.Save();
+                } else {
+                    dbMsg += "キャンセルされました";
+                }
+
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
 
 
         /// <summary>
