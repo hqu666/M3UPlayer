@@ -206,8 +206,10 @@ namespace M3UPlayer.Views {
 			string dbMsg = "";
 			try {
 				DraggedItem = null;
+				popup_text.Text = "";
 				IsDragging = false;
 				popup1.IsOpen = false;
+				MoveCount = 0;
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
@@ -361,39 +363,8 @@ namespace M3UPlayer.Views {
 					//IsDragging = false;
 
 				}
-
-				//if (!dataString.Equals("") && ellipse != null) {
-				//	dbMsg += ",dataString=" + dataString;
-				//	// If the string can be converted into a Brush, convert it.
-				//	if (converter.IsValid(dataString)) {
-				//		Brush newFill = (Brush)converter.ConvertFromString(dataString);
-				//		ellipse.Fill = newFill;
-				//	}
-				//}
 				e.Handled = true;
 				//		https://dobon.net/vb/dotnet/control/draganddrop.html
-				//dbMsg += "dragFrom=" + dragFrom;
-				//dbMsg += ",dragSouceUrl=" + dragSouceUrl;
-				//dbMsg += ",DDEfect=" + DDEfect;
-				////		Object senderObject = sender;                                 //playListが参照される
-				////		+Items   { System.Windows.Forms.ListBox.ObjectCollection}		System.Windows.Forms.ListBox.ObjectCollection
-				//if (dragFrom == playListBox.Name) {
-				//	if (e.Data.GetDataPresent(typeof(string))) {                //ドラッグされているデータがstring型か調べる
-				//		if ((e.KeyState & 8) == 8 && (e.AllowedEffect & DragDropEffects.Copy) == DragDropEffects.Copy) {                //Ctrlキーが押されていればCopy//"8"はCtrlキーを表す
-				//			e.Effect = DragDropEffects.Copy;
-				//		} else if ((e.KeyState & 32) == 32 && (e.AllowedEffect & DragDropEffects.Link) == DragDropEffects.Link) {   //Altキーが押されていればLink//"32"はAltキーを表す
-				//			e.Effect = DragDropEffects.Link;
-				//		} else if ((e.AllowedEffect & DragDropEffects.Move) == DragDropEffects.Move) {                              //何も押されていなければMove
-				//			e.Effect = DragDropEffects.Move;
-				//		} else {
-				//			//			e.Effect = DragDropEffects.None;
-				//		}
-				//	} else {
-				//		//		e.Effect = DragDropEffects.None;                    //string型でなければ受け入れない
-				//	}
-				//} else {
-				//	e.Effect = DragDropEffects.All;
-				//}
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
@@ -435,9 +406,9 @@ namespace M3UPlayer.Views {
 			string TAG = "[PlayList_MouseDown]";// + fileName;
 			string dbMsg = "";
 			try {
-				popup_text.Text = "";
-				IsDragging = false;
-				MoveCount = 0;
+				dbMsg += "IsDragging=" + IsDragging + "count=" + MoveCount;
+				ResetDragDrop();
+				dbMsg += ">>" + IsDragging + "count=" + MoveCount;
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
@@ -478,16 +449,21 @@ namespace M3UPlayer.Views {
 											 ellipse.Fill.ToString(),
 											 DragDropEffects.Copy);
 					}
+					//LeftButtonが離されたらカウントリセット
+					IsDragging = false;
 					MoveCount = 0;
 				} else if (e.LeftButton == MouseButtonState.Pressed) {
 					dbMsg += "している[" + PlayList.SelectedIndex + "]" + PlayList.IsFocused;
+					//LeftButtonがクリックされている間、カウントアップ
+					MoveCount++;
 					if (!IsDragging && 2 < MoveCount) {             // && !popup_text.Text.Equals("")
 						dbMsg += "、まだドラッグしていない";
 						IsDragging = VM.PlayList_DragEnter();              //Drag_nowが返される
-																		   //display the popup if it hasn't been opened yet
+						dbMsg += "IsDragging=" + IsDragging + "count=" + MoveCount;
 						if (!popup1.IsOpen && IsDragging) {
 							popup1.IsOpen = true;
 							dbMsg += "DataGrid内のpopアップを表示させる";
+							MyLog(TAG, dbMsg);
 						}
 
 					}
@@ -504,8 +480,6 @@ namespace M3UPlayer.Views {
 											 DragDropEffects.Copy);
 					}
 				}
-				//	MyLog(TAG, dbMsg);
-				MoveCount++;
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
@@ -521,7 +495,7 @@ namespace M3UPlayer.Views {
 			string TAG = "PlayList_MouseUp";
 			string dbMsg = "";
 			try {
-				dbMsg += "IsDragging=" + IsDragging;
+				dbMsg += "IsDragging=" + IsDragging +"count=" + MoveCount;
 				if (IsDragging) {
 					dbMsg += "Drag中";
 					var dataGrid = sender as DataGrid;
@@ -539,8 +513,9 @@ namespace M3UPlayer.Views {
 					dbMsg += "Drag中ではない";
 					VM.PLMouseUp();
 				}
-				IsDragging = false;
-				MoveCount = 0;
+				ResetDragDrop();
+				dbMsg += ">>IsDragging=" + IsDragging + "count=" + MoveCount;
+
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);

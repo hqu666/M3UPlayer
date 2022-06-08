@@ -2051,6 +2051,8 @@ namespace M3UPlayer.ViewModels {
                     string errorStr = "ドラッグ";
                     string? doStr = null;
                     if (SelectedPlayListFiles == null) {
+                        MyView.popup_text.Text = "";
+                        Drag_now = false;
                         dbMsg += ".SelectedPlayListFiles == null";
                     } else if (PlayListOpelate(titolStr, errorStr, doStr)) {
                         dbMsg += ",選択" + SelectedPlayListFiles.Count + "件";
@@ -2059,14 +2061,14 @@ namespace M3UPlayer.ViewModels {
                         dbMsg += "Drag開始＝" + DraggedItem_name;
                         MyView.popup_text.Text = DraggedItem_name;
                         Drag_now = true;
-                        RaisePropertyChanged("Drag_now");
                         PlayListSelectionMode = "Single";
                         RaisePropertyChanged("PlayListSelectionMode");
 
                     } else {
+                        MyView.popup_text.Text = "";
                         Drag_now = false;
-                        RaisePropertyChanged("Drag_now");
                     }
+                    RaisePropertyChanged("Drag_now");
                     dbMsg += ",Drag_now=" + Drag_now;
                     MyLog(TAG, dbMsg);
                 }
