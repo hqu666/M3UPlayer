@@ -2655,6 +2655,59 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
+
+        /// <summary>
+        /// 指定されたプレイリストリストに切り替え、URLで指定されたアイテムを選択する
+        /// </summary>
+        /// <param name="selectListFile"></param>
+        /// <param name="SelectedMediaFile"></param>
+        public void PlayListItemSelect(string selectListFile , string SelectedMediaFile) {
+            //int oldIndex,
+            string TAG = "PlayListItemSelect";
+            string dbMsg = "";
+            try {
+                dbMsg += "," + selectListFile + " の " + SelectedMediaFile + "を指定";
+                //移動先にリストを切り替える
+                CurrentPlayListFileName = selectListFile;
+				NowSelectedFile = SelectedMediaFile;
+                dbMsg += ">リスト切替>" + CurrentPlayListFileName;
+                if (PLComboSource.ContainsKey(CurrentPlayListFileName)) {
+                    dbMsg += "追加済み;";
+                } else {
+                    AddPlayListCombo(CurrentPlayListFileName);
+                    //         listIndex = 0;
+                    PlayListStr = "";
+                    foreach (var PLComboItem in PLComboSource) {
+                        PlayListStr += PLComboItem.Key + ",";
+                    }
+                    PlayListStr = PlayListStr.Substring(0, PlayListStr.Length - 1);
+                    dbMsg += ",PlayListStr=" + PlayListStr;
+                    PlayLists = PlayListStr.Split(',');
+                    dbMsg += ":追加";
+                }
+                int listIndex = 0;
+                foreach (PlayListModel PLItem in PLList) {
+                    if (PLItem.UrlStr.Equals(NowSelectedFile)) {
+                        NowSelect.PlayListUrlStr = CurrentPlayListFileName;
+                        NowSelect.ListItem = PLItem;
+                        NowSelect.SelectedIndex = listIndex;
+                        dbMsg += "," + NowSelect.PlayListUrlStr + "[" + NowSelect.SelectedIndex + "]" + NowSelect.ListItem.UrlStr;
+                        SelectedPlayListIndex = NowSelect.SelectedIndex;
+                        RaisePropertyChanged("SelectedPlayListIndex");
+                    }
+                    listIndex++;
+                }
+                Properties.Settings.Default.Save();
+            MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
+
+
+
+
         /// <summary>
         /// 選択されているプレイリストアイテムの削除
         /// </summary>
@@ -3043,26 +3096,6 @@ namespace M3UPlayer.ViewModels {
                         writer.WriteLine(NowSelectedFile);
                     }
                     //usingを使わない例: File.AppendAllText(selectListFile, NowSelectedFile);
-                    CurrentPlayListFileName = selectListFile;
-                    RaisePropertyChanged("CurrentPlayListFileName");
-                    dbMsg += ">>" + CurrentPlayListFileName;
-                    if (PLComboSource.ContainsKey(CurrentPlayListFileName)) {
-                        dbMsg += "追加済み;";
-                    } else {
-                        AddPlayListCombo(CurrentPlayListFileName);
-                        //         listIndex = 0;
-                        PlayListStr = "";
-                        foreach (var PLComboItem in PLComboSource) {
-                            PlayListStr += PLComboItem.Key + ",";
-                        }
-                        PlayListStr = PlayListStr.Substring(0, PlayListStr.Length - 1);
-                        dbMsg += ",PlayListStr=" + PlayListStr;
-                        PlayLists = PlayListStr.Split(',');
-                        dbMsg += ":追加";
-                    }
-                    int listIndex = Array.IndexOf(PlayLists, selectListFile);
-                    dbMsg += "、[" + listIndex + "/" + PlayLists.Length + "]" + selectListFile + "=" + CurrentPlayListFileName;
-
                     //ここから削除
                     dbMsg += "\r\n削除前[" + BeforSelectIndex + "/" + PLList.Count + "]";
                     PLList.RemoveAt(BeforSelectIndex);
@@ -3078,19 +3111,11 @@ namespace M3UPlayer.ViewModels {
                     StreamWriter sw = new StreamWriter(CurrentPlayListFileName, false, Encoding.UTF8);
                     sw.Write(text);
                     sw.Close();
-                    //削除ここまで
-                    PLListSelectedItem = PLList[SelectedPlayListIndex];
-                    CurrentPlayListFileName = PLListSelectedItem.UrlStr;
-                    dbMsg += CurrentPlayListFileName;
-                    //NowSelectedPath = System.IO.Path.GetDirectoryName(CurrentPlayListFileName);
-                    //dbMsg += ">>NowSelectedPath=" + NowSelectedPath;
-                    //RaisePropertyChanged("NowSelectedPath");
-                    //設定ファイル更新
-                    Properties.Settings.Default.Save();
+                    //削除ここまで//移動先に表示を切り替える
+                    PlayListItemSelect(selectListFile, NowSelectedFile);
                 } else {
                     dbMsg += "キャンセルされました";
                 }
-
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
