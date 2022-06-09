@@ -2298,8 +2298,6 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
-
-
         /// <summary>
         /// プレイリストでのマウスアップ                    Completes a drag/drop operation.
         /// </summary>
@@ -2666,10 +2664,14 @@ namespace M3UPlayer.ViewModels {
             string TAG = "PlayListItemSelect";
             string dbMsg = "";
             try {
+                BeforSelect = NowSelect;
                 dbMsg += "," + selectListFile + " の " + SelectedMediaFile + "を指定";
                 //移動先にリストを切り替える
                 CurrentPlayListFileName = selectListFile;
-				NowSelectedFile = SelectedMediaFile;
+                RaisePropertyChanged("CurrentPlayListFileName");
+                PlayListComboSelect(0);
+                NowSelectedFile = SelectedMediaFile;
+                RaisePropertyChanged("NowSelectedFile");
                 dbMsg += ">リスト切替>" + CurrentPlayListFileName;
                 if (PLComboSource.ContainsKey(CurrentPlayListFileName)) {
                     dbMsg += "追加済み;";
@@ -2685,6 +2687,8 @@ namespace M3UPlayer.ViewModels {
                     PlayLists = PlayListStr.Split(',');
                     dbMsg += ":追加";
                 }
+                ListUpFiles(CurrentPlayListFileName);
+                dbMsg += "、現在" + PLList.Count + "件";
                 int listIndex = 0;
                 foreach (PlayListModel PLItem in PLList) {
                     if (PLItem.UrlStr.Equals(NowSelectedFile)) {
@@ -2698,15 +2702,11 @@ namespace M3UPlayer.ViewModels {
                     listIndex++;
                 }
                 Properties.Settings.Default.Save();
-            MyLog(TAG, dbMsg);
+                MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
-
-
-
-
 
         /// <summary>
         /// 選択されているプレイリストアイテムの削除
@@ -3055,6 +3055,11 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
+        /// <summary>
+        /// 他のリストへ移動
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void PlayListItemMoveOtherListm_Click(object sender, RoutedEventArgs e) {
             string TAG = "PlayListItemMoveOtherListm_Click";
             string dbMsg = "";
@@ -3121,7 +3126,6 @@ namespace M3UPlayer.ViewModels {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
-
 
 
         /// <summary>
