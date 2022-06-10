@@ -1699,7 +1699,14 @@ namespace M3UPlayer.ViewModels {
             string TAG = "PlayListToPlayer";
             string dbMsg = "";
             try {
-                IsPlaying = false;
+                SliderValue= 0;
+
+                BeforSelect = NowSelect;
+                //前に使っていた
+                string? BeforSelecExtention = BeforSelect.ListItem.extentionStr;
+
+
+				IsPlaying = false;
                 string targetURLStr = targetItem.UrlStr;
                 dbMsg += "、targetURLStr=" + targetURLStr;
                 if (NowSelect.ListItem.UrlStr != null) {
@@ -1733,6 +1740,9 @@ namespace M3UPlayer.ViewModels {
                         flash = null;
                     }
                     MyView.FrameGrid.Children.RemoveAt(1);
+                }else if ((0 <= Array.IndexOf(WebVideo, BeforSelecExtention))) {
+                    dbMsg += "前に再生していたのはWeb" + BeforSelect.ListItem.UrlStr;
+                    await MyView.webView.EnsureCoreWebView2Async(null);
                 }
 
                 toWeb = true;  // false;
