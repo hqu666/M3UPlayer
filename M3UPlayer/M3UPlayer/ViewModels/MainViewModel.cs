@@ -2617,7 +2617,7 @@ namespace M3UPlayer.ViewModels {
         ////プレイリストのアイテム移動////////////////////////////////////
 
         /// <summary>
-        /// プレイリスト上での移動
+        /// プレイリスト上での移動/追加
         /// </summary>
         public void PlayListItemMoveTo(int dropRow, List<PlayListModel> dropPlayListFiles) {
             //int oldIndex,
@@ -2637,24 +2637,35 @@ namespace M3UPlayer.ViewModels {
                 int insertRow = dropRow;
 
                 foreach (PlayListModel one in dropPlayListFiles) {
-                    int removeIndex = PLList.IndexOf(one);
-                    if (-1 < removeIndex) {
-                        dbMsg += "\r\n[" + removeIndex + "/" + PLList.Count + "]";
-                        PLList.Remove(one);
+					string? extention = one.extentionStr;
+					if (-1 < Array.IndexOf(WMPFiles, extention)
+                        || -1 < Array.IndexOf(FlashVideo, extention)
+                        || -1 < Array.IndexOf(WebVideo, extention)
+                        ) {
+                        int removeIndex = PLList.IndexOf(one);
+                        if (-1 < removeIndex) {
+                            dbMsg += "\r\n[" + removeIndex + "/" + PLList.Count + "]";
+                            PLList.Remove(one);
+                        }
+                        dbMsg += ">>[" + insertRow + "/" + PLList.Count + "]" + one.UrlStr;
+                        if (insertRow < PLList.Count) {
+                            PLList.Insert(insertRow, one);
+                        } else {
+                            PLList.Add(one);
+                        }
+                        if (insertRow == dropRow) {
+                            PLListSelectedItem = one;
+                        }
+                        insertRow++;
+					} else {
+                        dbMsg += "\r\n" + one.UrlStr + "は対象外" ;
                     }
-                    dbMsg += ">>[" + insertRow + "/" + PLList.Count + "]" + one.UrlStr;
-                    if (insertRow < PLList.Count) {
-                        PLList.Insert(insertRow, one);
-                    } else {
-                        PLList.Add(one);
-                    }
-                    if (insertRow == dropRow) {
-                        PLListSelectedItem = one;
-                    }
-                    insertRow++;
+
                 }
                 RaisePropertyChanged("PLList");
                 RaisePropertyChanged("PLListSelectedItem");
+                ListItemCount = PLList.Count();
+                RaisePropertyChanged("ListItemCount");
                 IsDoSavePlayList(false);
                 dbMsg += ">>[" + insertRow + "/" + PLList.Count + "]";
                 MyLog(TAG, dbMsg);
@@ -2740,7 +2751,9 @@ namespace M3UPlayer.ViewModels {
                 }
                 RaisePropertyChanged("PLList");
                 IsDoSavePlayList(true);
-                dbMsg += ">> " + PLList.Count + "件";
+                ListItemCount = PLList.Count();
+                RaisePropertyChanged("ListItemCount");
+                dbMsg += ">> " + ListItemCount + "件";
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);

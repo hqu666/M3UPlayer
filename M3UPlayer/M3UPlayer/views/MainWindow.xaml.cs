@@ -247,16 +247,17 @@ namespace M3UPlayer.Views {
 			string TAG = "DropFileAdder";
 			string dbMsg = "";
 			try {
+				int dropRow = 0;
 				DataGridRow row = GetDataGridObject<DataGridRow>(dataGrid, point);
 				if (row == null) {
 					dbMsg += "行が拾えない";
 				} else {
-					// 行オブジェクトから行インデックス(0起算)を取得します。
-					int dropRow = row.GetIndex();
-					dbMsg += ",dropRow=" + dropRow + "行目に" + dropPlayListFiles.Count + "件";
-					VM.PlayListItemMoveTo(dropRow, dropPlayListFiles);
-					IsDragging = false;
+					dropRow = row.GetIndex();
 				}
+				// 行オブジェクトから行インデックス(0起算)を取得します。
+				dbMsg += ",dropRow=" + dropRow + "行目に" + dropPlayListFiles.Count + "件";
+				VM.PlayListItemMoveTo(dropRow, dropPlayListFiles);
+				IsDragging = false;
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
@@ -264,7 +265,7 @@ namespace M3UPlayer.Views {
 		}
 
 		/// <summary>
-		/// Dropで割り付けたリスナー
+		/// PlayListのDataGridへのDropで割り付けたリスナー
 		/// アイテムは未関係
 		/// </summary>
 		/// <param name="sender"></param>
@@ -289,11 +290,31 @@ namespace M3UPlayer.Views {
 				} else {
 					dbMsg += ",ellipse = null";
 					if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
-						dbMsg += "," + dropPlayListFiles.Count + "件" ;
+						CS_Util Util = new CS_Util();
+						List<PlayListModel> DropFiles = new List<PlayListModel>();
+						String[] fileNames = (string[])e.Data.GetData(DataFormats.FileDrop);
+						dbMsg += "," + fileNames.Length + "件" ;
+						foreach (String fName in fileNames) {
+							if (fName.Contains(".")) {
+								PlayListModel DFiles = new PlayListModel();
+								DFiles.UrlStr = fName;
+								DropFiles.Add(DFiles);
+								dbMsg += "\r\n[" + DropFiles.Count + "]" + fName;
+							} else {
+								dbMsg += "," + fName + "はフォルダ";
+								List<string>? retFNames = Util.GetAllFiles(fName);
+								foreach (String retF in retFNames) {
+									PlayListModel RFiles = new PlayListModel();
+									RFiles.UrlStr = retF;
+									DropFiles.Add(RFiles);
+									dbMsg += "\r\n[" + DropFiles.Count + "]" + retF;
+								}
+							}
+						}
 						DataGrid? dataGrid = sender as DataGrid;
 						if (dataGrid != null) {
 							Point point = e.GetPosition(dataGrid);
-							DropFileAdder(dataGrid, point, dropPlayListFiles);
+							DropFileAdder(dataGrid, point, DropFiles);
 						} else {
 							dbMsg += ",DataGridがnull";
 						}

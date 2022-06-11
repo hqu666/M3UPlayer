@@ -1,12 +1,51 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
 
 namespace M3UPlayer
 {
 	class CS_Util {
+
+		/*
+	   * サブディレクトリも含め全てのファイル名を取得する関数
+	   * 
+	   * 引用元：【C#】ドライブ直下からのファイルリスト取得について
+	   *        https://qiita.com/OneK/items/8b0d02817a9f2a2fbeb0
+	   */
+		public List<string> GetAllFiles(String DirPath) {
+			string TAG = "GetAllFiles";
+			string dbMsg = "[CS_Util]";
+			List<String> lstStr = new List<String>();    // 取得したファイル名を格納するためのリスト
+			String[] strBuff;   // ファイル名とディレクトリ名取得用
+
+			try {
+				// ファイル名取得
+				strBuff = Directory.GetFiles(DirPath, "*.*");        // 探索範囲がルートフォルダで時間が掛かるため、テキスト形式のファイルのみ探索
+				foreach (String file in strBuff) {
+					lstStr.Add(file);
+					dbMsg += "\r\n[" + lstStr.Count + "]" + file;
+				}
+				// ディレクトリ名の取得
+				strBuff = Directory.GetDirectories(DirPath);
+				foreach (String directory in strBuff) {
+					List<String> lstBuff = GetAllFiles(directory);    // 取得したディレクトリ名を引数にして再帰
+					lstBuff.ForEach(delegate (String str) {
+						lstStr.Add(str);
+						dbMsg += "\r\n[" + lstStr.Count + "]" + str;
+					});
+				}
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				MyErrorLog(TAG, dbMsg, er);
+			}
+			// 取得したファイル名リストを呼び出し元に返す
+			return lstStr;
+			//System.ArgumentException: String cannot be of zero length. (Parameter 'oldValue')at System.String.Replace(String oldValue, String newValue)
+		}
 
 		/// <summary>
 		/// カラーコードの文字列をSystem.Windows.MediaのColorに変換する
