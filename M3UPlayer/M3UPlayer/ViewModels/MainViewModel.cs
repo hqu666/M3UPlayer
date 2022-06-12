@@ -83,6 +83,11 @@ namespace M3UPlayer.ViewModels {
         public SelectionModel BeforSelect { get; set; }
 
         /// <summary>
+        /// 他のリストへの移動/コピー前のアイテムの配置
+        /// </summary>
+        public SelectionModel MoveBeforSelect { get; set; }
+
+        /// <summary>
         /// 選択されているプレイリストアイテムの配列:SelectedItemsは読み取り専用でBindingできない
         /// SelectionUnit が　FullRow;行単位,CellOrRowHeader:セル単位だが、行で選択も可能,Cell;セル単位
         /// </summary>
@@ -765,10 +770,14 @@ namespace M3UPlayer.ViewModels {
             string TAG = "BeforeClose";
             string dbMsg = "";
             try {
+                if (_timer != null) {
+                    _timer.Stop();
+                    _timer = null;  
+                }
                 if (PlayListSaveBTVisble != null) {
-                    if (PlayListSaveBTVisble.Equals("Visible")) {
-                        IsDoSavePlayList(false);
-                    }
+                if (PlayListSaveBTVisble.Equals("Visible")) {
+                    IsDoSavePlayList(false);
+                }
                 }
                 Properties.Settings.Default.SoundValue = SoundValue;
                 Properties.Settings.Default.ForwardCBComboSelected = ForwardCBComboSelected;
@@ -1448,8 +1457,8 @@ namespace M3UPlayer.ViewModels {
             string TAG = "BackBeforeItem_Click";
             string dbMsg = "";
             try {
-                CurrentPlayListFileName = BeforSelect.PlayListUrlStr;
-                PlayListComboSelected = BeforSelect.PlayListUrlStr;
+                CurrentPlayListFileName = MoveBeforSelect.PlayListUrlStr;
+                PlayListComboSelected = MoveBeforSelect.PlayListUrlStr;
                 int listIndex = Array.IndexOf(PlayLists, CurrentPlayListFileName);
                 dbMsg += ",切り替える前は[" + listIndex + "/" + PlayLists.Length + "]" + PlayLists[listIndex];
                 //元のコンボを再選択
@@ -1457,7 +1466,7 @@ namespace M3UPlayer.ViewModels {
 
                 /// 切り替える前の再生アイテム
                 PLListSelectedItem = new PlayListModel();
-                PLListSelectedItem = BeforSelect.ListItem;
+                PLListSelectedItem = MoveBeforSelect.ListItem;
                 SelectedPlayListIndex = PLList.IndexOf(PLListSelectedItem);
 				RaisePropertyChanged("SelectedPlayListIndex");
 				dbMsg += "の[" + SelectedPlayListIndex + "/" + PLList.Count + "]" + PLListSelectedItem.UrlStr;
@@ -1881,16 +1890,6 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
-        //void axWindowsMediaPlayer_PositionChange(object sender, AxWMPLib._WMPOCXEvents_PositionChangeEvent e) {
-        //    //   SliderValue = axWmp.Ctlcontrols.currentPosition;                        //GetPlayPosition();
-        //    SliderValue = e.newPosition;
-        //    RaisePropertyChanged("SliderValue");
-        //    //	TimeSpan span = new TimeSpan(0, 0, (int)SliderValue);
-        //    PositionStr = GetHMS(SliderValue.ToString());             //.ToString(@"hh\:mm\:ss");
-        //    //axWmp.Ctlcontrols.currentPositionString;                   //
-        //    RaisePropertyChanged("PositionStr");
-        //}
-
 
         /// <summary>
         /// タイマメソッド
@@ -1903,7 +1902,11 @@ namespace M3UPlayer.ViewModels {
             string dbMsg = "";
             try {
                 if (axWmp != null && !IsPositionSLDraging) {
-                    SliderValue = axWmp.Ctlcontrols.currentPosition;                        //GetPlayPosition();
+                    SliderValue = 0;
+
+                    if (0< axWmp.Ctlcontrols.currentPosition) { 
+                        SliderValue = axWmp.Ctlcontrols.currentPosition;                        //GetPlayPosition();
+                    }
                     RaisePropertyChanged("SliderValue");
                     PositionStr = GetHMS(SliderValue.ToString());             //.ToString(@"hh\:mm\:ss");
                     RaisePropertyChanged("PositionStr");
@@ -1955,15 +1958,18 @@ namespace M3UPlayer.ViewModels {
             string TAG = "SetupTimer";
             string dbMsg = "";
             try {
-                // タイマのインスタンスを生成
-                _timer = new DispatcherTimer(); // 優先度はDispatcherPriority.Background
-                                                // インターバルを設定
-                _timer.Interval = new TimeSpan(0, 0, 1);
-                // タイマメソッドを設定
-                _timer.Tick += new EventHandler(MyTimerMethod);
-                // タイマを開始
+                if (_timer == null) {
+                    // タイマのインスタンスを生成
+                    _timer = new DispatcherTimer(); // 優先度はDispatcherPriority.Background
+                                                    // インターバルを設定
+                    _timer.Interval = new TimeSpan(0, 0, 1);
+                    // タイマメソッドを設定
+                    _timer.Tick += new EventHandler(MyTimerMethod);
+					// タイマを開始
+				} else {
+                    _timer.Stop();
+                }
                 _timer.Start();
-
                 // 画面が閉じられるときに、タイマを停止
                 //MyView.Closing += new CancelEventHandler(StopTimer);
                 MyLog(TAG, dbMsg);
@@ -2685,7 +2691,7 @@ namespace M3UPlayer.ViewModels {
             string TAG = "PlayListItemSelect";
             string dbMsg = "";
             try {
-                BeforSelect = NowSelect;
+        //        BeforSelect = NowSelect;
                 dbMsg += "," + selectListFile + " の " + SelectedMediaFile + "を指定";
                 //移動先にリストを切り替える
                 CurrentPlayListFileName = selectListFile;
@@ -3012,8 +3018,9 @@ namespace M3UPlayer.ViewModels {
                     return;
                 }
                 //切り替える前
-                BeforSelect = NowSelect;
-                dbMsg += "," + BeforSelect.PlayListUrlStr + " の[ "+ BeforSelect.SelectedIndex + "]"+ BeforSelect.ListItem.UrlStr;
+                MoveBeforSelect = new SelectionModel();
+                MoveBeforSelect = NowSelect;
+                dbMsg += "," + MoveBeforSelect.PlayListUrlStr + " の[ "+ MoveBeforSelect.SelectedIndex + "]"+ MoveBeforSelect.ListItem.UrlStr;
 
                 NowSelectedFile = PLListSelectedItem.UrlStr;
                 dbMsg += "=" + NowSelectedFile;
@@ -3094,9 +3101,10 @@ namespace M3UPlayer.ViewModels {
                     return;
                 }
                 //切り替える前
-                BeforSelect = NowSelect;
-                int BeforSelectIndex = BeforSelect.SelectedIndex;
-                dbMsg += "," + BeforSelect.PlayListUrlStr + " の[ " + BeforSelectIndex + "]" + BeforSelect.ListItem.UrlStr;
+                MoveBeforSelect = new SelectionModel();
+                MoveBeforSelect = NowSelect;
+                int BeforSelectIndex = NowSelect.SelectedIndex;
+                dbMsg += "," + MoveBeforSelect.PlayListUrlStr + " の[ " + MoveBeforSelect.SelectedIndex + "]" + MoveBeforSelect.ListItem.UrlStr;
 
                 NowSelectedFile = PLListSelectedItem.UrlStr;
                 dbMsg += "=" + NowSelectedFile;
@@ -3128,10 +3136,16 @@ namespace M3UPlayer.ViewModels {
                     dbMsg += "\r\n削除前[" + BeforSelectIndex + "/" + PLList.Count + "]";
                     PLList.RemoveAt(BeforSelectIndex);
                     if (PLList.Count <= BeforSelectIndex) {
+                        MoveBeforSelect.SelectedIndex = PLList.Count;
                         SelectedPlayListIndex = PLList.Count;
+                    } else {
+                        MoveBeforSelect.SelectedIndex --;
+						if (MoveBeforSelect.SelectedIndex<0) {
+                            MoveBeforSelect.SelectedIndex = 0;
+                        }
+
                     }
                     dbMsg += ">削除後>[" + SelectedPlayListIndex + "/" + PlayLists.Length + "]";
-
                     string text = "";
                     foreach (PlayListModel One in PLList) {
                         text += One.UrlStr + "\r\n";
@@ -3140,6 +3154,7 @@ namespace M3UPlayer.ViewModels {
                     sw.Write(text);
                     sw.Close();
                     //削除ここまで//移動先に表示を切り替える
+                    dbMsg += "," + selectListFile + " の " + NowSelectedFile + "へ移動";
                     PlayListItemSelect(selectListFile, NowSelectedFile);
                 } else {
                     dbMsg += "キャンセルされました";

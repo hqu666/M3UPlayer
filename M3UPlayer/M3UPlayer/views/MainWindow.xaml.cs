@@ -276,6 +276,7 @@ namespace M3UPlayer.Views {
 			try {
 				Ellipse? ellipse = sender as Ellipse;
 				if (ellipse != null) {
+					// ここでは発生しないはずだが確認用；リストアイテムの移動
 					// If the DataObject contains string data, extract it.
 					if (e.Data.GetDataPresent(DataFormats.StringFormat)) {
 						string dataString = (string)e.Data.GetData(DataFormats.StringFormat);
@@ -621,27 +622,6 @@ namespace M3UPlayer.Views {
 		}
 
 		/// <summary>
-		/// 再生ポジションスライダーのツマミMouseDown
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void PositionSL_DragStarted(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e) {
-			string TAG = "PositionSL_DragStarted";
-			string dbMsg = TAG;
-			try {
-				Slider slider = (Slider)sender;
-				double newValue = slider.Value;
-				dbMsg += "newValue=" + newValue;
-				VM.IsPositionSLDraging = true;
-				//VM.PauseVideo();
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				dbMsg += "<<以降でエラー発生>>" + er.Message;
-				MyLog(TAG, dbMsg);
-			}
-		}
-
-		/// <summary>
 		/// FFコンボの変更
 		/// </summary>
 		/// <param name="sender"></param>
@@ -708,6 +688,27 @@ namespace M3UPlayer.Views {
 				dbMsg += "newValue=" + newValue;
 				VM.PositionSliderValueChang(newValue);
 				VM.IsPositionSLDraging = false;
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(TAG, dbMsg);
+			}
+		}
+
+		/// <summary>
+		/// 再生ポジションスライダーのツマミMouseDown
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void PositionSL_DragStarted(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e) {
+			string TAG = "PositionSL_DragStarted";
+			string dbMsg = TAG;
+			try {
+				Slider slider = (Slider)sender;
+				double newValue = slider.Value;
+				dbMsg += "newValue=" + newValue;
+				VM.IsPositionSLDraging = true;
+				//VM.PauseVideo();
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
