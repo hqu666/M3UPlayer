@@ -1716,6 +1716,15 @@ namespace M3UPlayer.ViewModels {
 
 
 				IsPlaying = false;
+                //リストとインデックスは更新
+                SelectedPlayListIndex= PLList.IndexOf(targetItem);
+                dbMsg += "、現在のリスト:" + PlayListComboSelected + "[" + SelectedPlayListIndex + "]";
+                NowSelect.PlayListUrlStr = PlayListComboSelected;
+                NowSelect.SelectedIndex = SelectedPlayListIndex;
+                infoStr = "[" + SelectedPlayListIndex + "/" + PLList.Count + "]" + targetItem.GranDir + " ・ " + targetItem.ParentDir + " ・ " + targetItem.Summary + " ( " + targetItem.extentionStr + " ) ";
+
+
+                //同じファイルの再生なら再生動作をスキップ
                 string targetURLStr = targetItem.UrlStr;
                 dbMsg += "、targetURLStr=" + targetURLStr;
                 if (NowSelect.ListItem.UrlStr != null) {
@@ -1727,14 +1736,10 @@ namespace M3UPlayer.ViewModels {
                 }
                 string extention = System.IO.Path.GetExtension(targetURLStr);
                 dbMsg += "、拡張子=" + extention;
-                infoStr = "[" + SelectedPlayListIndex + "/" + PLList.Count + "]" + targetItem.GranDir + " ・ " + targetItem.ParentDir + " ・ " +targetItem.Summary + " ( " + targetItem.extentionStr + " ) ";
-
 				if (NowSelect != null) {
                     BeforSelect = NowSelect;
                     dbMsg += ">>BeforSelect:" + BeforSelect.PlayListUrlStr + "[" + BeforSelect.SelectedIndex + "]" + BeforSelect.ListItem.UrlStr;
                 }
-                NowSelect.PlayListUrlStr = PlayListComboSelected;
-                NowSelect.SelectedIndex = SelectedPlayListIndex;
                 NowSelect.ListItem = targetItem;
                 dbMsg += ">>NowSelect:" + NowSelect.PlayListUrlStr + "[" + NowSelect.SelectedIndex + "]" + NowSelect.ListItem.UrlStr;
 
@@ -2321,52 +2326,57 @@ namespace M3UPlayer.ViewModels {
             string TAG = "[PLMouseUp]";
             string dbMsg = "";
             try {
-                PlayListModel targetItem = new PlayListModel();
-                targetItem.UrlStr = "https://www.yahoo.co.jp/";
-                string titolStr = "プレイリストアイテムファイルの操作";
-                string errorStr = "マウスアップ";
-                string? doStr = null;
-                if (PlayListOpelate(titolStr, errorStr, doStr)) {
-                    //if (DraggedItem != null) {
-                    //	//				DraggedItem = PLListSelectedItem;
-                    //	dbMsg += ",UrlStr=" + PLListSelectedItem.UrlStr;
-                    //	int oldIndex = PLList.IndexOf(PLListSelectedItem);
-                    //	dbMsg += "[" + oldIndex + "]";
-                    //	if (!_isDragging) {            //|| _isEditing
-                    //		return;
-                    //	}
+                dbMsg += ",選択ファイル" + SelectedPlayListFiles.Count + "件";
 
-                    //	//get the target item
-                    //	PlayListModel
-                    targetItem = SelectedPlayListFiles[0];
-                    //	if (targetItem == null) {           // || !ReferenceEquals(DraggedItem, targetItem)
+            ///    if (0 < SelectedPlayListFiles.Count && SelectedPlayListFiles[0] !=null) {
+                    PlayListModel targetItem = new PlayListModel();
+                    targetItem.UrlStr = "https://www.yahoo.co.jp/";
+                    string titolStr = "プレイリストアイテムファイルの操作";
+                    string errorStr = "マウスアップ";
+                    string? doStr = null;
+                    if (PlayListOpelate(titolStr, errorStr, doStr)) {
+                        //if (DraggedItem != null) {
+                        //	//				DraggedItem = PLListSelectedItem;
+                        //	dbMsg += ",UrlStr=" + PLListSelectedItem.UrlStr;
+                        //	int oldIndex = PLList.IndexOf(PLListSelectedItem);
+                        //	dbMsg += "[" + oldIndex + "]";
+                        //	if (!_isDragging) {            //|| _isEditing
+                        //		return;
+                        //	}
 
-                    //		//// create tempporary row
-                    //		//var temp = DraggedItem.Row.Table.NewRow();
-                    //		//temp.ItemArray = DraggedItem.Row.ItemArray;
-                    //		//int tempIndex = _shareTable.Rows.IndexOf(DraggedItem.Row);
+                        //	//get the target item
+                        //	PlayListModel
+                        targetItem = SelectedPlayListFiles[0];
+                        dbMsg += ",UrlStr=" + targetItem.UrlStr;
+                        //	if (targetItem == null) {           // || !ReferenceEquals(DraggedItem, targetItem)
 
-                    //		////remove the source from the list
-                    //		//_shareTable.Rows.Remove(DraggedItem.Row);
+                        //		//// create tempporary row
+                        //		//var temp = DraggedItem.Row.Table.NewRow();
+                        //		//temp.ItemArray = DraggedItem.Row.ItemArray;
+                        //		//int tempIndex = _shareTable.Rows.IndexOf(DraggedItem.Row);
 
-                    //		////get target index
-                    //		//var targetIndex = _shareTable.Rows.IndexOf(targetItem.Row);
+                        //		////remove the source from the list
+                        //		//_shareTable.Rows.Remove(DraggedItem.Row);
 
-                    //		////insert temporary at the target's location
-                    //		//_shareTable.Rows.InsertAt(temp, targetIndex);
+                        //		////get target index
+                        //		//var targetIndex = _shareTable.Rows.IndexOf(targetItem.Row);
 
-                    //		////select the dropped item
-                    //		//shareGrid.SelectedItem = shareGrid.Items[targetIndex];
-                    //	}
+                        //		////insert temporary at the target's location
+                        //		//_shareTable.Rows.InsertAt(temp, targetIndex);
 
-                    //reset
-                    //ResetDragDrop();
-                } else {
-                    dbMsg += "選択値無し";
-                }
-                dbMsg += ",UrlStr=" + targetItem.UrlStr;
-                //IsPlaying = false;
-                PlayListToPlayer(targetItem);
+                        //		////select the dropped item
+                        //		//shareGrid.SelectedItem = shareGrid.Items[targetIndex];
+                        //	}
+
+                        //reset
+                        //ResetDragDrop();
+                    } else {
+                        dbMsg += "選択値無し";
+                    }
+                    //   dbMsg += ",UrlStr=" + targetItem.UrlStr;
+                    //IsPlaying = false;
+                    PlayListToPlayer(targetItem);
+              //  }
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
