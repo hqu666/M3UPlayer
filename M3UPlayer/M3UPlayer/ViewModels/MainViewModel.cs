@@ -114,34 +114,34 @@ namespace M3UPlayer.ViewModels {
                         return;
                     _SelectedPlayListIndex = value;
                     RaisePropertyChanged("SelectedPlayListIndex");
-                    dbMsg += "[" + SelectedPlayListIndex + "]" + MyView.PlayList.CurrentItem + "Drag_now=" + Drag_now;
-                    // 選択されているものがあって、Dragで無ければ 
-                    if (MyView.PlayList.SelectedItems != null && !Drag_now) {
-                        SelectedPlayListFiles = new List<PlayListModel>();
-                        IList selectedItems = MyView.PlayList.SelectedItems;
-                        dbMsg += "、selectedItems=" + selectedItems.Count + "件";
-                        if (selectedItems.Count == 1) {
-                            PlayListModel? PLItem = new PlayListModel();      //直接代入でクラッシュしたのでローカル変数に取得
-                            PLItem = (PlayListModel)PLList[SelectedPlayListIndex];
-                            SelectedPlayListFiles.Add(PLItem);
-                        } else {
-                            foreach (object pli in selectedItems) {
-                                PlayListModel PLItem = new PlayListModel();      //直接代入でクラッシュしたのでローカル変数に取得
-                                PLItem = (PlayListModel)pli;
-                                SelectedPlayListFiles.Add(PLItem);
-                                dbMsg += "\r\n[" + SelectedPlayListFiles.Count + "]" + SelectedPlayListFiles[SelectedPlayListFiles.Count - 1].Summary;              //PLItem.UrlStr;
+                    //dbMsg += "[" + SelectedPlayListIndex + "]" + MyView.PlayList.CurrentItem + "Drag_now=" + Drag_now;
+                    //// 選択されているものがあって、Dragで無ければ 
+                    //if (MyView.PlayList.SelectedItems != null && !Drag_now) {
+                    //    SelectedPlayListFiles = new List<PlayListModel>();
+                    //    IList selectedItems = MyView.PlayList.SelectedItems;
+                    //    dbMsg += "、selectedItems=" + selectedItems.Count + "件";
+                    //    if (selectedItems.Count == 1) {
+                    //        PlayListModel? PLItem = new PlayListModel();      //直接代入でクラッシュしたのでローカル変数に取得
+                    //        PLItem = (PlayListModel)PLList[SelectedPlayListIndex];
+                    //        SelectedPlayListFiles.Add(PLItem);
+                    //    } else {
+                    //        foreach (object pli in selectedItems) {
+                    //            PlayListModel PLItem = new PlayListModel();      //直接代入でクラッシュしたのでローカル変数に取得
+                    //            PLItem = (PlayListModel)pli;
+                    //            SelectedPlayListFiles.Add(PLItem);
+                    //            dbMsg += "\r\n[" + SelectedPlayListFiles.Count + "]" + SelectedPlayListFiles[SelectedPlayListFiles.Count - 1].Summary;              //PLItem.UrlStr;
 
-                            }
-                            for (int i = 0; i < (MyView.PlayList.Items.Count - 1); ++i) {
-                                PlayListModel oneItem = SelectedPlayListFiles[i];
-                                dbMsg += "\r\n[" + i + "]" + oneItem.UrlStr;
-                            }
-                        }
-                    }
+                    //        }
+                    //        for (int i = 0; i < (MyView.PlayList.Items.Count - 1); ++i) {
+                    //            PlayListModel oneItem = SelectedPlayListFiles[i];
+                    //            dbMsg += "\r\n[" + i + "]" + oneItem.UrlStr;
+                    //        }
+                    //    }
+                    //}
 
-                    foreach (PlayListModel pli in MyView.PlayList.Items) {
+                    //foreach (PlayListModel pli in MyView.PlayList.Items) {
 
-                    }
+                    //}
                     MyLog(TAG, dbMsg);
                 } catch (Exception er) {
                     MyErrorLog(TAG, dbMsg, er);
@@ -2322,32 +2322,33 @@ namespace M3UPlayer.ViewModels {
         /// <summary>
         /// プレイリストでのマウスアップ                    Completes a drag/drop operation.
         /// </summary>
-        public void PLMouseUp() {
+        public void PLMouseUp(PlayListModel selectedItem) {
             string TAG = "[PLMouseUp]";
             string dbMsg = "";
             try {
-                dbMsg += ",選択ファイル" + SelectedPlayListFiles.Count + "件";
 
-            ///    if (0 < SelectedPlayListFiles.Count && SelectedPlayListFiles[0] !=null) {
+                if (selectedItem != null) {
+                    dbMsg += ",選択ファイル" + selectedItem.UrlStr;
                     PlayListModel targetItem = new PlayListModel();
                     targetItem.UrlStr = "https://www.yahoo.co.jp/";
                     string titolStr = "プレイリストアイテムファイルの操作";
                     string errorStr = "マウスアップ";
                     string? doStr = null;
                     if (PlayListOpelate(titolStr, errorStr, doStr)) {
-                        //if (DraggedItem != null) {
-                        //	//				DraggedItem = PLListSelectedItem;
-                        //	dbMsg += ",UrlStr=" + PLListSelectedItem.UrlStr;
-                        //	int oldIndex = PLList.IndexOf(PLListSelectedItem);
-                        //	dbMsg += "[" + oldIndex + "]";
-                        //	if (!_isDragging) {            //|| _isEditing
-                        //		return;
-                        //	}
+                    //if (DraggedItem != null) {
+                    //	//				DraggedItem = PLListSelectedItem;
+                    //	dbMsg += ",UrlStr=" + PLListSelectedItem.UrlStr;
+                    //	int oldIndex = PLList.IndexOf(PLListSelectedItem);
+                    //	dbMsg += "[" + oldIndex + "]";
+                    //	if (!_isDragging) {            //|| _isEditing
+                    //		return;
+                    //	}
 
-                        //	//get the target item
-                        //	PlayListModel
-                        targetItem = SelectedPlayListFiles[0];
+                    //	//get the target item
+                    //	PlayListModel
+                        targetItem = selectedItem;  // ;
                         dbMsg += ",UrlStr=" + targetItem.UrlStr;
+                        SelectedPlayListFiles[0] = targetItem;
                         //	if (targetItem == null) {           // || !ReferenceEquals(DraggedItem, targetItem)
 
                         //		//// create tempporary row
@@ -2376,7 +2377,9 @@ namespace M3UPlayer.ViewModels {
                     //   dbMsg += ",UrlStr=" + targetItem.UrlStr;
                     //IsPlaying = false;
                     PlayListToPlayer(targetItem);
-              //  }
+				} else {
+                    dbMsg += ",選択ファイル無し";
+                }
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
@@ -2701,12 +2704,12 @@ namespace M3UPlayer.ViewModels {
             string TAG = "PlayListItemSelect";
             string dbMsg = "";
             try {
-        //        BeforSelect = NowSelect;
-                dbMsg += "," + selectListFile + " の " + SelectedMediaFile + "を指定";
+                //        BeforSelect = NowSelect;
+                dbMsg += ",現在[" + PLComboSelectedIndex + "/"+ PLComboSource.Count + "]" + PlayListComboSelected ;
+                dbMsg += ">>" + selectListFile + " の " + SelectedMediaFile + "を指定";
                 //移動先にリストを切り替える
                 CurrentPlayListFileName = selectListFile;
                 RaisePropertyChanged("CurrentPlayListFileName");
-                PlayListComboSelect(0);
                 NowSelectedFile = SelectedMediaFile;
                 RaisePropertyChanged("NowSelectedFile");
                 dbMsg += ">リスト切替>" + CurrentPlayListFileName;
@@ -2724,6 +2727,16 @@ namespace M3UPlayer.ViewModels {
                     PlayLists = PlayListStr.Split(',');
                     dbMsg += ":追加";
                 }
+
+				int PLIndex = 0;
+				foreach (string PLKey in PLComboSource.Keys) {
+                    if (PLKey.Equals(selectListFile)) {
+                        break;
+                    }
+                    PLIndex++;
+                }
+                PLComboSelectedIndex = PLIndex;
+                RaisePropertyChanged("PLComboSelectedIndex");
                 ListUpFiles(CurrentPlayListFileName);
                 dbMsg += "、現在" + PLList.Count + "件";
                 int listIndex = 0;
@@ -3815,7 +3828,7 @@ namespace M3UPlayer.ViewModels {
                 RaisePropertyChanged("SelectedPlayListIndex");
                 dbMsg += ">>=" + SelectedPlayListIndex;
                 dbMsg += "/" + PLList.Count;
-                PLMouseUp();
+                PLMouseUp(PLList[SelectedPlayListIndex]);
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
@@ -3836,7 +3849,7 @@ namespace M3UPlayer.ViewModels {
                 RaisePropertyChanged("SelectedPlayListIndex");
                 dbMsg += ">>=" + SelectedPlayListIndex;
                 dbMsg += "/" + PLList.Count;
-                PLMouseUp();
+                PLMouseUp(PLList[SelectedPlayListIndex]);
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);

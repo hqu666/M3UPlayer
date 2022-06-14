@@ -518,9 +518,10 @@ namespace M3UPlayer.Views {
 			string dbMsg = "";
 			try {
 				dbMsg += "IsDragging=" + IsDragging +"count=" + MoveCount;
+				DataGrid dataGrid = sender as DataGrid;
+				PlayListModel selectedItem =(PlayListModel) dataGrid.SelectedItem;
 				if (IsDragging) {
 					dbMsg += "Drag中";
-					var dataGrid = sender as DataGrid;
 					var point = e.GetPosition(dataGrid);
 					var row = GetDataGridObject<DataGridRow>(dataGrid, point);
 					if (row == null) {
@@ -533,7 +534,7 @@ namespace M3UPlayer.Views {
 					ResetDragDrop();
 				} else {
 					dbMsg += "Drag中ではない";
-					VM.PLMouseUp();
+					VM.PLMouseUp(selectedItem);
 				}
 				ResetDragDrop();
 				dbMsg += ">>IsDragging=" + IsDragging + "count=" + MoveCount;
