@@ -705,11 +705,11 @@ namespace M3UPlayer.Views {
 			string TAG = "PositionSL_DragStarted";
 			string dbMsg = TAG;
 			try {
-				Slider slider = (Slider)sender;
-				double newValue = slider.Value;
-				dbMsg += "newValue=" + newValue;
-				VM.IsPositionSLDraging = true;
-				//VM.PauseVideo();
+				//Slider slider = (Slider)sender;
+				//double newValue = slider.Value;
+				//dbMsg += "newValue=" + newValue;
+				//VM.IsPositionSLDraging = true;
+				////VM.PauseVideo();
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;

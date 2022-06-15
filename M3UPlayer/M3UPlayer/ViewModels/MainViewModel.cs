@@ -3786,7 +3786,7 @@ namespace M3UPlayer.ViewModels {
             string dbMsg = "";
             try {
                 dbMsg += ",SliderValue=" + SliderValue;
-                dbMsg += ",newPosition=" + newPosition;
+                dbMsg += ">newPosition>" + newPosition;
                 SliderValue = newPosition;
                 RaisePropertyChanged("SliderValue");
                 switch (movieType) {
@@ -3807,11 +3807,11 @@ namespace M3UPlayer.ViewModels {
                         }
                         break;
                 }
-                PositionSLTTText = GetHMS(newPosition.ToString());
-                dbMsg += ">>" + PositionSLTTText;
-                RaisePropertyChanged("PositionSLTTText");
-                //IsPlaying = true;
-                //RaisePropertyChanged("IsPlaying");
+                //PositionSLTTText = GetHMS(newPosition.ToString());
+                //dbMsg += ">>" + PositionSLTTText;
+                //RaisePropertyChanged("PositionSLTTText");
+                ////IsPlaying = true;
+                ////RaisePropertyChanged("IsPlaying");
 
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
