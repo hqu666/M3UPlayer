@@ -653,30 +653,7 @@ namespace M3UPlayer.Views {
 
 
 		/// <summary>
-		/// 再生ポジションスライダーのツマミ Thumb の DragCompleted
-		/// 再生ポジションスライダーが変更された
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void PositionSL_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e) {
-			string TAG = "PositionSL_DragCompleted";
-			string dbMsg = TAG;
-			try {
-				Slider slider = (Slider)sender;
-				double newValue = slider.Value;
-				dbMsg += "newValue=" + newValue;
-				VM.PositionSliderValueChang(newValue);
-				//slider.ToolTip = VM.GetHMS(newValue.ToString());
-				//dbMsg += ">>" + slider.ToolTip;
-				MyLog(TAG, dbMsg);
-			} catch (Exception er) {
-				dbMsg += "<<以降でエラー発生>>" + er.Message;
-				MyLog(TAG, dbMsg);
-			}
-		}
-
-		/// <summary>
-		/// 再生ポジションスライダーのクリック
+		/// 再生ポジションスライダー・バー部分のクリック
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
@@ -697,6 +674,30 @@ namespace M3UPlayer.Views {
 		}
 
 		/// <summary>
+		/// 再生ポジションスライダーのツマミ Thumb の DragCompleted
+		/// 再生ポジションスライダーが変更された
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void PositionSL_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e) {
+			string TAG = "PositionSL_DragCompleted";
+			string dbMsg = TAG;
+			try {
+				Slider slider = (Slider)sender;
+				double newValue = slider.Value;
+				dbMsg += "newValue=" + newValue;
+				VM.PositionSliderValueChang(newValue);
+				//slider.ToolTip = VM.GetHMS(newValue.ToString());
+				//dbMsg += ">>" + slider.ToolTip;
+				VM.SetupTimer();
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(TAG, dbMsg);
+			}
+		}
+
+		/// <summary>
 		/// 再生ポジションスライダーのツマミMouseDown
 		/// </summary>
 		/// <param name="sender"></param>
@@ -709,6 +710,7 @@ namespace M3UPlayer.Views {
 				//double newValue = slider.Value;
 				//dbMsg += "newValue=" + newValue;
 				//VM.IsPositionSLDraging = true;
+				VM.TimerStop();
 				////VM.PauseVideo();
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {

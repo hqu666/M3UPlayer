@@ -1963,10 +1963,11 @@ namespace M3UPlayer.ViewModels {
         /// <summary>
         /// タイマを設定する
         /// </summary>
-        private void SetupTimer() {
+        public void SetupTimer() {
             string TAG = "SetupTimer";
             string dbMsg = "";
             try {
+                dbMsg += ",SliderValue=" + SliderValue + " / " + SliderMaximum;
                 if (_timer != null) {
                     _timer.Stop();
                     _timer = null;
@@ -1990,6 +1991,23 @@ namespace M3UPlayer.ViewModels {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
+
+        public void TimerStop() {
+            string TAG = "TimerStop";
+            string dbMsg = "";
+            try {
+                dbMsg += ",SliderValue=" + SliderValue +" / " + SliderMaximum;
+
+                if (_timer != null) {
+                    _timer.Stop();
+                    _timer = null;
+                }
+                MyLog(TAG, dbMsg);
+            } catch (Exception er) {
+                MyErrorLog(TAG, dbMsg, er);
+            }
+        }
+
 
         // タイマを停止
         private void StopTimer(object sender, CancelEventArgs e) {
