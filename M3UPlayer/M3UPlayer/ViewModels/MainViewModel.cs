@@ -1911,10 +1911,14 @@ namespace M3UPlayer.ViewModels {
 
                     if (0< axWmp.Ctlcontrols.currentPosition) { 
                         SliderValue = axWmp.Ctlcontrols.currentPosition;                        //GetPlayPosition();
-                    }
-                    RaisePropertyChanged("SliderValue");
-                    PositionStr = GetHMS(SliderValue.ToString());             //.ToString(@"hh\:mm\:ss");
-                    RaisePropertyChanged("PositionStr");
+                        RaisePropertyChanged("SliderValue");
+                        PositionStr = GetHMS(SliderValue.ToString());             //.ToString(@"hh\:mm\:ss");
+                        RaisePropertyChanged("PositionStr");
+					} else {
+                        SetupTimer();
+                        dbMsg += ",currentPosition=" + axWmp.Ctlcontrols.currentPosition;
+                        MyLog(TAG, dbMsg);
+					}
                     //this.IsPlaying = axWmp.IsPlaying;
                     //dbMsg += ":IsPlaying=" + IsPlaying;
                     //double position = axWmp.GetPlayPosition();
@@ -1963,7 +1967,11 @@ namespace M3UPlayer.ViewModels {
             string TAG = "SetupTimer";
             string dbMsg = "";
             try {
-                if (_timer == null) {
+                if (_timer != null) {
+                    _timer.Stop();
+                    _timer = null;
+                }
+                //if (_timer == null) {
                     // タイマのインスタンスを生成
                     _timer = new DispatcherTimer(); // 優先度はDispatcherPriority.Background
                                                     // インターバルを設定
@@ -1971,9 +1979,9 @@ namespace M3UPlayer.ViewModels {
                     // タイマメソッドを設定
                     _timer.Tick += new EventHandler(MyTimerMethod);
 					// タイマを開始
-				} else {
-                    _timer.Stop();
-                }
+				//} else {
+    //                _timer.Stop();
+    //            }
                 _timer.Start();
                 // 画面が閉じられるときに、タイマを停止
                 //MyView.Closing += new CancelEventHandler(StopTimer);
@@ -3788,7 +3796,8 @@ namespace M3UPlayer.ViewModels {
                         break;
                     case 1:
                         if (axWmp != null) {
-                            axWmp.Ctlcontrols.currentPosition = newPosition;
+							//SetupTimer();
+							axWmp.Ctlcontrols.currentPosition = newPosition;
                         }
                         break;
                     case 2:
