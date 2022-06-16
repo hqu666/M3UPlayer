@@ -508,18 +508,18 @@ namespace M3UPlayer.Views {
 		}
 
 		/// <summary>
-		/// マウスボタンを離す
-		/// 右クリックされたアイテムからフルパスをグローバル変数に設定
+		/// マウス左ボタンを離す
+		/// 選択されているアイテムからフルパスをグローバル変数に設定
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void PlayList_MouseUp(object sender, MouseButtonEventArgs e) {
-			string TAG = "PlayList_MouseUp";
+		private void PlayList_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
+			string TAG = "PlayList_MouseLeftButtonUp";
 			string dbMsg = "";
 			try {
-				dbMsg += "IsDragging=" + IsDragging +"count=" + MoveCount;
+				dbMsg += "IsDragging=" + IsDragging + "count=" + MoveCount;
 				DataGrid dataGrid = sender as DataGrid;
-				PlayListModel selectedItem =(PlayListModel) dataGrid.SelectedItem;
+				PlayListModel selectedItem = (PlayListModel)dataGrid.SelectedItem;
 				if (IsDragging) {
 					dbMsg += "Drag中";
 					var point = e.GetPosition(dataGrid);
@@ -533,6 +533,13 @@ namespace M3UPlayer.Views {
 					VM.PlayList_Drop(dropRow);
 					ResetDragDrop();
 				} else {
+					//判別実験：どちらも通ってしまう
+					if (e.RightButton == MouseButtonState.Released) {
+						dbMsg += "、右ボタン";
+					}
+					if (e.LeftButton == MouseButtonState.Released) {
+						dbMsg += "、左ボタン";
+					}
 					dbMsg += "Drag中ではない";
 					VM.PLMouseUp(selectedItem);
 				}
@@ -543,7 +550,9 @@ namespace M3UPlayer.Views {
 			} catch (Exception er) {
 				MyErrorLog(TAG, dbMsg, er);
 			}
+
 		}
+
 
 
 		private ListSortDirection? _isDescending = ListSortDirection.Descending;

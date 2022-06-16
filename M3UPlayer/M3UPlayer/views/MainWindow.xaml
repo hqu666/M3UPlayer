@@ -264,10 +264,11 @@
                            DragLeave="PlayList_DragLeave"
                            MouseDown="PlayList_MouseDown" 
                            MouseMove="PlayList_MouseMove"
-                           MouseUp="PlayList_MouseUp"
                            Sorting="PlayList_Sorting"
                            Margin="0,0,5,0" 
+                           MouseLeftButtonUp="PlayList_MouseLeftButtonUp" 
 						>
+                    <!--MouseUp="PlayList_MouseUp"-->
 
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
