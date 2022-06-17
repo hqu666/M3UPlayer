@@ -303,11 +303,6 @@ namespace M3UPlayer.ViewModels {
                     if (_SliderValue == value)
                         return;
                     _SliderValue = value;
-                    //if (axWmp != null) {
-                    //	_timer.Stop();
-                    //	axWmp.SetPlayPosition(value);
-                    //	_timer.Start();
-                    //}
                     RaisePropertyChanged("SliderValue");
                     //                  MyLog(TAG, dbMsg);
                 } catch (Exception er) {
@@ -481,7 +476,7 @@ namespace M3UPlayer.ViewModels {
                                 }
                                 break;
                         }
-                        MyView.MuteBtImage.Source = MuteOnImage;
+                        MyView.MuteBtImage.Source = MuteOnImage;        // new BitmapImage(new Uri("/views/ei_silence.png", UriKind.Relative));
                     } else {
                         dbMsg += ",SoundValue=" + SoundValue;
                         switch (movieType) {
@@ -501,8 +496,9 @@ namespace M3UPlayer.ViewModels {
                                 }
                                 break;
                         }
-                        MyView.MuteBtImage.Source = MuteOffImage;
-                    }
+						//      MyView.MuteBtImage.Source = new BitmapImage(new Uri("pack://application:,,,/views/ei-sound.png", UriKind.Relative));
+						MyView.MuteBtImage.Source = MuteOffImage;
+					}
                     MyLog(TAG, dbMsg);
                 } catch (Exception er) {
                     MyErrorLog(TAG, dbMsg, er);
@@ -692,7 +688,7 @@ namespace M3UPlayer.ViewModels {
                 PLList = new ObservableCollection<PlayListModel>();
                 pouseImage = new BitmapImage(new Uri("/views/pousebtn.png", UriKind.Relative));
                 playImage = new BitmapImage(new Uri("/views/pl_r_btn.png", UriKind.Relative));
-                MuteOnImage = new BitmapImage(new Uri("/views/ei_silence.png", UriKind.Relative));
+                MuteOnImage = new BitmapImage(new Uri("/views/sound _off.png", UriKind.Relative));//ei_silence
                 MuteOffImage = new BitmapImage(new Uri("/views/ei-sound.png", UriKind.Relative));
                 assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;  //実行デレクトリ		+Path.AltDirectorySeparatorChar + "brows.htm";
                 dbMsg += ",assemblyPath=" + assemblyPath;
@@ -1834,7 +1830,8 @@ namespace M3UPlayer.ViewModels {
                     //    axWmp.PositionChange += axWindowsMediaPlayer_PositionChange;  //はシークなどの操作がされた時のみ発生  
                     // UIを無効化
                     axWmp.uiMode = "none";
-        //            infoStr = axWmp.currentMedia.name;
+                    //            infoStr = axWmp.currentMedia.name;
+
                 } else if ((0 <= Array.IndexOf(FlashVideo, extention))) {
                     movieType = 1;
                     if (flash == null) {
@@ -1887,7 +1884,8 @@ namespace M3UPlayer.ViewModels {
                     IsHideControl = true;
                 }
                 IsPlaying = true;
-				RaisePropertyChanged("infoStr");
+                bTime = 0;
+                RaisePropertyChanged("infoStr");
                 dbMsg += "、infoStr=" + infoStr;
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
@@ -1895,6 +1893,16 @@ namespace M3UPlayer.ViewModels {
             }
         }
 
+
+        /// <summary>
+        /// タイマのインスタンス
+        /// </summary>
+        private DispatcherTimer _timer;
+
+        /// <summary>
+        /// カウントアップ前の再生ポジション
+        /// </summary>
+        private double bTime = 0;
 
         /// <summary>
         /// タイマメソッド
@@ -1907,18 +1915,27 @@ namespace M3UPlayer.ViewModels {
             string dbMsg = "";
             try {
                 if (axWmp != null && !IsPositionSLDraging) {
+                    dbMsg += ",currentPosition=" + SliderValue;
                     SliderValue = 0;
 
-                    if (0< axWmp.Ctlcontrols.currentPosition) { 
+                    if (0 < axWmp.Ctlcontrols.currentPosition) {
                         SliderValue = axWmp.Ctlcontrols.currentPosition;                        //GetPlayPosition();
                         RaisePropertyChanged("SliderValue");
+                        dbMsg += ">>" + SliderValue + "/" + SliderMaximum;
                         PositionStr = GetHMS(SliderValue.ToString());             //.ToString(@"hh\:mm\:ss");
                         RaisePropertyChanged("PositionStr");
-					} else {
+                        dbMsg += "=" + PositionStr;
+                        if ((SliderMaximum- SliderValue)<1) {
+                            //少数にすると拾えない事がある
+                            _timer.Stop();
+                            MyLog(TAG, dbMsg);
+                            ForwardList();
+                        }
+                        bTime = SliderValue;
+                    } else {
                         SetupTimer();
-                        dbMsg += ",currentPosition=" + axWmp.Ctlcontrols.currentPosition;
                         MyLog(TAG, dbMsg);
-					}
+                    }
                     //this.IsPlaying = axWmp.IsPlaying;
                     //dbMsg += ":IsPlaying=" + IsPlaying;
                     //double position = axWmp.GetPlayPosition();
@@ -1949,16 +1966,12 @@ namespace M3UPlayer.ViewModels {
 
                 }
                 //			RaisePropertyChanged();
-     //           MyLog(TAG, dbMsg);
+                //           MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
         }
 
-        /// <summary>
-        /// タイマのインスタンス
-        /// </summary>
-        private DispatcherTimer _timer;
 
         /// <summary>
         /// タイマを設定する
@@ -3671,6 +3684,7 @@ namespace M3UPlayer.ViewModels {
         }
 
         public ICommand PlayBtClick => new DelegateCommand(ClickPlayBt);
+ 
         /// <summary>
         /// Playボタンのクリック
         /// </summary>
