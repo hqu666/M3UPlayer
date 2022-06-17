@@ -1925,13 +1925,13 @@ namespace M3UPlayer.ViewModels {
                         PositionStr = GetHMS(SliderValue.ToString());             //.ToString(@"hh\:mm\:ss");
                         RaisePropertyChanged("PositionStr");
                         dbMsg += "=" + PositionStr;
-                        if ((SliderMaximum- SliderValue)<1) {
-                            //少数にすると拾えない事がある
-                            _timer.Stop();
-                            MyLog(TAG, dbMsg);
-                            ForwardList();
-                        }
-                        bTime = SliderValue;
+                        //if ((SliderMaximum- SliderValue)<1) {
+                        //    //少数にすると拾えない事がある
+                        //    _timer.Stop();
+                        //    MyLog(TAG, dbMsg);
+                        //    ForwardList();
+                        //}
+                        //bTime = SliderValue;
                     } else {
                         SetupTimer();
                         MyLog(TAG, dbMsg);
@@ -1965,8 +1965,17 @@ namespace M3UPlayer.ViewModels {
                     //}
 
                 }
-                //			RaisePropertyChanged();
-                //           MyLog(TAG, dbMsg);
+                if ((SliderMaximum - SliderValue) < 1) {
+                    //少数にすると拾えない事がある
+                    _timer.Stop();
+                    MyLog(TAG, dbMsg);
+                    ForwardList();
+					if (!IsPlaying) {
+                        IsPlaying=true;
+                    }
+                } else {
+                    bTime = SliderValue;
+                }
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
             }
