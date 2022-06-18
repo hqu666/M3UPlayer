@@ -378,8 +378,9 @@ namespace M3UPlayer.ViewModels {
                                     break;
                                 case 2:
                                     if (flash != null) {
-                                        flash.SetVariable("isPlay", "true");
-                                        //flash.Play();
+                                       // flash.Playing=true;
+                                        //             flash.SetVariable("Playing", "true");
+                                        //		flash.Play();
                                     }
                                     break;
                             }
@@ -398,10 +399,10 @@ namespace M3UPlayer.ViewModels {
                                     break;
                                 case 2:
                                     if (flash != null) {
-                                        flash.SetVariable("isPlay", "false");
-
-                                        //       flash.Stop();
-                                    }
+                                      //  flash.Playing = false;
+                                        //flash.SetVariable("Playing", "false");
+                                      //  flash.Stop();
+									}
                                     break;
                             }
                             MyView.PlayBtImage.Source = playImage;
@@ -1833,7 +1834,7 @@ namespace M3UPlayer.ViewModels {
                     //            infoStr = axWmp.currentMedia.name;
 
                 } else if ((0 <= Array.IndexOf(FlashVideo, extention))) {
-                    movieType = 1;
+                    movieType = 2;
                     if (flash == null) {
                         flash = new AxShockwaveFlash();
                     }
@@ -1854,9 +1855,10 @@ namespace M3UPlayer.ViewModels {
                     assemblyName = urlStrs[urlStrs.Length - 1];
                     dbMsg += ">>" + assemblyName;
 					//          playerUrl = @assemblyPath.Replace(assemblyName, "flvplayer-305.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
+
+                    //フラダンス　
 					playerUrl = @assemblyPath.Replace(assemblyName, "fladance.swf");   
                     //☆デバッグ用を\bin\Debugにコピーしておく
-																						   //		string nextMove = assemblyPath.Replace( assemblyName, "tonext.htm" );
 					dbMsg += ",playerUrl=" + playerUrl;
                     //,playerUrl=C:\Users\博臣\source\repos\file_tree_clock_web1\file_tree_clock_web1\bin\Debug\fladance.swf 
                     if (File.Exists(playerUrl)) {
@@ -1880,8 +1882,10 @@ namespace M3UPlayer.ViewModels {
                     /*
                          Flash 4 で新しくサポートされたスクリプトメソッド       http://kb2.adobe.com/jp/cps/228/228681.html
                          https://csharp.hotexamples.com/jp/examples/AxShockwaveFlashObjects/AxShockwaveFlash/-/php-axshockwaveflash-class-examples.html
+                    ActiveX を使用するデスクトップアプリケーションとの通信
+                    https://help.adobe.com/ja_JP/as3/dev/WS5b3ccc516d4fbf351e63e3d118a9b90204-7cb0zephyr_serranozephyr.html
                         */
-                    IsHideControl = true;
+                    // IsHideControl = true;
                 }
                 IsPlaying = true;
                 bTime = 0;
@@ -1922,47 +1926,13 @@ namespace M3UPlayer.ViewModels {
                         SliderValue = axWmp.Ctlcontrols.currentPosition;                        //GetPlayPosition();
                         RaisePropertyChanged("SliderValue");
                         dbMsg += ">>" + SliderValue + "/" + SliderMaximum;
-                        PositionStr = GetHMS(SliderValue.ToString());             //.ToString(@"hh\:mm\:ss");
+                        PositionStr = GetHMS(SliderValue.ToString()); 
                         RaisePropertyChanged("PositionStr");
                         dbMsg += "=" + PositionStr;
-                        //if ((SliderMaximum- SliderValue)<1) {
-                        //    //少数にすると拾えない事がある
-                        //    _timer.Stop();
-                        //    MyLog(TAG, dbMsg);
-                        //    ForwardList();
-                        //}
-                        //bTime = SliderValue;
                     } else {
                         SetupTimer();
                         MyLog(TAG, dbMsg);
                     }
-                    //this.IsPlaying = axWmp.IsPlaying;
-                    //dbMsg += ":IsPlaying=" + IsPlaying;
-                    //double position = axWmp.GetPlayPosition();
-                    //SliderMaximum = axWmp.GetDuration();
-                    //dbMsg += "," + position;
-                    //if (0 < position) {
-                    //	TimeSpan span = new TimeSpan(0, 0, (int)position);
-                    //	this.PositionStr = span.ToString(@"hh\:mm\:ss");
-                    //	if (position < 1) {
-                    //		SliderMaximum = axWmp.GetDuration();
-                    //		dbMsg += " / " + SliderMaximum;
-                    //		span = new TimeSpan(0, 0, (int)SliderMaximum);
-                    //		this.DurationStr = span.ToString(@"hh\:mm\:ss");
-                    //	}
-                    //	SliderValue = position;
-                    //} else {
-                    //	this.DurationStr = "00:00:00";
-                    //	this.PositionStr = "00:00:00";
-                    //}
-                    //dbMsg += ",>>" + PositionStr + " / " + DurationStr;
-                    //SoundValue = axWmp.GetVolume();
-                    //dbMsg += "," + SoundValue;
-                    //if (SoundValue == 0) {
-                    //	IsMute = true;
-                    //} else {
-                    //	IsMute = false;
-                    //}
 
                 }
                 if ((SliderMaximum - SliderValue) < 1) {
