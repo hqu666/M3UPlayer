@@ -86,6 +86,7 @@ namespace M3UPlayer.ViewModels {
         /// 他のリストへの移動/コピー前のアイテムの配置
         /// </summary>
         public SelectionModel MoveBeforSelect { get; set; }
+        public string BeforSelectListUrl;
 
         /// <summary>
         /// 選択されているプレイリストアイテムの配列:SelectedItemsは読み取り専用でBindingできない
@@ -1454,8 +1455,11 @@ namespace M3UPlayer.ViewModels {
             string TAG = "BackBeforeItem_Click";
             string dbMsg = "";
             try {
-                CurrentPlayListFileName = MoveBeforSelect.PlayListUrlStr;
-                PlayListComboSelected = MoveBeforSelect.PlayListUrlStr;
+                
+                CurrentPlayListFileName = BeforSelectListUrl;
+                PlayListComboSelected = BeforSelectListUrl;
+                //CurrentPlayListFileName = MoveBeforSelect.PlayListUrlStr;
+                //PlayListComboSelected = MoveBeforSelect.PlayListUrlStr;
                 int listIndex = Array.IndexOf(PlayLists, CurrentPlayListFileName);
                 dbMsg += ",切り替える前は[" + listIndex + "/" + PlayLists.Length + "]" + PlayLists[listIndex];
                 //元のコンボを再選択
@@ -3059,6 +3063,7 @@ namespace M3UPlayer.ViewModels {
                     return;
                 }
                 //切り替える前
+                BeforSelectListUrl = NowSelect.PlayListUrlStr;
                 MoveBeforSelect = new SelectionModel();
                 MoveBeforSelect = NowSelect;
                 dbMsg += "," + MoveBeforSelect.PlayListUrlStr + " の[ "+ MoveBeforSelect.SelectedIndex + "]"+ MoveBeforSelect.ListItem.UrlStr;
@@ -3142,6 +3147,7 @@ namespace M3UPlayer.ViewModels {
                     return;
                 }
                 //切り替える前
+                BeforSelectListUrl = NowSelect.PlayListUrlStr;
                 MoveBeforSelect = new SelectionModel();
                 MoveBeforSelect = NowSelect;
                 int BeforSelectIndex = NowSelect.SelectedIndex;
@@ -3176,17 +3182,12 @@ namespace M3UPlayer.ViewModels {
                     //ここから削除
                     dbMsg += "\r\n削除前[" + BeforSelectIndex + "/" + PLList.Count + "]";
                     PLList.RemoveAt(BeforSelectIndex);
-                    if (PLList.Count <= BeforSelectIndex) {
-                        MoveBeforSelect.SelectedIndex = PLList.Count;
-                        SelectedPlayListIndex = PLList.Count;
-                    } else {
-                        MoveBeforSelect.SelectedIndex --;
-						if (MoveBeforSelect.SelectedIndex<0) {
-                            MoveBeforSelect.SelectedIndex = 0;
-                        }
+                    MoveBeforSelect.SelectedIndex--;
+                    if (MoveBeforSelect.SelectedIndex < 0) {
+                        MoveBeforSelect.SelectedIndex = 0;
 
                     }
-                    dbMsg += ">削除後>[" + SelectedPlayListIndex + "/" + PlayLists.Length + "]";
+					dbMsg += ">削除後>"+ MoveBeforSelect.PlayListUrlStr + "の[" + MoveBeforSelect.SelectedIndex + "/" + PLList.Count + "]";
                     string text = "";
                     foreach (PlayListModel One in PLList) {
                         text += One.UrlStr + "\r\n";
@@ -3838,6 +3839,7 @@ namespace M3UPlayer.ViewModels {
             string TAG = "ForwardList";
             string dbMsg = "";
             try {
+                SliderValue = 0;
                 PauseVideo();
                 dbMsg += "SelectedPlayListIndex=" + SelectedPlayListIndex;
                 if ((PLList.Count - 2) < SelectedPlayListIndex) {
@@ -3860,6 +3862,7 @@ namespace M3UPlayer.ViewModels {
             string TAG = "RewindList";
             string dbMsg = "";
             try {
+                SliderValue = 0;
                 dbMsg += "SelectedPlayListIndex=" + SelectedPlayListIndex;
                 if (SelectedPlayListIndex < 1) {
                     SelectedPlayListIndex = PLList.Count - 1;
