@@ -2931,6 +2931,7 @@ namespace M3UPlayer.ViewModels {
                     return;
                 }
 
+                BeforSelectListUrl = NowSelect.PlayListUrlStr;
                 NowSelectedFile = PLListSelectedItem.UrlStr;
                 //flasfでNull
                 dbMsg += "[" + SelectedPlayListIndex + "]" + NowSelectedFile;
@@ -2964,12 +2965,12 @@ namespace M3UPlayer.ViewModels {
 				pEXPLORER.EnableRaisingEvents = true;
 				//起動する
 				pEXPLORER.Start();
-				//pEXPLORER = Process.Start("EXPLORER.EXE", pathStr);
-				dbMsg += ",pEXPLORER[" + pEXPLORER.Id + "]start" + pEXPLORER.StartTime.ToString("HH:mm:ss.fff") + ",Arguments=" + pEXPLORER.StartInfo.Arguments;
-				pEXPLORER.WaitForExit();
-				dbMsg += ">>Exit" + pEXPLORER.ExitTime.ToString("HH:mm:ss.fff") + ",Arguments=" + pEXPLORER.StartInfo.Arguments;
-				dbMsg += ">>ExitCode=" + pEXPLORER.ExitCode.ToString();
-				pEXPLORER.Kill();
+				////pEXPLORER = Process.Start("EXPLORER.EXE", pathStr);
+				//dbMsg += ",pEXPLORER[" + pEXPLORER.Id + "]start" + pEXPLORER.StartTime.ToString("HH:mm:ss.fff") + ",Arguments=" + pEXPLORER.StartInfo.Arguments;
+				//pEXPLORER.WaitForExit();
+				//dbMsg += ">>Exit" + pEXPLORER.ExitTime.ToString("HH:mm:ss.fff") + ",Arguments=" + pEXPLORER.StartInfo.Arguments;
+				//dbMsg += ">>ExitCode=" + pEXPLORER.ExitCode.ToString();
+				//pEXPLORER.Kill();
 				MyLog(TAG, dbMsg);
 			} catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
