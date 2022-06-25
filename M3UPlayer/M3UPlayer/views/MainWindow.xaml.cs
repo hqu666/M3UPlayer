@@ -747,6 +747,31 @@ namespace M3UPlayer.Views {
 				MyLog(TAG, dbMsg);
 			}
 		}
+
+		/// <summary>
+		/// 自動送り
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void IsSendAoutCB_Click(object sender, RoutedEventArgs e) {
+			string TAG = "IsSendAoutCB_Click";
+			string dbMsg = TAG;
+			try {
+				CheckBox checkBox = (CheckBox)sender;
+				bool newValue = (bool)checkBox.IsChecked;
+				dbMsg += "newValue=" + newValue;
+
+				if (newValue == null) {
+					newValue = true;
+				}
+				VM.IsSendAuto = newValue;
+				MyLog(TAG, dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(TAG, dbMsg);
+			}
+		}
+
 		/// ///////////////////////////////////////////////////////////////////////
 		private void MainFrame_Navigated(object sender, System.Windows.Navigation.NavigationEventArgs e) {
 			string TAG = "[MainFrame_Navigated]";

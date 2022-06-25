@@ -214,5 +214,17 @@ namespace M3UPlayer.Properties {
                 this["WindowTop"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool IsSendAuto {
+            get {
+                return ((bool)(this["IsSendAuto"]));
+            }
+            set {
+                this["IsSendAuto"] = value;
+            }
+        }
     }
 }

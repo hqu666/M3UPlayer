@@ -325,7 +325,9 @@
                 </Popup>
 
                 <StackPanel Grid.Row="2" 
-                            Orientation="Horizontal" HorizontalAlignment="Left" 
+                            Orientation="Horizontal" 
+                            HorizontalAlignment="Left" VerticalAlignment="Center"
+                            
                             >
                     <!--HorizontalAlignment="Right"-->
 
@@ -399,7 +401,16 @@
                             <ImageBrush ImageSource="/views/ffbtn.png" Stretch="UniformToFill"/>
                         </Button.Background>
                     </Button>
-
+                    <CheckBox x:Name="IsSendAoutCB" 
+                              Content="自動送り" 
+                              IsChecked="True" 
+                              Foreground="White"
+                              HorizontalAlignment="Center" 
+                              FontSize="18" 
+                              Height="24" 
+                              Margin="20,0,0,0" 
+                              Click="IsSendAoutCB_Click"
+                              />
                 </StackPanel>
 
                 <StackPanel Grid.Row="2" 
@@ -520,17 +531,26 @@
                                     Thumb.DragStarted="PositionSL_DragStarted"
                                     Thumb.DragCompleted="PositionSL_DragCompleted"
                                     Maximum="{Binding SliderMaximum, Mode=OneWay}"
-                                    ToolTip="{Binding PositionStr , Mode=OneWay}" 
-                                    AutoToolTipPlacement="TopLeft"
                                     Value="{Binding SliderValue, Mode=TwoWay}"
                                     Style="{DynamicResource MySliderStyle}"
-                                   >
+                                    AutoToolTipPlacement="TopLeft"
+                                 >
+                                <Slider.ToolTip>
+                                    <StackPanel >
+                                        <WrapPanel>
+                                            <TextBlock FontWeight="Bold" FontSize="14" Margin="0,0,0,5" 
+                                                       Text="{Binding PositionStr , Mode=OneWay}"
+                                                       ></TextBlock>
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Slider.ToolTip>
                                 <!--
                                     ToolTip="{Binding PositionStr , Mode=OneWay}" 
-                                    ToolTipService.ToolTip="{Binding PositionSLTTText , Mode=OneWay}" 
+                                      AutoToolTipPlacement="TopLeft"
+                                 ToolTipService.ToolTip="{Binding PositionSLTTText , Mode=OneWay}" 
 
-                                PositionStr     
-                                     ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Value}" 
+                                        <Border BorderBrush="Silver" BorderThickness="0,1,0,0" Margin="0,8" />
+                                        <Image Source="images.png" Margin="0,0,5,0" />
                                   ValueChanged="Slider_ValueChanged"
                                                                    ValueChanged="{Binding PositionSliderValueChanged}"
 
@@ -817,17 +837,6 @@
                                         </Style.Triggers>
                                     </Style>
                                 </Slider.Resources>
- 
-                                <!--<Slider.ToolTip>
-                                    <ToolTip>
-                                        <StackPanel Orientation="Vertical">
-                                            --><!--<Image Source="anthem.jpg" Height="100" />--><!--
-                                            <TextBlock Text="{Binding PositionSLTTText , Mode=OneWay}" />
-                                        </StackPanel>
-                                    </ToolTip>
-                                </Slider.ToolTip>-->
-
-
 
                             </Slider>
                             <ComboBox x:Name="ForwardCB"

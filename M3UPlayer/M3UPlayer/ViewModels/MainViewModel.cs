@@ -316,7 +316,31 @@ namespace M3UPlayer.ViewModels {
         /// スライダーのToolTip文字
         /// </summary>
         public string PositionSLTTText { get; set; }
-        
+
+
+        //
+        private bool _IsSendAuto;
+        /// <summary>
+        /// 自動送り 
+        /// </summary>
+        public bool IsSendAuto {
+            get => _IsSendAuto;
+            set {
+                string TAG = "IsSendAuto(set)";
+                string dbMsg = "";
+                try {
+                    dbMsg += "value=" + value;
+                    if (_IsSendAuto == value)
+                        return;
+                    _IsSendAuto = value;
+                    RaisePropertyChanged("IsSendAuto");
+                    Properties.Settings.Default.IsSendAuto = value;
+                    //                  MyLog(TAG, dbMsg);
+                } catch (Exception er) {
+                    MyErrorLog(TAG, dbMsg, er);
+                }
+            }
+        }
 
 
         public BitmapImage playImage;
@@ -753,6 +777,9 @@ namespace M3UPlayer.ViewModels {
                 //_BeforSelect = new SelectionModel();
                 NowSelect = new SelectionModel();
                 BeforSelect = new SelectionModel();
+                IsSendAuto=Properties.Settings.Default.IsSendAuto;
+                dbMsg += ",IsSendAuto=" + IsSendAuto;
+
                 MyLog(TAG, dbMsg);
             } catch (Exception er) {
                 MyErrorLog(TAG, dbMsg, er);
@@ -1933,13 +1960,15 @@ namespace M3UPlayer.ViewModels {
                         PositionStr = GetHMS(SliderValue.ToString()); 
                         RaisePropertyChanged("PositionStr");
                         dbMsg += "=" + PositionStr;
+
                     } else {
                         SetupTimer();
                         MyLog(TAG, dbMsg);
                     }
 
                 }
-                if ((SliderMaximum - SliderValue) < 1) {
+                dbMsg += ",IsSendAuto=" + IsSendAuto;
+                if (IsSendAuto && (SliderMaximum - SliderValue) < 1) {
                     //少数にすると拾えない事がある
                     _timer.Stop();
                     MyLog(TAG, dbMsg);
