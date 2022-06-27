@@ -317,8 +317,6 @@ namespace M3UPlayer.ViewModels {
         /// </summary>
         public string PositionSLTTText { get; set; }
 
-
-        //
         private bool _IsSendAuto;
         /// <summary>
         /// 自動送り 
@@ -988,6 +986,7 @@ namespace M3UPlayer.ViewModels {
             try {
                 dbMsg += ",files=" + files.Length + "件";
                 dbMsg += ">PLList>" + PLList.Count + "件";
+                int InsPosition = 0;
                 foreach (string url in files) {
                     dbMsg += "\r\n" + url;
                     if (File.Exists(url)) {
@@ -1000,7 +999,8 @@ namespace M3UPlayer.ViewModels {
                                 if (InsertTo == -1) {
                                     PLList.Add(playListModel);
                                 } else {
-                                    PLList.Insert(InsertTo, playListModel);
+                                    PLList.Insert(InsPosition, playListModel);
+                                    InsPosition++;
                                 }
                             }
                         }
@@ -1526,7 +1526,7 @@ namespace M3UPlayer.ViewModels {
 				if (isDescending== ListSortDirection.Ascending) {
                     switch (sortIndex) {
                         case 0:
-                            PLList = new ObservableCollection<PlayListModel>(PLList.OrderBy(n => n.Summary));
+                            PLList = new ObservableCollection<PlayListModel>(PLList.OrderByDescending(n => n.Summary));
                             PLList = new ObservableCollection<PlayListModel>(PLList.OrderBy(n => n.ParentDir));
                             PLList = new ObservableCollection<PlayListModel>(PLList.OrderBy(n => n.UrlStr));
                             break;
@@ -1546,7 +1546,7 @@ namespace M3UPlayer.ViewModels {
 				} else {
                     switch (sortIndex) {
                         case 0:
-                            PLList = new ObservableCollection<PlayListModel>(PLList.OrderByDescending(n => n.Summary));
+                            PLList = new ObservableCollection<PlayListModel>(PLList.OrderBy(n => n.Summary));
                             PLList = new ObservableCollection<PlayListModel>(PLList.OrderByDescending(n => n.ParentDir));
                             PLList = new ObservableCollection<PlayListModel>(PLList.OrderByDescending(n => n.UrlStr));
                             break;
@@ -3614,15 +3614,55 @@ namespace M3UPlayer.ViewModels {
 
                 // ダイアログを表示
                 if (cofDialog.ShowDialog() == CommonFileDialogResult.Ok) {
-                    //    MessageBox.Show(dialog.FileName);
-                    NowSelectedPath = cofDialog.FileName;              //fbDialog.SelectedPath;
+					int count = 0;
+					//    MessageBox.Show(dialog.FileName);
+					NowSelectedPath = cofDialog.FileName;              //fbDialog.SelectedPath;
                     dbMsg += ">>" + NowSelectedPath;
-                    string[] files = System.IO.Directory.GetFiles(@NowSelectedPath, "*", System.IO.SearchOption.AllDirectories);
-                    dbMsg += ">>" + files.Length + "件";
-                    //設定ファイル更新
-                    Properties.Settings.Default.Save();
-                    FilesAdd(files, 0);
-                    IsDoSavePlayList(false);
+					//フォルダ内のファイルを読み込む※順番は保証されない
+					string[] files = System.IO.Directory.GetFiles(@NowSelectedPath, "*", SearchOption.AllDirectories);
+					dbMsg += ">>" + files.Length + "件";
+
+					//CultureInfoを作成
+					System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("ja-JP");
+					//StringComparerを作成、大文字小文字を区別しない
+					StringComparer cmp = StringComparer.Create(ci, true);
+
+					//並び替える
+					Array.Sort(files, cmp);
+					foreach (string file in files) {
+						dbMsg += "\r\n[" + count + "]" + file;
+                        count++;
+					               }
+					FilesAdd(files, 0);
+					/*
+					DirectoryInfo dir = new DirectoryInfo(@NowSelectedPath);
+					FileInfo[] files = dir.GetFiles();
+					//FileInfo[] files =new FileInfo[];
+					//foreach (FileInfo fi in dir.GetFiles()) {
+					//    files[count] = fi;
+					//    dbMsg += "\r\n[" + count + "]" + files[count];
+					//    count++;
+					//}
+					dbMsg += ">>" + files.Length + "件";
+					Array.Sort<FileInfo>(files, delegate (FileInfo a, FileInfo b) {
+						// ファイルサイズで昇順ソート
+						// return (int)(a.Length - b.Length);
+
+						// ファイル名でソート
+						return a.Name.CompareTo(b.Name);
+					});
+					//設定ファイル更新
+					Properties.Settings.Default.Save();
+					count = 0;
+					string[] readfiles = new string[files.Length];
+					foreach (FileInfo file in files) {
+						readfiles[count] = file.Name;
+						dbMsg += "\r\n[" + count + "]" + readfiles[count];
+                        count++;
+					}
+					FilesAdd(readfiles, 0);
+                    */
+					IsDoSavePlayList(false);
                 } else {
                     dbMsg += "キャンセルされました";
                 }
