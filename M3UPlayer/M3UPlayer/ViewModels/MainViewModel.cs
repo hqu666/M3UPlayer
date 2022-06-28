@@ -11714,7 +11714,7 @@ AddType video/MP2T .ts
                                                                         MessageBoxImage icon
                                                                         ) {
             CS_Util Util = new CS_Util();
-            return Util.MessageShowWPF(msgStr, titolStr, buttns, icon);
+            return Util.MessageShowWPF(msgStr, titolStr, buttns, icon,MyView);
         }
 
 

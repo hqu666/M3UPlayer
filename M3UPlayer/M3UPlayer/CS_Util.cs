@@ -150,8 +150,8 @@ namespace M3UPlayer
         public MessageBoxResult MessageShowWPF(String msgStr,
 												String titolStr = null,
 												MessageBoxButton buttns = MessageBoxButton.OK,
-												MessageBoxImage icon = MessageBoxImage.None
-												)
+												MessageBoxImage icon = MessageBoxImage.None,
+												Window window = null)
 		{
 			String TAG = "MessageShowWPF";
 			String dbMsg = "開始";
@@ -161,11 +161,11 @@ namespace M3UPlayer
 				dbMsg += "mggStr=" + msgStr;
 				//メッセージボックスを表示する		https://docs.microsoft.com/ja-jp/dotnet/api/system.windows.messagebox?view=netcore-3.1
 				if (titolStr == null) {
-					result = MessageBox.Show(msgStr);
+					result = MessageBox.Show(window,msgStr);
 				} else if (icon == MessageBoxImage.None) {
-					result = MessageBox.Show(msgStr, titolStr, buttns);
+					result = MessageBox.Show(window,msgStr, titolStr, buttns );
 				} else {
-					result = MessageBox.Show(msgStr, titolStr, buttns, icon);
+					result = MessageBox.Show(window,msgStr, titolStr, buttns, icon);
 				}
 				dbMsg += ",result=" + result;
 				MyLog(TAG, dbMsg);
