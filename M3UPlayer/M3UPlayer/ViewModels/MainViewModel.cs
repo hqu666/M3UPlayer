@@ -3544,7 +3544,7 @@ namespace M3UPlayer.ViewModels {
                 // ダイアログのインスタンスを生成
                 ofDialog = new OpenFileDialog();
                 // ファイルの種類を設定
-                ofDialog.Filter = "プレイリスト (*.m3u*)|*.m3u*|ムービー (*.mp4)|*.mp4|全てのファイル (*.*)|*.*";
+                ofDialog.Filter = "全てのファイル (*.*)|*.*|ムービー (*.mp4)|*.mp4|プレイリスト (*.m3u*)|*.m3u*";
 
 
                 //	System.Windows.Forms.OpenFileDialog ofDialog = new System.Windows.Forms.OpenFileDialog();
