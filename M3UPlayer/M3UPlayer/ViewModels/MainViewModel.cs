@@ -3545,9 +3545,6 @@ namespace M3UPlayer.ViewModels {
                 ofDialog = new OpenFileDialog();
                 // ファイルの種類を設定
                 ofDialog.Filter = "全てのファイル (*.*)|*.*|ムービー (*.mp4)|*.mp4|プレイリスト (*.m3u*)|*.m3u*";
-
-
-                //	System.Windows.Forms.OpenFileDialog ofDialog = new System.Windows.Forms.OpenFileDialog();
                 //② デフォルトのフォルダを指定する
                 if (CurrentPlayListFileName.Equals("")) {
                     CurrentPlayListFileName = "C;";
