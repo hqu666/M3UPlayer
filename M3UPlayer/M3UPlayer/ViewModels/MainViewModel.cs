@@ -712,7 +712,7 @@ namespace M3UPlayer.ViewModels {
                 PLList = new ObservableCollection<PlayListModel>();
                 pouseImage = new BitmapImage(new Uri("/views/pousebtn.png", UriKind.Relative));
                 playImage = new BitmapImage(new Uri("/views/pl_r_btn.png", UriKind.Relative));
-                MuteOnImage = new BitmapImage(new Uri("/views/sound _off.png", UriKind.Relative));//ei_silence
+                MuteOnImage = new BitmapImage(new Uri("/views/ei_silence.png", UriKind.Relative));//ei_silence
                 MuteOffImage = new BitmapImage(new Uri("/views/ei-sound.png", UriKind.Relative));
                 assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;  //実行デレクトリ		+Path.AltDirectorySeparatorChar + "brows.htm";
                 dbMsg += ",assemblyPath=" + assemblyPath;

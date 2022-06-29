@@ -163,7 +163,7 @@
                             <ImageBrush ImageSource="/views/folder_icon.png" Stretch="UniformToFill"/>
                         </Button.Background>
                     </Button>
-                    <Button Command="{Binding ExploreShow}"
+                    <!--<Button Command="{Binding ExploreShow}"
 							AutomationProperties.HelpText="エクスプローラーからDorp" 
 						Grid.Column="2" 
 							HorizontalAlignment="Center"  VerticalAlignment="Top" MinWidth="26" Panel.ZIndex="26" Height="26" Margin="0,5,0,0" Grid.RowSpan="2"
@@ -171,7 +171,7 @@
                         <Button.Background>
                             <ImageBrush ImageSource="/views/explore_icon.png" Stretch="UniformToFill"/>
                         </Button.Background>
-                    </Button>
+                    </Button>-->
                     <!--<Button Content="新規プレイリスト"
                              Command="{Binding FileNameInputShow}"
   						    Grid.Column="3" Margin="5,5,5,5" Grid.RowSpan="2" 
